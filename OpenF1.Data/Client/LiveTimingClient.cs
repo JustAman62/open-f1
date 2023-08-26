@@ -30,10 +30,7 @@ public sealed class LiveTimingClient : IDisposable
     private HubConnection? _connection;
     private bool disposedValue;
 
-    public LiveTimingClient(ILogger<LiveTimingClient> logger)
-    {
-        _logger = logger;
-    }
+    public LiveTimingClient(ILogger<LiveTimingClient> logger) => _logger = logger;
 
     public async Task StartAsync(Action<string> eventHandler)
     {
