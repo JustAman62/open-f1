@@ -94,6 +94,8 @@ csharp_style_deconstructed_variable_declaration = true:warning
 csharp_prefer_simple_default_expression = true:warning
 csharp_style_prefer_local_over_anonymous_function = true:suggestion
 csharp_style_inlined_variable_declaration = true:error
+# Namespace preferences
+csharp_style_namespace_declarations=file_scoped:error
 ###############################
 # C# Formatting Rules         #
 ###############################
