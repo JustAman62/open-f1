@@ -58,13 +58,11 @@ public sealed class LiveTimingClient : ILiveTimingClient, IDisposable
 
         var proxy = _connection.CreateHubProxy("Streaming");
         proxy.On("feed", eventHandler);
-        proxy.Subscribe("Heartbeat");
 
         await _connection.Start();
 
-        _logger.LogInformation("Subsribing to lots of topics");
+        _logger.LogInformation("Subscribing to lots of topics");
 
-        proxy.Subscribe("Heartbeat");
         await proxy.Invoke("Subscribe", new[] { _topics });
 
         _logger.LogInformation("Started Live Timing client");

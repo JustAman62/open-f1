@@ -107,6 +107,8 @@ while (true)
         await services.DisposeAsync();
         break;
     }
+
+    await Task.Delay(500);
 }
 
 static void WriteCommandHelp()

@@ -1,0 +1,30 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": ".NET Core Launch (console)",
+            "type": "coreclr",
+            "request": "launch",
+            "preLaunchTask": "build",
+            "program": "${workspaceFolder}/OpenF1.Data.Ingest/bin/Debug/net7.0/OpenF1.Data.Ingest.dll",
+            "args": [],
+            "cwd": "${workspaceFolder}/OpenF1.Data.Ingest",
+            "console": "internalConsole",
+            "stopAtEntry": false
+        },
+        {
+            "name": ".NET Core Attach",
+            "type": "coreclr",
+            "request": "attach"
+        },
+        {
+            "name": "Docker .NET Launch",
+            "type": "docker",
+            "request": "launch",
+            "preLaunchTask": "docker-run: debug",
+            "netCore": {
+                "appProject": "${workspaceFolder}/OpenF1.Data.Ingest/OpenF1.Data.Ingest.csproj"
+            }
+        }
+    ]
+}
