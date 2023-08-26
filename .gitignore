@@ -406,3 +406,4 @@ ASALocalRun/
 
 bin
 obj
+*.db
