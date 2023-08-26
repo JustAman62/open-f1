@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 25.0.1706.0
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OpenF1.Data.Injest", "OpenF1.Data.Injest\OpenF1.Data.Injest.csproj", "{248FD62A-5975-4CB6-8AD0-5F12815FF048}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OpenF1.Data", "OpenF1.Data\OpenF1.Data.csproj", "{59CC2980-E840-4233-8734-B0BF4D59B0BC}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{248FD62A-5975-4CB6-8AD0-5F12815FF048}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{248FD62A-5975-4CB6-8AD0-5F12815FF048}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{248FD62A-5975-4CB6-8AD0-5F12815FF048}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{248FD62A-5975-4CB6-8AD0-5F12815FF048}.Release|Any CPU.Build.0 = Release|Any CPU
+		{59CC2980-E840-4233-8734-B0BF4D59B0BC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{59CC2980-E840-4233-8734-B0BF4D59B0BC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{59CC2980-E840-4233-8734-B0BF4D59B0BC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{59CC2980-E840-4233-8734-B0BF4D59B0BC}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {E20CE80D-B769-4ED6-A068-EC4F17D583BB}
+	EndGlobalSection
+EndGlobal

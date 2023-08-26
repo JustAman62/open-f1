@@ -1,0 +1,71 @@
+{
+  "format": 1,
+  "restore": {
+    "/Users/aman/Projects/OpenF1/OpenF1.Data/OpenF1.Data.csproj": {}
+  },
+  "projects": {
+    "/Users/aman/Projects/OpenF1/OpenF1.Data/OpenF1.Data.csproj": {
+      "version": "1.0.0",
+      "restore": {
+        "projectUniqueName": "/Users/aman/Projects/OpenF1/OpenF1.Data/OpenF1.Data.csproj",
+        "projectName": "OpenF1.Data",
+        "projectPath": "/Users/aman/Projects/OpenF1/OpenF1.Data/OpenF1.Data.csproj",
+        "packagesPath": "/Users/aman/.nuget/packages/",
+        "outputPath": "/Users/aman/Projects/OpenF1/OpenF1.Data/obj/",
+        "projectStyle": "PackageReference",
+        "configFilePaths": [
+          "/Users/aman/.nuget/NuGet/NuGet.Config"
+        ],
+        "originalTargetFrameworks": [
+          "net7.0"
+        ],
+        "sources": {
+          "https://api.nuget.org/v3/index.json": {}
+        },
+        "frameworks": {
+          "net7.0": {
+            "targetAlias": "net7.0",
+            "projectReferences": {}
+          }
+        },
+        "warningProperties": {
+          "warnAsError": [
+            "NU1605"
+          ]
+        }
+      },
+      "frameworks": {
+        "net7.0": {
+          "targetAlias": "net7.0",
+          "dependencies": {
+            "Microsoft.AspNet.SignalR.Client": {
+              "target": "Package",
+              "version": "[2.4.3, )"
+            },
+            "Microsoft.EntityFrameworkCore.Sqlite": {
+              "target": "Package",
+              "version": "[7.0.10, )"
+            }
+          },
+          "imports": [
+            "net461",
+            "net462",
+            "net47",
+            "net471",
+            "net472",
+            "net48",
+            "net481"
+          ],
+          "assetTargetFallback": true,
+          "warn": true,
+          "frameworkReferences": {
+            "Microsoft.NETCore.App": {
+              "privateAssets": "all"
+            }
+          },
+          "runtimeIdentifierGraphPath": "/usr/local/share/dotnet/sdk/7.0.304/RuntimeIdentifierGraph.json"
+        }
+      }
+    }
+  }
+}

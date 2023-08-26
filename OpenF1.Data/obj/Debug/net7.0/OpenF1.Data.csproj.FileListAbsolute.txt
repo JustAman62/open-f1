@@ -1,0 +1,12 @@
+/Users/aman/Projects/OpenF1/OpenF1.Data/bin/Debug/net7.0/OpenF1.Data.deps.json
+/Users/aman/Projects/OpenF1/OpenF1.Data/bin/Debug/net7.0/OpenF1.Data.dll
+/Users/aman/Projects/OpenF1/OpenF1.Data/bin/Debug/net7.0/OpenF1.Data.pdb
+/Users/aman/Projects/OpenF1/OpenF1.Data/obj/Debug/net7.0/OpenF1.Data.csproj.AssemblyReference.cache
+/Users/aman/Projects/OpenF1/OpenF1.Data/obj/Debug/net7.0/OpenF1.Data.GeneratedMSBuildEditorConfig.editorconfig
+/Users/aman/Projects/OpenF1/OpenF1.Data/obj/Debug/net7.0/OpenF1.Data.AssemblyInfoInputs.cache
+/Users/aman/Projects/OpenF1/OpenF1.Data/obj/Debug/net7.0/OpenF1.Data.AssemblyInfo.cs
+/Users/aman/Projects/OpenF1/OpenF1.Data/obj/Debug/net7.0/OpenF1.Data.csproj.CoreCompileInputs.cache
+/Users/aman/Projects/OpenF1/OpenF1.Data/obj/Debug/net7.0/OpenF1.Data.dll
+/Users/aman/Projects/OpenF1/OpenF1.Data/obj/Debug/net7.0/refint/OpenF1.Data.dll
+/Users/aman/Projects/OpenF1/OpenF1.Data/obj/Debug/net7.0/OpenF1.Data.pdb
+/Users/aman/Projects/OpenF1/OpenF1.Data/obj/Debug/net7.0/ref/OpenF1.Data.dll
