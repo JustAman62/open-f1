@@ -1,8 +1,8 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="7.0.10" />
-    <PackageReference Include="Microsoft.AspNet.SignalR.Client" Version="2.4.3" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" />
+    <PackageReference Include="Microsoft.AspNet.SignalR.Client" />
   </ItemGroup>
-  
+
 </Project>
