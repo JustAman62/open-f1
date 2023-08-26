@@ -2,7 +2,7 @@
 
 open-f1 is a open source Live Timing client which integrates with the F1 Live Timing data stream. The client allows you to receive live data during F1 sessions, from where you can do your own processing.
 
-open-f1 also allows you to record timing data from sessions using the `OpenF1.Data.Injest` command line app. This app writes session data to a local sqlite database. The client `OpenF1.Data` can then use this database as a source to replay events from an earlier sessions, instead of the normal F1 Live Timing data source. This replay functionality allows you to develop tools and processing pipelines outside of live F1 sessions.
+open-f1 also allows you to record timing data from sessions using the `OpenF1.Data.Ingest` command line app. This app writes session data to a local sqlite database. The client `OpenF1.Data` can then use this database as a source to replay events from an earlier sessions, instead of the normal F1 Live Timing data source. This replay functionality allows you to develop tools and processing pipelines outside of live F1 sessions.
 
 ## Inspiration
 

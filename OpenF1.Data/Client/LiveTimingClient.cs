@@ -3,7 +3,7 @@ using Microsoft.Extensions.Logging;
 
 namespace OpenF1.Data;
 
-public sealed class LiveTimingClient : IDisposable
+public sealed class LiveTimingClient : ILiveTimingClient, IDisposable
 {
     private readonly string[] _topics = new[]
     {
@@ -28,7 +28,7 @@ public sealed class LiveTimingClient : IDisposable
     private readonly ILogger<LiveTimingClient> _logger;
 
     private HubConnection? _connection;
-    private bool disposedValue;
+    private bool _disposedValue;
 
     public LiveTimingClient(ILogger<LiveTimingClient> logger) => _logger = logger;
 
@@ -58,11 +58,13 @@ public sealed class LiveTimingClient : IDisposable
 
         var proxy = _connection.CreateHubProxy("Streaming");
         proxy.On("feed", eventHandler);
+        proxy.Subscribe("Heartbeat");
 
         await _connection.Start();
 
         _logger.LogInformation("Subsribing to lots of topics");
 
+        proxy.Subscribe("Heartbeat");
         await proxy.Invoke("Subscribe", new[] { _topics });
 
         _logger.LogInformation("Started Live Timing client");
@@ -72,10 +74,10 @@ public sealed class LiveTimingClient : IDisposable
 
     public void Dispose()
     {
-        if (!disposedValue)
+        if (!_disposedValue)
         {
             DisposeConnection();
-            disposedValue = true;
+            _disposedValue = true;
         }
         GC.SuppressFinalize(this);
     }

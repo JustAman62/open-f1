@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 25.0.1706.0
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OpenF1.Data.Injest", "OpenF1.Data.Injest\OpenF1.Data.Injest.csproj", "{248FD62A-5975-4CB6-8AD0-5F12815FF048}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OpenF1.Data.Ingest", "OpenF1.Data.Ingest\OpenF1.Data.Ingest.csproj", "{248FD62A-5975-4CB6-8AD0-5F12815FF048}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OpenF1.Data", "OpenF1.Data\OpenF1.Data.csproj", "{59CC2980-E840-4233-8734-B0BF4D59B0BC}"
 EndProject

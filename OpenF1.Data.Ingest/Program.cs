@@ -5,7 +5,7 @@ using OpenF1.Data;
 
 WriteCommandHelp();
 
-Console.WriteLine("Starting Live Timing Injestion!");
+Console.WriteLine("Starting Live Timing Ingestion!");
 
 // Set up some services
 var services = new ServiceCollection()
@@ -20,19 +20,20 @@ var services = new ServiceCollection()
         }))
     .AddLiveTimingDbContext()
     .AddLiveTimingClient()
+    .AddLiveTimingProvider()
     .BuildServiceProvider();
 
 var timingClient = services
-    .GetRequiredService<LiveTimingClient>();
+    .GetRequiredService<ILiveTimingClient>();
 
 // Init the Db if it doesn't exist
 await InitDatabase();
 
-// Beging injesting data to DB
+// Begin ingesting data to DB
 await timingClient
-    .StartAsync(InjestData);
+    .StartAsync(IngestData);
 
-void InjestData(string data)
+void IngestData(string data)
 {
     var serviceScope = services.CreateScope();
     var dbContext = serviceScope
@@ -66,7 +67,7 @@ while (true)
             .Where(x => x.LoggedDateTime > startOfDay)
             .CountAsync();
 
-        Console.WriteLine($"{dataPoints} injested for today.");
+        Console.WriteLine($"{dataPoints} ingested for today.");
 
         var latestDataPoint = await dbContext
             .RawTimingDataPoints
