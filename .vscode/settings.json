@@ -1,3 +1,12 @@
 {
-    "dotnet.defaultSolution": "OpenF1.sln"
+    "dotnet.defaultSolution": "OpenF1.sln",
+    "sqltools.useNodeRuntime": true,
+    "sqltools.connections": [
+        {
+            "previewLimit": 50,
+            "driver": "SQLite",
+            "database": "/Users/aman/.local/share/open-f1/timing-data.db",
+            "name": "Open F1"
+        }
+    ]
 }

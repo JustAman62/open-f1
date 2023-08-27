@@ -10,7 +10,7 @@ public sealed class LiveTimingProvider : ILiveTimingProvider
     private readonly ILogger<LiveTimingProvider> _logger;
 
     private readonly ConcurrentDictionary<LiveTimingDataType, List<Action<LiveTimingDataPoint>>> _subscriptions = new();
-    private readonly List<Action<string>> _rawSubscriptions = new();
+    private readonly List<Action<RawTimingDataPoint>> _rawSubscriptions = new();
 
     public LiveTimingProvider(ILiveTimingClient timingClient, LiveTimingDbContext timingDbContext, ILogger<LiveTimingProvider> logger) 
     {
@@ -45,17 +45,20 @@ public sealed class LiveTimingProvider : ILiveTimingProvider
                 });
     }
 
-    public void SubscribeRaw(Action<string> action)
+    public void SubscribeRaw(Action<RawTimingDataPoint> action)
     {
         _logger.LogInformation("Adding raw subscription");
         _rawSubscriptions.Add(action);
     }
 
-    private void HandleRawData(string input) 
+    private void HandleRawData(string data) 
     {
+        var rawDataPoint = RawTimingDataPoint.Parse(data);
+        if (rawDataPoint is null) return;
+
         // Pass the raw data to all the raw data subscribers
         _logger.LogInformation("Found {} raw data subscribers, sending data point", _rawSubscriptions.Count);
-        _rawSubscriptions.ForEach(x => x(input));
+        _rawSubscriptions.ForEach(x => x(rawDataPoint));
 
         // TODO: Parse the input
         var dataPoint = new HeartbeatDataPoint();

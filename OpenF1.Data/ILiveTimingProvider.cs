@@ -24,5 +24,5 @@ public interface ILiveTimingProvider
     /// Subscribes to the raw data feed coming from the Live Timing data source.
     /// </summary>
     /// <param name="action">The <see cref="Action"/> to invoke with the raw data.</param>
-    void SubscribeRaw(Action<string> action);
+    void SubscribeRaw(Action<RawTimingDataPoint> action);
 }

@@ -39,13 +39,13 @@ void IngestData(string data)
     var dbContext = serviceScope
         .ServiceProvider
         .GetRequiredService<LiveTimingDbContext>();
-
-    dbContext.Add<RawTimingDataPoint>(new()
+    var dataPoint = RawTimingDataPoint.Parse(data);
+    if (dataPoint is not null)
     {
-        EventData = data,
-        LoggedDateTime = DateTime.UtcNow
-    });
-    dbContext.SaveChanges();
+        dbContext.RawTimingDataPoints.Add(dataPoint);
+
+        dbContext.SaveChanges();
+    }
 }
 
 // Keep the app running, kill on "q" being written to console
@@ -88,7 +88,8 @@ while (true)
             .RawTimingDataPoints
             .Add(new()
             {
-                EventData = "{}",
+                EventType = "TimingData",
+                EventData = @"{""Lines"":{""1"":{""Sectors"":{""1"":{""Segments"":{""3"":{""Status"":2048}}}}}}}",
                 LoggedDateTime = DateTime.UtcNow
             });
 

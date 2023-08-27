@@ -54,10 +54,9 @@ public sealed class LiveTimingClient : ILiveTimingClient, IDisposable
 
         _connection.Error += (ex) => _logger.LogError(ex, "Error in live timing client: {}", ex.ToString());
         _connection.Reconnecting += () => _logger.LogWarning("Live timing client is reconnecting");
-        _connection.Received += (str) => _logger.LogInformation("Data received from live timing: {}", str);
+        _connection.Received += eventHandler;
 
         var proxy = _connection.CreateHubProxy("Streaming");
-        proxy.On("feed", eventHandler);
 
         await _connection.Start();
 
