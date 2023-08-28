@@ -9,6 +9,6 @@ public interface IRawDataParser
     /// </summary>
     /// <param name="dataPoint">The <see cref="RawTimingDataPoint"/> to parse.</param>
     /// <returns>A derived class of <see cref="LiveTimingDataPoint"/>, or <see langword="null"/> if parsing fails..</returns>
-    LiveTimingDataPoint? ParseRawData(RawTimingDataPoint dataPoint);
+    LiveTimingDataPoint? ParseRawTimingDataPoint(RawTimingDataPoint dataPoint);
 }
 

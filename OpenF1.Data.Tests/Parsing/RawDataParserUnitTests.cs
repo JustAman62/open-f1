@@ -21,7 +21,7 @@ public class RawDataParserUnitTests
         var parser = new RawDataParser(Substitute.For<ILogger<RawDataParser>>());
 
         // Act
-        var result = parser.ParseRawData(rawData);
+        var result = parser.ParseRawTimingDataPoint(rawData);
 
         // Assert
         Assert.Null(result);
@@ -40,13 +40,32 @@ public class RawDataParserUnitTests
         var parser = new RawDataParser(Substitute.For<ILogger<RawDataParser>>());
 
         // Act
-        var result = parser.ParseRawData(rawData);
+        var result = parser.ParseRawTimingDataPoint(rawData);
 
         // Assert
         Assert.NotNull(result);
         var heartbeat = Assert.IsType<HeartbeatDataPoint>(result);
         Assert.NotEqual(DateTimeOffset.MinValue, heartbeat.Data.Utc);
         Assert.Equal(DateTimeOffset.Parse("2023-08-27T15:30:41.8907666Z"), heartbeat.Data.Utc);
+    }
+
+    [Fact]
+    public void VerifyParseTimingDataWithUnusedMembers()
+    {
+        // Arrange
+        var rawData = new RawTimingDataPoint
+        {
+            EventType = LiveTimingDataType.TimingData.ToString(),
+            EventData = "{\"Lines\":{\"1\":{\"Sectors\":{\"1\":{\"Segments\":{\"3\":{\"Status\":2048}}}}}}}",
+            LoggedDateTime = DateTime.UtcNow
+        };
+        var parser = new RawDataParser(Substitute.For<ILogger<RawDataParser>>());
+
+        // Act
+        var result = parser.ParseRawTimingDataPoint(rawData);
+
+        // Assert
+        Assert.NotNull(result);
     }
 }
 

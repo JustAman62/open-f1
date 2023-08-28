@@ -406,4 +406,6 @@ ASALocalRun/
 
 bin
 obj
+**/bin/**
+**/obj/**
 *.db

@@ -1,13 +1,12 @@
-using System.Text.Json;
 using OpenF1.Data;
 
 public sealed record HeartbeatDataPoint : LiveTimingDataPoint
 {
     public override LiveTimingDataType LiveTimingDataType => LiveTimingDataType.Heartbeat;
 
-    public HeartbeatDataPoint(string eventData, DateTime loggedDateTime)
+    public HeartbeatDataPoint(HeartbeatData eventData, DateTime loggedDateTime)
         : base(loggedDateTime) =>
-        Data = JsonSerializer.Deserialize<HeartbeatData>(eventData)!;
+        Data = eventData;
 
     public HeartbeatData Data { get; init; }
 

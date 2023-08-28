@@ -1,6 +1,9 @@
 ﻿<?xml version="1.0" encoding="UTF-8"?>
 <Project>
 	<ItemGroup>
+    <PackageVersion Include="AutoMapper" Version="12.0.0" />
+    <PackageVersion Include="AutoMapper.Collection" Version="9.0.0" />
+    <PackageVersion Include="AutoMapper.Extensions.Microsoft.DependencyInjection" Version="12.0.0" />
     <PackageVersion Include="coverlet.collector" Version="6.0.0" />
     <PackageVersion Include="Microsoft.EntityFrameworkCore.Sqlite" Version="7.0.10" />
     <PackageVersion Include="Microsoft.AspNet.SignalR.Client" Version="2.4.3" />
