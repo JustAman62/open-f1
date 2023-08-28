@@ -9,12 +9,11 @@ public record RawTimingDataPoint
     public string EventData { get; set; } = null!;
     public DateTime LoggedDateTime { get; set; }
 
-    [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE0046:Convert to conditional expression", Justification = "Multiple validation difficult to read")]
     public static RawTimingDataPoint? Parse(string rawData)
     {
         try
         {
-            var json = JsonObject.Parse(rawData);
+            var json = JsonNode.Parse(rawData);
             var data = json?["A"];
 
             if (data is null) return null;
@@ -24,10 +23,14 @@ public record RawTimingDataPoint
                 return null;
             }
 
+            var eventData = data[1] is JsonValue
+                ? data[1]!.ToString()
+                : data[1]!.ToJsonString();
+
             return new()
             {
                 EventType = data[0]!.ToString(),
-                EventData = data[1]!.ToString(),
+                EventData = eventData,
                 LoggedDateTime = DateTime.Parse(data[2]!.ToString()),
             };
 

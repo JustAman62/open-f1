@@ -5,10 +5,4 @@
     <PackageReference Include="Microsoft.AspNet.SignalR.Client" />
   </ItemGroup>
 
-  <ItemGroup>
-    <None Remove="Parsing\" />
-  </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Parsing\" />
-  </ItemGroup>
 </Project>

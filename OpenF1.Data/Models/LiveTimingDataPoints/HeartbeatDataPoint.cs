@@ -13,6 +13,6 @@ public sealed record HeartbeatDataPoint : LiveTimingDataPoint
 
     public sealed record HeartbeatData
     {
-        public DateTime Utc { get; init; }
+        public DateTimeOffset Utc { get; init; }
     }
 }

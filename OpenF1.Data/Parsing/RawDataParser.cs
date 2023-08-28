@@ -16,6 +16,11 @@ public class RawDataParser : IRawDataParser
             return null;
         }
 
+        if (dataPoint.EventType.EndsWith(".z"))
+        {
+            // TODO: Unzip the data before proceeding
+        }
+
         LiveTimingDataPoint? parsed = dataType switch
         {
             LiveTimingDataType.Heartbeat => new HeartbeatDataPoint(dataPoint.EventData, dataPoint.LoggedDateTime),
@@ -26,6 +31,8 @@ public class RawDataParser : IRawDataParser
         {
             _logger.LogError("Could not parse data of type {}.", dataType);
         }
+
+        return parsed;
     }
 }
 

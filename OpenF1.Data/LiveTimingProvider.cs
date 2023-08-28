@@ -61,7 +61,7 @@ public sealed class LiveTimingProvider : ILiveTimingProvider
         _rawSubscriptions.ForEach(x => x(rawDataPoint));
 
         // TODO: Parse the input
-        var dataPoint = new HeartbeatDataPoint();
+        var dataPoint = new HeartbeatDataPoint(rawDataPoint.EventData, rawDataPoint.LoggedDateTime);
 
         _logger.LogInformation("Received a {} data point, sending to subscribers", dataPoint.LiveTimingDataType);
 
