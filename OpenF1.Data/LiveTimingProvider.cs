@@ -27,8 +27,6 @@ public sealed class LiveTimingProvider : ILiveTimingProvider
         _logger = logger;
     }
 
-    public TimingDataPoint? LatestLiveTimingDataPoint { get; private set; }
-
     public void Start(DataSource dataSource = DataSource.Live)
     {
         switch (dataSource)

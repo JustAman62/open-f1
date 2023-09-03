@@ -7,13 +7,18 @@ namespace OpenF1.Data;
 /// </summary>
 public abstract record LiveTimingDataPoint
 {
-    public LiveTimingDataPoint(DateTime loggedDateTime) =>
+    public LiveTimingDataPoint(string sessionName, DateTime loggedDateTime)
+    {
+        SessionName = sessionName;
         LoggedDateTime = loggedDateTime;
+    }
 
     /// <summary>
     /// The discriminator for this type, specifying which type of data point this is.
     /// </summary>
     public abstract LiveTimingDataType LiveTimingDataType { get; }
+
+    public string SessionName { get; init; }
 
     public DateTime LoggedDateTime { get; init; }
 }

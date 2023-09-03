@@ -1,5 +1,3 @@
-using System;
-using NSubstitute;
 using Microsoft.Extensions.Logging;
 
 namespace OpenF1.Data.Tests;
@@ -35,6 +33,7 @@ public class RawDataParserUnitTests
         {
             EventType = LiveTimingDataType.Heartbeat.ToString(),
             EventData = "{\"Utc\":\"2023-08-27T15:30:41.8907666Z\",\"_kf\":true}",
+            SessionName = "Test Session",
             LoggedDateTime = DateTime.UtcNow
         };
         var parser = new RawDataParser(Substitute.For<ILogger<RawDataParser>>());
@@ -47,6 +46,7 @@ public class RawDataParserUnitTests
         var heartbeat = Assert.IsType<HeartbeatDataPoint>(result);
         Assert.NotEqual(DateTimeOffset.MinValue, heartbeat.Data.Utc);
         Assert.Equal(DateTimeOffset.Parse("2023-08-27T15:30:41.8907666Z"), heartbeat.Data.Utc);
+        Assert.Equal("Test Session", heartbeat.SessionName);
     }
 
     [Fact]

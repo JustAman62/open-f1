@@ -26,8 +26,8 @@ public class RawDataParser : IRawDataParser
 
             LiveTimingDataPoint? parsed = dataType switch
             {
-                LiveTimingDataType.Heartbeat => new HeartbeatDataPoint(JsonSerializer.Deserialize<HeartbeatDataPoint.HeartbeatData>(dataPoint.EventData)!, dataPoint.LoggedDateTime),
-                LiveTimingDataType.TimingData => new TimingDataPoint(JsonSerializer.Deserialize<TimingDataPoint.TimingData>(dataPoint.EventData)!, dataPoint.LoggedDateTime),
+                LiveTimingDataType.Heartbeat => new HeartbeatDataPoint(JsonSerializer.Deserialize<HeartbeatDataPoint.HeartbeatData>(dataPoint.EventData)!, dataPoint.SessionName, dataPoint.LoggedDateTime),
+                LiveTimingDataType.TimingData => new TimingDataPoint(JsonSerializer.Deserialize<TimingDataPoint.TimingData>(dataPoint.EventData)!, dataPoint.SessionName, dataPoint.LoggedDateTime),
                 _ => null
             };
 

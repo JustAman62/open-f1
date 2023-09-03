@@ -8,7 +8,7 @@ public class TimingDataProcessorUnitTests
     [Fact]
     public async Task VerifyUpdateForSameDriver()
     {
-        var (processor, timingProvider) = CreateProcessor();
+        var (processor, timingProvider, dbContext) = CreateProcessor();
         await processor.StartAsync();
 
         timingProvider.TimingDataReceived += Raise.Event<EventHandler<TimingDataPoint>>(
@@ -24,6 +24,7 @@ public class TimingDataProcessorUnitTests
                     }
                 }
             },
+            "Test Session",
             DateTime.UtcNow));
 
         Assert.NotEmpty(processor.DriverLapData);
@@ -45,6 +46,7 @@ public class TimingDataProcessorUnitTests
                     }
                 }
             },
+            "Test Session",
             DateTime.UtcNow));
 
         Assert.NotEmpty(processor.DriverLapData);
@@ -52,12 +54,14 @@ public class TimingDataProcessorUnitTests
         Assert.True(lapDriverData.TryGetValue(0, out driverData));
         Assert.Equal("+2.345", driverData.GapToLeader);
         Assert.Equal("+0.234", driverData.IntervalToPositionAhead!.Value);
+
+        Assert.Equal(1, dbContext.DriverLaps.Count());
     }
 
     [Fact]
     public async Task VerifyLapChangeForDriver()
     {
-        var (processor, timingProvider) = CreateProcessor();
+        var (processor, timingProvider, dbContext) = CreateProcessor();
         await processor.StartAsync();
 
         timingProvider.TimingDataReceived += Raise.Event<EventHandler<TimingDataPoint>>(
@@ -74,6 +78,7 @@ public class TimingDataProcessorUnitTests
                         }
                     }
                 },
+                "Test Session",
                 DateTime.UtcNow)
             );
 
@@ -91,6 +96,7 @@ public class TimingDataProcessorUnitTests
                         }
                     }
                 },
+                "Test Session",
                 DateTime.UtcNow)
             );
 
@@ -104,9 +110,11 @@ public class TimingDataProcessorUnitTests
         Assert.True(lapDriverData.TryGetValue(3, out var lap3Data));
         Assert.Equal(3, lap3Data.NumberOfLaps);
         Assert.Equal("1:12:00.000", lap3Data.LastLapTime!.Value);
+
+        Assert.Equal(2, dbContext.DriverLaps.Count());
     }
 
-    private (TimingDataProcessor, ILiveTimingProvider) CreateProcessor()
+    private (TimingDataProcessor, ILiveTimingProvider, LiveTimingDbContext) CreateProcessor()
     {
         var mapper = new MapperConfiguration(x =>
                 x.AddMaps(typeof(AutoMapper.TimingDataPointConfiguration).Assembly))
@@ -114,11 +122,13 @@ public class TimingDataProcessorUnitTests
 
         var liveTimingProvider = Substitute.For<ILiveTimingProvider>();
 
+        var (_, dbContext, factory) = TestHelpers.CreateDbContext();
         var processor = new TimingDataProcessor(
             liveTimingProvider,
+            factory,
             mapper,
             Substitute.For<ILogger<TimingDataProcessor>>());
-        return (processor, liveTimingProvider);
+        return (processor, liveTimingProvider, dbContext);
     }
 }
 

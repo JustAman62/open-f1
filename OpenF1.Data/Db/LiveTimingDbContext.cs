@@ -10,6 +10,8 @@ public class LiveTimingDbContext : DbContext
 
     public DbSet<RawTimingDataPoint> RawTimingDataPoints => Set<RawTimingDataPoint>();
 
+    public DbSet<DriverLap> DriverLaps => Set<DriverLap>();
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         var rawTimingDataPoint = modelBuilder.Entity<RawTimingDataPoint>();
@@ -20,6 +22,9 @@ public class LiveTimingDbContext : DbContext
         rawTimingDataPoint.Property(x => x.EventData).HasColumnName("EVENT_DATA").HasColumnType("nvarchar(8000)");
         rawTimingDataPoint.Property(x => x.LoggedDateTime).HasColumnName("LOGD_TS").HasConversion<long>();
 
+        var driverLap = modelBuilder.Entity<DriverLap>();
+        driverLap.ToTable("DRIVER_LAPS");
+        driverLap.HasKey(x => new { x.DriverNumber, x.NumberOfLaps, x.SessionName });
         base.OnModelCreating(modelBuilder);
     }
 }

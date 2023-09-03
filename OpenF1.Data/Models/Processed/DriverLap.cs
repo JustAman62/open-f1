@@ -1,8 +1,10 @@
 namespace OpenF1.Data;
 
-public sealed record DriverLapData 
+public sealed record DriverLap 
 {
-    public string? GapToLeader { get; set; } = null!;
+    public string DriverNumber { get; set; } = null!;
+    public string SessionName { get; set; } = null!;
+    public string? GapToLeader { get; set; }
     public string? Interval { get; set; }
     public int? Line { get; set; }
     public bool? InPit { get; set; }
