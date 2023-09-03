@@ -37,11 +37,13 @@ public class TimingDataPointConfiguration : Profile
         {
             if (dest.TryGetValue(k, out var existing))
             {
-                ctx.Mapper.Map(v, existing);
+                // Map the existing value to itself to create a copy and prevent reference based bugs
+                // Bad for performance, but good to expectations of mapping
+                ctx.Mapper.Map(v, ctx.Mapper.Map<TValue>(existing));
             }
             else
             {
-                dest.Add(k, v);
+                dest.Add(ctx.Mapper.Map<TKey>(k), ctx.Mapper.Map<TValue>(v));
             }
         }
         return dest;

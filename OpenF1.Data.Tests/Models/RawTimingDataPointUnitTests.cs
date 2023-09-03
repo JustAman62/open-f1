@@ -9,10 +9,11 @@ public class RawTimingDataPointUnitTests
     public void VerifyParse(string expectedEventType, string expectedData, string expectedDateTime, string input)
     {
         // Arrange & Act
-        var result = RawTimingDataPoint.Parse(input);
+        var result = RawTimingDataPoint.Parse(input, "Session Name");
 
         // Assert
         Assert.NotNull(result);
+        Assert.Equal("SessionName", result.SessionName);
         Assert.Equal(expectedEventType, result.EventType);
         Assert.Equal(expectedData, result.EventData);
         Assert.Equal(expectedDateTime, result.LoggedDateTime.ToUniversalTime().ToString("u"));

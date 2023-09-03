@@ -8,4 +8,10 @@
     <PackageReference Include="Microsoft.AspNet.SignalR.Client" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Remove="Processing\" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Processing\" />
+  </ItemGroup>
 </Project>

@@ -35,6 +35,8 @@ public sealed class LiveTimingClient : ILiveTimingClient, IDisposable
     public async Task StartAsync(Action<string> eventHandler)
     {
         _logger.LogInformation("Starting Live Timing client");
+        
+        if (_connection is not null) throw new InvalidOperationException("Timing client already has an open connection.");
 
         // Fetch the cookie value that is hardcoded below
         // Leaving this here to show how I did it. I don't think I need to change the value yet.
@@ -67,7 +69,11 @@ public sealed class LiveTimingClient : ILiveTimingClient, IDisposable
         _logger.LogInformation("Started Live Timing client");
     }
 
-    private void DisposeConnection() => _connection?.Dispose();
+    private void DisposeConnection()
+    {
+        _connection?.Dispose();
+        _connection = null;
+    }
 
     public void Dispose()
     {

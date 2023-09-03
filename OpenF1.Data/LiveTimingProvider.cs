@@ -10,17 +10,19 @@ public sealed class LiveTimingProvider : ILiveTimingProvider
     private readonly ILiveTimingClient _timingClient;
     private readonly LiveTimingDbContext _timingDbContext;
     private readonly IRawDataParser _parser;
+    private readonly ISessionProvider _sessionProvider;
     private readonly IMapper _mapper;
     private readonly ILogger<LiveTimingProvider> _logger;
 
-    private readonly ConcurrentDictionary<LiveTimingDataType, List<Action<LiveTimingDataPoint>>> _subscriptions = new();
-    private readonly List<Action<RawTimingDataPoint>> _rawSubscriptions = new();
+    public event EventHandler<RawTimingDataPoint>? RawDataReceived;
+    public event EventHandler<TimingDataPoint>? TimingDataReceived;
 
-    public LiveTimingProvider(ILiveTimingClient timingClient, LiveTimingDbContext timingDbContext, IRawDataParser parser, IMapper mapper, ILogger<LiveTimingProvider> logger) 
+    public LiveTimingProvider(ILiveTimingClient timingClient, LiveTimingDbContext timingDbContext, IRawDataParser parser, ISessionProvider sessionProvider, IMapper mapper, ILogger<LiveTimingProvider> logger)
     {
         _timingClient = timingClient;
         _timingDbContext = timingDbContext;
         _parser = parser;
+        _sessionProvider = sessionProvider;
         _mapper = mapper;
         _logger = logger;
     }
@@ -29,7 +31,8 @@ public sealed class LiveTimingProvider : ILiveTimingProvider
 
     public void Start(DataSource dataSource = DataSource.Live)
     {
-        switch (dataSource) {
+        switch (dataSource)
+        {
             case DataSource.Live:
                 _timingClient.StartAsync(HandleRawData);
                 break;
@@ -41,30 +44,11 @@ public sealed class LiveTimingProvider : ILiveTimingProvider
         }
     }
 
-    public void Subscribe(LiveTimingDataType liveTimingDataType, Action<LiveTimingDataPoint> action)
+    public void HandleRawData(string data)
     {
-        _logger.LogInformation("Adding new subscription for {}", liveTimingDataType);
-
-        _subscriptions
-            .AddOrUpdate(
-                key: liveTimingDataType,
-                addValue: new() { action },
-                updateValueFactory: (_, existing) =>
-                {
-                    existing.Add(action);
-                    return existing;
-                });
-    }
-
-    public void SubscribeRaw(Action<RawTimingDataPoint> action)
-    {
-        _logger.LogInformation("Adding raw subscription");
-        _rawSubscriptions.Add(action);
-    }
-
-    public void HandleRawData(string data) 
-    {
-        var rawDataPoint = RawTimingDataPoint.Parse(data);
+        // TODO; Make this code path async
+        var sessionName = _sessionProvider.GetSessionName().Result;
+        var rawDataPoint = RawTimingDataPoint.Parse(data, sessionName);
         if (rawDataPoint is null) return;
 
         HandleRawData(rawDataPoint);
@@ -73,59 +57,27 @@ public sealed class LiveTimingProvider : ILiveTimingProvider
     public void HandleRawData(RawTimingDataPoint rawDataPoint)
     {
         // Pass the raw data to all the raw data subscribers
-        _logger.LogInformation("Found {} raw data subscribers, sending data point", _rawSubscriptions.Count);
-        _rawSubscriptions.ForEach(x => x.Invoke(rawDataPoint));
+        RawDataReceived?.Invoke(this, rawDataPoint);
 
         var dataPoint = _parser.ParseRawTimingDataPoint(rawDataPoint);
         if (dataPoint is null) return;
 
-        _logger.LogInformation("Received a {} data point, sending to subscribers", dataPoint.LiveTimingDataType);
+        _logger.LogInformation("Received a {} data point, raising event", dataPoint.LiveTimingDataType);
 
-        // Update the aggregated data
-        var updatedDataPoint = UpdateAggregation(dataPoint);
-        if (updatedDataPoint is null) return;
-
-        // Send the aggregated data to all the subscribers for this data type
-        if (_subscriptions.TryGetValue(updatedDataPoint.LiveTimingDataType, out var subscribers))
-        {
-            _logger.LogInformation("Found {} subscribers for {}", subscribers.Count, updatedDataPoint.LiveTimingDataType);
-            foreach (var subscriber in subscribers)
-            {
-                try
-                {
-                    subscriber.Invoke(updatedDataPoint);
-                }
-                catch (Exception ex)
-                {
-                    _logger.LogError(ex, "Live timing subscriber for {} threw an exception: {}", updatedDataPoint.LiveTimingDataType, ex.ToString());
-                }
-            }
-        }
-    }
-
-    private LiveTimingDataPoint? UpdateAggregation(LiveTimingDataPoint dataPoint)
-    {
         switch (dataPoint)
         {
             case TimingDataPoint timingDataPoint:
-                if (LatestLiveTimingDataPoint is null)
-                {
-                    LatestLiveTimingDataPoint = _mapper.Map<TimingDataPoint>(timingDataPoint);
-                }
-                else
-                {
-                    _mapper.Map(timingDataPoint, LatestLiveTimingDataPoint);
-                }
-                return LatestLiveTimingDataPoint;
+                TimingDataReceived?.Invoke(this, timingDataPoint);
+                break;
         }
-
-        return null;
     }
 
     private async Task StartRecordedSessionAsync()
     {
+        var sessionName = await _sessionProvider.GetSessionName();
         var records = await _timingDbContext
             .RawTimingDataPoints
+            .Where(x => x.SessionName == sessionName)
             .OrderBy(x => x.LoggedDateTime)
             .ToListAsync();
         var queue = new Queue<RawTimingDataPoint>(records);
