@@ -4,7 +4,7 @@ public sealed record HeartbeatDataPoint : LiveTimingDataPoint
 {
     public override LiveTimingDataType LiveTimingDataType => LiveTimingDataType.Heartbeat;
 
-    public HeartbeatDataPoint(HeartbeatData eventData, string sessionName, DateTime loggedDateTime)
+    public HeartbeatDataPoint(HeartbeatData eventData, string sessionName, DateTimeOffset loggedDateTime)
         : base(sessionName, loggedDateTime) =>
         Data = eventData;
 

@@ -7,7 +7,7 @@ namespace OpenF1.Data;
 /// </summary>
 public abstract record LiveTimingDataPoint
 {
-    public LiveTimingDataPoint(string sessionName, DateTime loggedDateTime)
+    public LiveTimingDataPoint(string sessionName, DateTimeOffset loggedDateTime)
     {
         SessionName = sessionName;
         LoggedDateTime = loggedDateTime;
@@ -20,5 +20,5 @@ public abstract record LiveTimingDataPoint
 
     public string SessionName { get; init; }
 
-    public DateTime LoggedDateTime { get; init; }
+    public DateTimeOffset LoggedDateTime { get; init; }
 }

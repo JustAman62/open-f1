@@ -97,7 +97,7 @@ while (true)
             {
                 EventType = "TimingData",
                 EventData = @"{""Lines"":{""1"":{""Sectors"":{""1"":{""Segments"":{""3"":{""Status"":2048}}}}}}}",
-                LoggedDateTime = DateTime.UtcNow
+                LoggedDateTime = DateTimeOffset.UtcNow
             });
 
         await dbContext.SaveChangesAsync();

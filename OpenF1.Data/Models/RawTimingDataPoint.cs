@@ -8,7 +8,7 @@ public record RawTimingDataPoint
     public string SessionName { get; set; } = null!;
     public string EventType { get; set; } = null!;
     public string EventData { get; set; } = null!;
-    public DateTime LoggedDateTime { get; set; }
+    public DateTimeOffset LoggedDateTime { get; set; }
 
     public static RawTimingDataPoint? Parse(string rawData, string sessionName)
     {
@@ -32,7 +32,8 @@ public record RawTimingDataPoint
             {
                 EventType = data[0]!.ToString(),
                 EventData = eventData,
-                LoggedDateTime = DateTime.Parse(data[2]!.ToString()),
+                LoggedDateTime = DateTimeOffset.Parse(data[2]!.ToString()),
+                SessionName = sessionName
             };
 
         }

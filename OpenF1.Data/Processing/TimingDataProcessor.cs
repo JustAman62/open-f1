@@ -2,7 +2,6 @@ using System.Collections.Concurrent;
 using AutoMapper;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
-using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
 namespace OpenF1.Data;
 

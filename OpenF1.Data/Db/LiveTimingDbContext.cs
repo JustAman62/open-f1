@@ -18,9 +18,9 @@ public class LiveTimingDbContext : DbContext
         rawTimingDataPoint.ToTable("RAW_DATA_POINTS");
         rawTimingDataPoint.HasKey(x => x.Id);
         rawTimingDataPoint.Property(x => x.Id).HasColumnName("ID").HasColumnType("INTEGER").ValueGeneratedOnAdd();
-        rawTimingDataPoint.Property(x => x.EventType).HasColumnName("EVENT_TYPE").HasColumnType("nvarchar(100)");
-        rawTimingDataPoint.Property(x => x.EventData).HasColumnName("EVENT_DATA").HasColumnType("nvarchar(8000)");
-        rawTimingDataPoint.Property(x => x.LoggedDateTime).HasColumnName("LOGD_TS").HasConversion<long>();
+        rawTimingDataPoint.Property(x => x.EventType).HasColumnName("EVENT_TYPE").HasColumnType("TEXT");
+        rawTimingDataPoint.Property(x => x.EventData).HasColumnName("EVENT_DATA").HasColumnType("TEXT");
+        rawTimingDataPoint.Property(x => x.LoggedDateTime).HasColumnName("LOGD_TS");
 
         var driverLap = modelBuilder.Entity<DriverLap>();
         driverLap.ToTable("DRIVER_LAPS");

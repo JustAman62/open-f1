@@ -34,7 +34,7 @@ public class RawDataParserUnitTests
             EventType = LiveTimingDataType.Heartbeat.ToString(),
             EventData = "{\"Utc\":\"2023-08-27T15:30:41.8907666Z\",\"_kf\":true}",
             SessionName = "Test Session",
-            LoggedDateTime = DateTime.UtcNow
+            LoggedDateTime = DateTimeOffset.UtcNow
         };
         var parser = new RawDataParser(Substitute.For<ILogger<RawDataParser>>());
 
@@ -57,7 +57,7 @@ public class RawDataParserUnitTests
         {
             EventType = LiveTimingDataType.TimingData.ToString(),
             EventData = "{\"Lines\":{\"1\":{\"Sectors\":{\"1\":{\"Segments\":{\"3\":{\"Status\":2048}}}}}}}",
-            LoggedDateTime = DateTime.UtcNow
+            LoggedDateTime = DateTimeOffset.UtcNow
         };
         var parser = new RawDataParser(Substitute.For<ILogger<RawDataParser>>());
 

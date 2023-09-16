@@ -6,7 +6,7 @@ public sealed record TimingDataPoint : LiveTimingDataPoint
 {
     public override LiveTimingDataType LiveTimingDataType => LiveTimingDataType.TimingData;
 
-    public TimingDataPoint(TimingData data, string sessionName, DateTime loggedDateTime)
+    public TimingDataPoint(TimingData data, string sessionName, DateTimeOffset loggedDateTime)
         : base(sessionName, loggedDateTime)
         => Data = data;
 

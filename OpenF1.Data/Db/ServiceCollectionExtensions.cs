@@ -10,17 +10,14 @@ public static partial class ServiceCollectionExtensions
         collection
             .AddDbContext<LiveTimingDbContext>(builder =>
             {
-                var dbPath = Environment.GetEnvironmentVariable("OPEN_F1_DATA_PATH");
-                if (string.IsNullOrWhiteSpace(dbPath))
+                var connectionString = Environment.GetEnvironmentVariable("OPEN_F1_DB_CONNECTION_STRING");
+                if (string.IsNullOrWhiteSpace(connectionString))
                 {
-                    var path = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData, Environment.SpecialFolderOption.Create);
-                    dbPath = Path.Join(path, "open-f1", "timing-data.db");
+                    connectionString = "Host=localhost:51000;Database=OPEN_F1;Username=postgres;Password=changeit";
                 }
 
-                Directory.GetParent(dbPath)?.Create();
-
                 _ = builder
-                    .UseSqlite($"Data Source={dbPath}")
+                    .UseNpgsql(connectionString)
                     .EnableSensitiveDataLogging(true)
                     .EnableDetailedErrors(true);
             });

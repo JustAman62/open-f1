@@ -9,11 +9,18 @@ services:
       dockerfile: OpenF1.Data.Ingest/Dockerfile
     profiles: ["ingest"]
     environment:
-      - OPEN_F1_DATA_PATH=/data/timing-data.db
+      - OPEN_F1_DB_CONNECTION_STRING="Host=db;Database=OPEN_F1;Username=postgres;Password=changeit"
+  
+  db:
+    image: postgres:15
+    ports:
+      - 51000:5432
+    profiles: ["db"]
     volumes:
-      # Mount the local open-f1 working dir to the containers working dir 
-      #mso that databases are persisted correctly on the local machine
-      - ~/.local/share/open-f1:/data:rw
+      - ~/.local/share/open-f1/data:/var/lib/postgresql/data:rw
+    environment:
+      POSTGRES_PASSWORD: changeit
+      POSTGRES_DB: OPEN_F1
 
   grafana:
     image: grafana/grafana-enterprise
@@ -22,11 +29,8 @@ services:
       - 3000:3000
     volumes:
       - ~/.local/share/open-f1/grafana:/var/lib/grafana:rw
-      - ~/.local/share/open-f1:/var/data:rw
     environment:
       - GF_AUTH_ANONYMOUS_ENABLED=true
       - GF_AUTH_DISABLE_LOGIN_FORM=true
       - GF_AUTH_ANONYMOUS_ORG_ROLE=Admin
       - GF_FEATURE_TOGGLES_ENABLE=publicDashboards
-      - GF_INSTALL_PLUGINS=frser-sqlite-datasource
-

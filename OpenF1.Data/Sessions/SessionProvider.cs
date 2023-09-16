@@ -29,19 +29,21 @@ public sealed class SessionProvider : ISessionProvider
         try 
         {
             var httpClient = new HttpClient();
-            var res  = await httpClient.GetFromJsonAsync<JsonObject>($"https://livetiming.formula1.com/static/SessionInfo.json?{DateTimeOffset.UtcNow.ToUnixTimeMilliseconds()}");
-            _sessionName = res?["Meeting"]?["Name"]?.ToString();
+            var currentDateTime = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds().ToString();
+            var res  = await httpClient.GetStringAsync($"https://livetiming.formula1.com/static/SessionInfo.json?{currentDateTime}");
+            var jsonObject = JsonObject.Parse(res);
+            _sessionName = $"{jsonObject?["Meeting"]?["Name"]} {jsonObject?["Name"]}";
             _lastFetch = DateTimeOffset.UtcNow;
 
             _logger.LogInformation($"Fetched the current session: {_sessionName}");
 
             return _sessionName!;
         }
-        catch (Exception)
+        catch (Exception ex)
         {
+            _logger.LogError(ex, $"Exception thrown trying to fetch session name");
             if (_sessionName is not null) return _sessionName;
             throw;
         }
-
     }
 }

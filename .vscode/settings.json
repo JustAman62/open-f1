@@ -4,9 +4,13 @@
     "sqltools.connections": [
         {
             "previewLimit": 50,
-            "driver": "SQLite",
-            "database": "/Users/aman/.local/share/open-f1/timing-data.db",
-            "name": "Open F1"
+            "server": "localhost",
+            "port": 51000,
+            "driver": "PostgreSQL",
+            "name": "Open F1",
+            "database": "OPEN_F1",
+            "username": "postgres",
+            "password": "changeit"
         }
     ]
 }
