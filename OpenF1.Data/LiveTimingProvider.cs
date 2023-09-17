@@ -1,4 +1,3 @@
-using System.Collections.Concurrent;
 using AutoMapper;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
@@ -8,39 +7,37 @@ namespace OpenF1.Data;
 public sealed class LiveTimingProvider : ILiveTimingProvider
 {
     private readonly ILiveTimingClient _timingClient;
-    private readonly LiveTimingDbContext _timingDbContext;
+    private readonly IDbContextFactory<LiveTimingDbContext> _timingDbContextFactory;
     private readonly IRawDataParser _parser;
     private readonly ISessionProvider _sessionProvider;
     private readonly IMapper _mapper;
     private readonly ILogger<LiveTimingProvider> _logger;
 
+    private Task? _runningTask = null;
+    private Queue<RawTimingDataPoint>? _queue = null;
+
     public event EventHandler<RawTimingDataPoint>? RawDataReceived;
     public event EventHandler<TimingDataPoint>? TimingDataReceived;
 
-    public LiveTimingProvider(ILiveTimingClient timingClient, LiveTimingDbContext timingDbContext, IRawDataParser parser, ISessionProvider sessionProvider, IMapper mapper, ILogger<LiveTimingProvider> logger)
+    public LiveTimingProvider(ILiveTimingClient timingClient, IDbContextFactory<LiveTimingDbContext> timingDbContext, IRawDataParser parser, ISessionProvider sessionProvider, IMapper mapper, ILogger<LiveTimingProvider> logger)
     {
         _timingClient = timingClient;
-        _timingDbContext = timingDbContext;
+        _timingDbContextFactory = timingDbContext;
         _parser = parser;
         _sessionProvider = sessionProvider;
         _mapper = mapper;
         _logger = logger;
     }
 
-    public void Start(DataSource dataSource = DataSource.Live)
-    {
-        switch (dataSource)
-        {
-            case DataSource.Live:
-                _timingClient.StartAsync(HandleRawData);
-                break;
-            case DataSource.Recorded:
-                Task.Run(StartRecordedSessionAsync);
-                break;
-            default:
-                throw new NotImplementedException($"Support for data source {dataSource} not yet implemented!");
-        }
-    }
+    public void Start() =>
+        _runningTask = _runningTask?.IsCompleted ?? true
+            ? _timingClient.StartAsync(HandleRawData)
+            : throw new InvalidOperationException("Live Timing client already started");
+
+    public void StartSimulatedSession(string sessionName, string simulationName) =>
+        _runningTask = _runningTask?.IsCompleted ?? true
+            ? StartRecordedSessionAsync(sessionName, simulationName)
+            : throw new InvalidOperationException("Simulated session already started");
 
     public void HandleRawData(string data)
     {
@@ -70,22 +67,23 @@ public sealed class LiveTimingProvider : ILiveTimingProvider
         }
     }
 
-    private async Task StartRecordedSessionAsync()
+    private async Task StartRecordedSessionAsync(string sessionName, string simulationName)
     {
-        var sessionName = await _sessionProvider.GetSessionName();
-        var records = await _timingDbContext
+        var dbContext = await _timingDbContextFactory.CreateDbContextAsync();
+        var records = await dbContext
             .RawTimingDataPoints
             .Where(x => x.SessionName == sessionName)
             .OrderBy(x => x.LoggedDateTime)
             .ToListAsync();
-        var queue = new Queue<RawTimingDataPoint>(records);
+        _queue = new Queue<RawTimingDataPoint>(records);
 
-        var lastRecord = queue.Dequeue();
+        var lastRecord = _queue.Dequeue();
         while (lastRecord is not null)
         {
+            lastRecord.SessionName = simulationName;
             HandleRawData(lastRecord);
 
-            var newRecord = queue.Dequeue();
+            var newRecord = _queue.Dequeue();
 
             if (newRecord is not null)
             {

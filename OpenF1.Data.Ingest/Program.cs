@@ -24,8 +24,6 @@ var services = new ServiceCollection()
     .AddLiveTimingProvider()
     .BuildServiceProvider();
 
-var timingClient = services
-    .GetRequiredService<ILiveTimingClient>();
 
 // Init the Db if it doesn't exist
 await InitDatabase();
@@ -35,18 +33,28 @@ var sessionProvider = services.GetRequiredService<ISessionProvider>();
 var sessionName = await sessionProvider.GetSessionName().ConfigureAwait(false);
 Console.WriteLine($"Current Session: {sessionName}");
 
-// Begin ingesting data to DB
-await timingClient
-    .StartAsync(IngestData);
+// Start the live timing data processors
+var processingService = services
+    .GetRequiredService<ProcessingService>();
+await processingService.StartAsync();
 
-void IngestData(string data)
+// var timingClient = services
+//     .GetRequiredService<ILiveTimingClient>();
+
+// // Begin ingesting data to DB
+// await timingClient
+//     .StartAsync(IngestData);
+
+var timingProvider = services.GetRequiredService<ILiveTimingProvider>();
+timingProvider.RawDataReceived += (sender, data) => IngestData(data);
+timingProvider.Start();
+
+void IngestData(RawTimingDataPoint dataPoint)
 {
     var serviceScope = services.CreateScope();
     var dbContext = serviceScope
         .ServiceProvider
         .GetRequiredService<LiveTimingDbContext>();
-    var sessionName = sessionProvider.GetSessionName().Result;
-    var dataPoint = RawTimingDataPoint.Parse(data, sessionName);
     if (dataPoint is not null)
     {
         dbContext.RawTimingDataPoints.Add(dataPoint);

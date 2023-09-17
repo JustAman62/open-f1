@@ -8,7 +8,7 @@ public static partial class ServiceCollectionExtensions
     public static IServiceCollection AddLiveTimingDbContext(this IServiceCollection collection)
     {
         collection
-            .AddDbContext<LiveTimingDbContext>(builder =>
+            .AddDbContextFactory<LiveTimingDbContext>(builder =>
             {
                 var connectionString = Environment.GetEnvironmentVariable("OPEN_F1_DB_CONNECTION_STRING");
                 if (string.IsNullOrWhiteSpace(connectionString))

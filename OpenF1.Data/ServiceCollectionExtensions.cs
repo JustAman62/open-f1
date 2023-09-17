@@ -15,6 +15,7 @@ public static partial class ServiceCollectionExtensions
             .AddLiveTimingClient()
             .AddLiveTimingDataParsing()
             .AddSessionProvider()
+            .AddLiveTimingProcessors()
             .TryAddSingleton<ILiveTimingProvider, LiveTimingProvider>();
 
         return collection;

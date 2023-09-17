@@ -38,6 +38,8 @@ public sealed record TimingDataPoint : LiveTimingDataPoint
 
             public Dictionary<string, LapSectorTime> Sectors { get; set; } = new();
 
+            public BestLap BestLapTime { get; set; } = new();
+
             public sealed record Interval
             {
                 /// <summary>
@@ -56,6 +58,12 @@ public sealed record TimingDataPoint : LiveTimingDataPoint
                 public string? Value { get; set; }
                 public bool? OverallFastest { get; set; }
                 public bool? PersonalFastest { get; set; }
+            }
+
+            public sealed record BestLap
+            {
+                public string? Value { get; set; }
+                public int? Lap { get; set; }
             }
 
             public override string ToString() => JsonSerializer.Serialize(this);

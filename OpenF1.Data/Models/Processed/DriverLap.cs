@@ -12,6 +12,8 @@ public sealed record DriverLap
     public int? NumberOfPitStops { get; set; }
     public int? NumberOfLaps { get; set; }
     public string? LastLapTime { get; set; }
+    public bool? LastLapTimeOverallFastest { get; set; }
+    public bool? LastLapTimePersonalFastest { get; set; }
     public string? Sector1Time { get; set; }
     public bool? Sector1OverallFastest { get; set; }
     public bool? Sector1PersonalFastest { get; set; }
@@ -21,4 +23,6 @@ public sealed record DriverLap
     public string? Sector3Time { get; set; }
     public bool? Sector3OverallFastest { get; set; }
     public bool? Sector3PersonalFastest { get; set; }
+    public string? BestLapTime { get; set; }
+    public int? BestLapNumber { get; set; }
 }

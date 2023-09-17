@@ -12,6 +12,12 @@ public interface ILiveTimingProvider
     /// <summary>
     /// Sets up the stream of data and begins pushing messages to any subscribers.
     /// </summary>
-    /// <param name="dataSource">What <see cref="DataSource"/> to read data from.</param>
-    void Start(DataSource dataSource = DataSource.Live);
+    void Start();
+
+    /// <summary>
+    /// Starts a simulated session for a previously recorded session.
+    /// </summary>
+    /// <param name="sessionName">The name of the previous recorded session.</param>
+    /// <param name="simulationName">The name of the session to record any new data under..</param>
+    void StartSimulatedSession(string sessionName, string simulationName);
 }

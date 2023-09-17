@@ -1,4 +1,5 @@
 using System.Collections.Concurrent;
+using System.Security.Cryptography.X509Certificates;
 using AutoMapper;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
@@ -99,6 +100,12 @@ public class TimingDataProcessor : IProcessor
         newDriverLap.DriverNumber = driverNumber;
         newDriverLap.SessionName = sessionName;
         newDriverLap.NumberOfLaps ??= -1;
+
+        if (isUpdate)
+        {
+            isUpdate = dbContext.DriverLaps.Any(x => x.DriverNumber == driverNumber && x.SessionName == sessionName && x.NumberOfLaps == x.NumberOfLaps);
+        }
+
         if (isUpdate)
         {
             dbContext.DriverLaps.Update(newDriverLap);
