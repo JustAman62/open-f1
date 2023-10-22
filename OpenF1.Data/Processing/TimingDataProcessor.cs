@@ -34,16 +34,34 @@ public class TimingDataProcessor : IProcessor
         _logger = logger;
     }
 
-    public Task StartAsync()
+    public async Task StartAsync()
     {
+        using var dbContext = await _dbContextFactory.CreateDbContextAsync();
+        var latestDriverLaps = await dbContext.DriverLaps
+            .GroupBy(x => x.Line)
+            .Select(x => x.OrderByDescending(x => x.NumberOfLaps).First())
+            .ToListAsync();
+
+        foreach (var driverLap in latestDriverLaps.Where(x => x != null))
+        {
+            var laps = new ConcurrentDictionary<int, TimingDataPoint.TimingData.Driver>()
+            {
+                [driverLap.NumberOfLaps.GetValueOrDefault()] = new()
+                {
+                    Line = driverLap.Line,
+                    NumberOfLaps = driverLap.NumberOfLaps
+                }
+            };
+            DriverLapData.TryAdd(driverLap.DriverNumber, laps);
+        }
+
         _liveTimingProvider.TimingDataReceived += Process;
         _logger.LogInformation("Subscribed to Timing Data stream for processing");
-        return Task.CompletedTask;
     }
 
     private async void Process(object? _, TimingDataPoint dataPoint)
     {
-        var dbContext = await _dbContextFactory.CreateDbContextAsync();
+        using var dbContext = await _dbContextFactory.CreateDbContextAsync();
 
         foreach (var (driverNumber, data) in dataPoint.Data.Lines)
         {

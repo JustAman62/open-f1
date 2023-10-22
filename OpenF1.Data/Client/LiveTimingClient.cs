@@ -1,5 +1,7 @@
-﻿using Microsoft.AspNet.SignalR.Client;
+﻿using System.Text.Json;
+using Microsoft.AspNet.SignalR.Client;
 using Microsoft.Extensions.Logging;
+using Newtonsoft.Json.Linq;
 
 namespace OpenF1.Data;
 
@@ -8,11 +10,10 @@ public sealed class LiveTimingClient : ILiveTimingClient, IDisposable
     private readonly string[] _topics = new[]
     {
         "Heartbeat",
-        "CarData.z",
-        "Position.z",
+        // "CarData.z",
+        // "Position.z",
         "ExtrapolatedClock",
         "TopThree",
-        "RcmSeries",
         "TimingStats",
         "TimingAppData",
         "WeatherData",
@@ -56,7 +57,7 @@ public sealed class LiveTimingClient : ILiveTimingClient, IDisposable
 
         _connection.Error += (ex) => _logger.LogError(ex, "Error in live timing client: {}", ex.ToString());
         _connection.Reconnecting += () => _logger.LogWarning("Live timing client is reconnecting");
-        _connection.Received += eventHandler;
+        //_connection.Received += eventHandler;
 
         var proxy = _connection.CreateHubProxy("Streaming");
 
@@ -64,8 +65,13 @@ public sealed class LiveTimingClient : ILiveTimingClient, IDisposable
 
         _logger.LogInformation("Subscribing to lots of topics");
 
-        await proxy.Invoke("Subscribe", new[] { _topics });
+        await proxy.Invoke("Subscribe", (string a) => Console.WriteLine("SessionInfo " + a), new[] { new[] { "SessionInfo" } });
 
+        var res = await proxy.Invoke<JObject>("Subscribe", new[] { _topics });
+        Console.WriteLine(res.GetType());
+        Console.WriteLine("Serialized" + res.ToString());
+        var sub = proxy.Subscribe("TimingData");
+        sub.Received += (data) => Console.WriteLine(JsonSerializer.Serialize(data));
         _logger.LogInformation("Started Live Timing client");
     }
 
