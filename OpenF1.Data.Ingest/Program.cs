@@ -27,26 +27,15 @@ var sessionProvider = services.GetRequiredService<ISessionProvider>();
 var sessionName = await sessionProvider.GetSessionName().ConfigureAwait(false);
 Console.WriteLine($"Current Session: {sessionName}");
 
-// // Start the live timing data processors
-// var processingService = services
-//     .GetRequiredService<ProcessingService>();
-// await processingService.StartAsync();
+// Start the live timing data processors
+var processingService = services
+    .GetRequiredService<ProcessingService>();
+await processingService.StartAsync();
 
-var timingClient = services
-    .GetRequiredService<ILiveTimingClient>();
+var timingProvider = services
+    .GetRequiredService<ILiveTimingProvider>();
 
-// Begin ingesting data to DB
-await timingClient
-    .StartAsync(IngestData);
-
-// var timingProvider = services.GetRequiredService<ILiveTimingProvider>();
-// timingProvider.RawDataReceived += (sender, data) => IngestData(data);
-// timingProvider.Start();
-
-void IngestData(string dataString)
-{
-    Console.WriteLine(dataString);
-}
+timingProvider.Start();
 
 // Keep the app running, kill on "q" being written to console
 // Write "s" to console for a quick status report

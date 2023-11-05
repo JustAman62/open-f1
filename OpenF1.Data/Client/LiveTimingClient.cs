@@ -57,7 +57,7 @@ public sealed class LiveTimingClient : ILiveTimingClient, IDisposable
 
         _connection.Error += (ex) => _logger.LogError(ex, "Error in live timing client: {}", ex.ToString());
         _connection.Reconnecting += () => _logger.LogWarning("Live timing client is reconnecting");
-        //_connection.Received += eventHandler;
+        _connection.Received += eventHandler;
 
         var proxy = _connection.CreateHubProxy("Streaming");
 
@@ -68,10 +68,12 @@ public sealed class LiveTimingClient : ILiveTimingClient, IDisposable
         await proxy.Invoke("Subscribe", (string a) => Console.WriteLine("SessionInfo " + a), new[] { new[] { "SessionInfo" } });
 
         var res = await proxy.Invoke<JObject>("Subscribe", new[] { _topics });
-        Console.WriteLine(res.GetType());
-        Console.WriteLine("Serialized" + res.ToString());
-        var sub = proxy.Subscribe("TimingData");
-        sub.Received += (data) => Console.WriteLine(JsonSerializer.Serialize(data));
+        var enumerable = res.AsJEnumerable().Select(x => x.Value<JObject>().ToString());
+        foreach (var e in enumerable) 
+        {
+            Console.WriteLine(e);
+        }
+        eventHandler(res.ToString());
         _logger.LogInformation("Started Live Timing client");
     }
 
