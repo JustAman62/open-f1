@@ -1,8 +1,6 @@
 namespace OpenF1.Data;
 
-public interface IProcessor
+public interface IProcessor<T>
 {
-    LiveTimingDataType LiveTimingDataType { get; }
-    Task StartAsync();
+    void Process(T data);
 }
-

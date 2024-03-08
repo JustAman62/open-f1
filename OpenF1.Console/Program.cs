@@ -6,8 +6,8 @@ var serviceCollection = new ServiceCollection()
     .AddOptions()
     .AddSingleton<ConsoleLoop>()
     .AddSingleton<State>()
-    .AddSingleton<IInputHandler, TestInputHandler>()
-    .AddSingleton<TestDisplay>();
+    .AddSingleton<IInputHandler, EscapeInputHandler>()
+    .AddSingleton<IDisplay, MainDisplay>();
 
 var services = serviceCollection.BuildServiceProvider();
 

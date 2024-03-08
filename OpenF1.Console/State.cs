@@ -1,3 +1,6 @@
 namespace OpenF1.Console;
 
-public record State(Screen CurrentScreen = Screen.Main);
+public record State
+{
+    public Screen CurrentScreen { get; set; } = Screen.Main;
+}
