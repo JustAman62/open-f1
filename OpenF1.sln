@@ -21,6 +21,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OpenF1.Data.Tests", "OpenF1
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OpenF1.Data.Api", "OpenF1.Data.Api\OpenF1.Data.Api.csproj", "{3500F3BB-2824-4517-8542-BB47E2C1A2CE}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OpenF1.Console", "OpenF1.Console\OpenF1.Console.csproj", "{CBB226E9-95B4-4552-98DC-D3885861ACC0}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -43,6 +45,10 @@ Global
 		{3500F3BB-2824-4517-8542-BB47E2C1A2CE}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{3500F3BB-2824-4517-8542-BB47E2C1A2CE}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{3500F3BB-2824-4517-8542-BB47E2C1A2CE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CBB226E9-95B4-4552-98DC-D3885861ACC0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CBB226E9-95B4-4552-98DC-D3885861ACC0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CBB226E9-95B4-4552-98DC-D3885861ACC0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CBB226E9-95B4-4552-98DC-D3885861ACC0}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
