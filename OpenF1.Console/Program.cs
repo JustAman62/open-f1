@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿using InMemLogger;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using OpenF1.Console;
 using OpenF1.Data;
@@ -6,7 +7,7 @@ using Spectre.Console;
 
 var serviceCollection = new ServiceCollection()
     .AddOptions()
-    .AddLogging(configure => configure.ClearProviders())
+    .AddLogging(configure => configure.ClearProviders().AddInMemory())
     .AddSingleton<ConsoleLoop>()
     .AddSingleton<State>()
     .AddInputHandlers()

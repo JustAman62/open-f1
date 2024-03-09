@@ -2,11 +2,15 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "C#: OpenF1.Console Debug",
-            "type": "dotnet",
+            "name": ".NET Core Launch (console)",
+            "type": "coreclr",
             "request": "launch",
-            "projectPath": "${workspaceFolder}/OpenF1.Console/OpenF1.Console.csproj"
+            "preLaunchTask": "build",
+            "program": "${workspaceFolder}/OpenF1.Console/bin/Debug/net8.0/OpenF1.Console.dll",
+            "args": [],
+            "cwd": "${workspaceFolder}/OpenF1.Console/",
+            "stopAtEntry": false,
+            "console": "integratedTerminal"
         }
-
     ]
 }

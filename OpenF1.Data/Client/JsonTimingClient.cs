@@ -1,4 +1,5 @@
 using System.Text.Json;
+using System.Text.Json.Nodes;
 using Microsoft.Extensions.Logging;
 using OpenF1.Data;
 
@@ -18,7 +19,7 @@ public class JsonTimingClient(IEnumerable<IProcessor> processors, ILogger<JsonTi
         _fileName = fileName;
         _cts.Cancel();
         _cts = new CancellationTokenSource();
-        ExecuteTask = ExecuteAsync(_cts.Token);
+        ExecuteTask = Task.Run(() => ExecuteAsync(_cts.Token), _cts.Token);
         return Task.CompletedTask;
     }
 
@@ -37,8 +38,8 @@ public class JsonTimingClient(IEnumerable<IProcessor> processors, ILogger<JsonTi
         {
             try
             {
-                var parts = JsonSerializer.Deserialize<string[]>(line)!;
-                ProcessData(parts[0], parts[1], DateTimeOffset.Parse(parts[2]));
+                var parts = JsonNode.Parse(line)!.AsArray();
+                ProcessData(parts[0].ToString(), parts[1].ToString(), DateTimeOffset.Parse(parts[2].ToString()));
             }
             catch (Exception ex)
             {

@@ -14,6 +14,9 @@ public abstract class TimingClient(IEnumerable<IProcessor> processors, ILogger l
             case "Heartbeat":
                 SendToProcessor<HeartbeatDataPoint>(data);
                 break;
+            case "RaceControlMessages":
+                SendToProcessor<RaceControlMessageDataPoint>(data);
+                break;
         }
     }
 

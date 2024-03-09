@@ -34,6 +34,8 @@ public static class ServiceCollectionExtensions
             _ = services.AddSingleton(typeof(IDisplay), type);
         }
 
+        services.AddSingleton<LogDisplayOptions>();
+
         return services;
     }
 }
