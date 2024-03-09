@@ -37,7 +37,7 @@ public class ConsoleLoop(
             AnsiConsole.Clear();
             AnsiConsole.Write(layout);
 
-            await Task.Delay(16);
+            await Task.Delay(20);
         }
     }
 

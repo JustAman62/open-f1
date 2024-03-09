@@ -10,13 +10,18 @@ public sealed class CursorUpInputHandler(State state) : IInputHandler
 
     public Task ExecuteAsync(ConsoleKeyInfo consoleKeyInfo)
     {
-        if (state.CursorOffset <= 0)
+        if (consoleKeyInfo.Modifiers.HasFlag(ConsoleModifiers.Shift))
         {
-            state.CursorOffset = 0;
+            state.CursorOffset -= 5;
         }
         else
         {
             state.CursorOffset--;
+        }
+
+        if (state.CursorOffset < 0)
+        {
+            state.CursorOffset = 0;
         }
 
         return Task.CompletedTask;
@@ -34,7 +39,14 @@ public sealed class CursorDownInputHandler(State state) : IInputHandler
 
     public Task ExecuteAsync(ConsoleKeyInfo consoleKeyInfo)
     {
-        state.CursorOffset++;
+        if (consoleKeyInfo.Modifiers.HasFlag(ConsoleModifiers.Shift))
+        {
+            state.CursorOffset += 5;
+        }
+        else
+        {
+            state.CursorOffset++;
+        }
         return Task.CompletedTask;
     }
 }

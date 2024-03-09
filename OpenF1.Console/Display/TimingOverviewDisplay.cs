@@ -42,7 +42,7 @@ public class TimingOverviewDisplay(
     private IRenderable GetTimingTower()
     {
         var table = new Table();
-        table.AddColumns("", "Interval", "Last Lap", "S1", "S2", "S3");
+        table.AddColumns("", "Gap", "Interval", "Best Lap", "Last Lap", "S1", "S2", "S3", "Pits");
         if (timingData.LatestLiveTimingDataPoint is null)
         {
             return new Text("No Timing");
@@ -56,7 +56,9 @@ public class TimingOverviewDisplay(
             var driver = driverList.Latest?.GetValueOrDefault(driverNumber) ?? new();
             table.AddRow(
                 new Text($"{line.Position, 2} {driver.RacingNumber, 2} {driver.Tla}"),
+                new Text(line.GapToLeader ?? ""),
                 new Text(line.IntervalToPositionAhead?.Value ?? ""),
+                new Text(line.BestLapTime?.Value ?? "NULL"),
                 new Text(line.LastLapTime?.Value ?? "NULL", GetStyle(line.LastLapTime)),
                 new Text(
                     line.Sectors.GetValueOrDefault("0")?.Value ?? "",
@@ -69,6 +71,16 @@ public class TimingOverviewDisplay(
                 new Text(
                     line.Sectors.GetValueOrDefault("2")?.Value ?? "",
                     GetStyle(line.Sectors.GetValueOrDefault("2"))
+                ),
+                new Text(
+                    line.InPit.GetValueOrDefault()
+                        ? "IN PITS"
+                        : line.PitOut.GetValueOrDefault()
+                            ? "PIT OUT"
+                            : line.NumberOfPitStops.ToString()!,
+                    line.InPit.GetValueOrDefault() || line.PitOut.GetValueOrDefault()
+                        ? new Style(background: Color.Yellow)
+                        : Style.Plain
                 )
             );
         }
@@ -108,7 +120,7 @@ public class TimingOverviewDisplay(
 
         foreach (var (key, value) in messages)
         {
-            table.AddRow($"{value.Utc:T}", value.Message);
+            table.AddRow($"{value.Utc:HH:mm:ss}", value.Message);
         }
         return new Panel(table)
         {

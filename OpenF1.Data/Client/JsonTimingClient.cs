@@ -39,7 +39,7 @@ public class JsonTimingClient(IEnumerable<IProcessor> processors, ILogger<JsonTi
             try
             {
                 var parts = JsonNode.Parse(line)!.AsArray();
-                ProcessData(parts[0].ToString(), parts[1].ToString(), DateTimeOffset.Parse(parts[2].ToString()));
+                ProcessData(parts[0]!.ToString(), parts[1]!.ToString(), DateTimeOffset.Parse(parts[2]!.ToString()));
             }
             catch (Exception ex)
             {
