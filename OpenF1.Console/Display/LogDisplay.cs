@@ -11,16 +11,18 @@ public record LogDisplayOptions
     public LogLevel MinimumLogLevel = LogLevel.Information;
 }
 
-public class LogDisplay(InMemoryLogger inMemoryLogger, LogDisplayOptions options) : IDisplay
+public class LogDisplay(State state, InMemoryLogger inMemoryLogger, LogDisplayOptions options) : IDisplay
 {
     public Screen Screen => Screen.Logs;
 
     public Task<IRenderable> GetContentAsync()
     {
         var logs = inMemoryLogger
-            .RecordedLogs.Where(x => x.Level > options.MinimumLogLevel)
+            .RecordedLogs.Where(x => x.Level >= options.MinimumLogLevel)
+            .Reverse()
             .Select(x => $"{x.Level} {x.Message} {x.Exception}")
-            .Take(AnsiConsole.Profile.Height / 2);
+            .Skip(state.CursorOffset)
+            .Take(5);
 
         var rowTexts = new List<IRenderable>()
         {

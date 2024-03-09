@@ -14,9 +14,10 @@ public abstract class TimingClient(IEnumerable<IProcessor> processors, ILogger l
 
     public ILogger Logger { get; } = logger;
 
-    protected void ProcessData(string type, string data, DateTimeOffset timestamp)
+    protected void ProcessData(string type, string? data, DateTimeOffset timestamp)
     {
         Logger.LogInformation($"Processing {type} data point for timestamp {timestamp} :: {data}");
+        if (data is null) return;
         switch (type)
         {
             case "Heartbeat":

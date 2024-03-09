@@ -1,3 +1,5 @@
+using Microsoft.AspNet.SignalR.Client;
+
 namespace OpenF1.Data;
 
 /// <summary>
@@ -5,9 +7,10 @@ namespace OpenF1.Data;
 /// </summary>
 public interface ILiveTimingClient
 {
+    public HubConnection? Connection { get; }
+
     /// <summary>
     /// Starts the timing client, which establishes a connection to the real F1 live timing data source.
     /// </summary>
-    /// <param name="eventHandler">The <see cref="Action"/> to call for every raw data event received from F1.</param>
-    Task StartAsync(Action<string> eventHandler);
+    Task StartAsync();
 }

@@ -5,6 +5,7 @@ using Spectre.Console.Rendering;
 namespace OpenF1.Console;
 
 public class TimingOverviewDisplay(
+    State state,
     RaceControlMessageProcessor raceControlMessages,
     TimingDataProcessor timingData,
     DriverListDataProcessor driverList,
@@ -100,11 +101,12 @@ public class TimingOverviewDisplay(
         table.AddColumns("Timestamp", "Message");
         table.HideHeaders();
 
-        foreach (
-            var (key, value) in raceControlMessages.RaceControlMessages.Messages.OrderByDescending(
-                x => x.Value.Utc
-            )
-        )
+        var messages = raceControlMessages
+            .RaceControlMessages.Messages.OrderByDescending(x => x.Value.Utc)
+            .Skip(state.CursorOffset)
+            .Take(5);
+
+        foreach (var (key, value) in messages)
         {
             table.AddRow($"{value.Utc:T}", value.Message);
         }

@@ -3,7 +3,7 @@ using Spectre.Console;
 
 public class StartSimulatedSessionInputHandler(IJsonTimingClient jsonTimingClient) : IInputHandler
 {
-    public Screen[]? ApplicableScreens => [Screen.ManageSimulatedSession];
+    public Screen[]? ApplicableScreens => [Screen.ManageSession];
 
     public ConsoleKey ConsoleKey => ConsoleKey.S;
 
