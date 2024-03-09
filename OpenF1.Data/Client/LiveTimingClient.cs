@@ -83,6 +83,7 @@ public sealed class LiveTimingClient(
 
     private void HandleSubscriptionResponse(string res)
     {
+        res = res.ReplaceLineEndings("");
         File.WriteAllText("./SimulationData/SubscriptionResponseTest.txt", res);
 
         var obj = JsonNode.Parse(res)?.AsObject();

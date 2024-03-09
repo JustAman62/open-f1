@@ -67,10 +67,14 @@ public class TimingOverviewDisplay(
         {
             var driver = driverList.Latest?.GetValueOrDefault(driverNumber) ?? new();
             var appData = timingAppData.Latest?.Lines.GetValueOrDefault(driverNumber) ?? new();
-            var stint = appData.Stints.Last().Value;
+            var stint = appData.Stints.LastOrDefault().Value;
 
             table.AddRow(
-                new Text($"{line.Position, 2} {driver.RacingNumber, 2} {driver.Tla}"),
+                new Columns(
+                    new Text($"{line.Position, 2}"),
+                    new Markup($"{driver.TeamColour} {driver.RacingNumber, 2}"),
+                    new Text(driver.Tla ?? "UNK")
+                ),
                 new Text(line.GapToLeader ?? ""),
                 new Text(line.IntervalToPositionAhead?.Value ?? ""),
                 new Text(line.BestLapTime?.Value ?? "NULL"),
@@ -98,8 +102,8 @@ public class TimingOverviewDisplay(
                         : Style.Plain
                 ),
                 new Columns(
-                    new Text($"{stint.Compound?[0]}", GetStyle(stint)),
-                    new Text($"{stint.TotalLaps, 2}")
+                    new Text($"{stint?.Compound?[0]}", GetStyle(stint)),
+                    new Text($"{stint?.TotalLaps, 2}")
                 )
             );
         }
@@ -130,7 +134,7 @@ public class TimingOverviewDisplay(
         "IDE0046:Convert to conditional expression",
         Justification = "Harder to read"
     )]
-    private Style GetStyle(TimingAppDataPoint.Driver.Stint stint)
+    private Style GetStyle(TimingAppDataPoint.Driver.Stint? stint)
     {
         if (stint is null)
             return _normal;

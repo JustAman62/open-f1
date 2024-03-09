@@ -35,9 +35,17 @@ public class ConsoleLoop(
             }
 
             var display = displays.SingleOrDefault(x => x.Screen == state.CurrentScreen);
-            contentPanel = display is not null
-                ? await display.GetContentAsync().ConfigureAwait(false)
-                : new Panel($"Unknown Display Selected: {state.CurrentScreen}").Expand();
+
+            try
+            {
+                contentPanel = display is not null
+                    ? await display.GetContentAsync().ConfigureAwait(false)
+                    : new Panel($"Unknown Display Selected: {state.CurrentScreen}").Expand();
+            }
+            catch (Exception ex)
+            {
+                contentPanel = new Panel($"Exception: {ex.ToString().EscapeMarkup()}").Expand();
+            }
 
             layout["Content"].Update(contentPanel);
 

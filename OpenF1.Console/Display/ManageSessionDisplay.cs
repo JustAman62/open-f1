@@ -11,7 +11,7 @@ public class ManageSessionDisplay(IJsonTimingClient jsonTimingClient, ILiveTimin
     {
         var table = new Table();
         table.AddColumn("Recent Data Points");
-        foreach (var item in liveTimingClient.RecentDataPoints)
+        foreach (var item in liveTimingClient.RecentDataPoints.ToList())
         {
             table.AddRow(item.EscapeMarkup());
         }
