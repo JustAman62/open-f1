@@ -9,7 +9,7 @@ public class ConsoleLoop(
     IEnumerable<IInputHandler> inputHandlers
 )
 {
-    public async Task ExecuteAsync(LiveDisplayContext ctx)
+    public async Task ExecuteAsync()
     {
         var contentPanel = new Panel("Open F1").Expand().SafeBorder() as IRenderable;
         var layout = new Layout("Root").SplitRows(
@@ -17,8 +17,6 @@ public class ConsoleLoop(
             new Layout("Footer")
         );
         layout["Footer"].Size = 3;
-
-        ctx.UpdateTarget(layout);
 
         while (true)
         {
@@ -37,7 +35,7 @@ public class ConsoleLoop(
 
             layout["Content"].Update(contentPanel);
             AnsiConsole.Clear();
-            ctx.Refresh();
+            AnsiConsole.Write(layout);
 
             await Task.Delay(16);
         }

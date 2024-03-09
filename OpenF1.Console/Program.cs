@@ -18,6 +18,4 @@ var services = serviceCollection.BuildServiceProvider();
 var consoleLoop = services.GetRequiredService<ConsoleLoop>();
 
 var layout = new Layout("Root");
-await AnsiConsole
-    .Live(layout)
-    .StartAsync(consoleLoop.ExecuteAsync);
+await consoleLoop.ExecuteAsync();
