@@ -1,6 +1,5 @@
 using AutoMapper;
 using AutoMapper.EquivalencyExpression;
-using AutoMapper.Execution;
 using OpenF1.Data.AutoMapper;
 
 namespace OpenF1.Data.Tests;

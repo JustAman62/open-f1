@@ -1,7 +1,4 @@
-using System.Reflection;
-using System.Security.Cryptography;
 using Microsoft.Extensions.DependencyInjection;
-using Npgsql.Replication;
 
 namespace OpenF1.Console;
 

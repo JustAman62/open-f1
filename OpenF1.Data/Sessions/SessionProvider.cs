@@ -1,5 +1,4 @@
 using System.Text.Json.Nodes;
-using System.Net.Http.Json;
 using Microsoft.Extensions.Logging;
 
 namespace OpenF1.Data;

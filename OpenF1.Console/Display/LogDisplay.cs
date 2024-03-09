@@ -1,4 +1,3 @@
-using System.Security.Cryptography;
 using InMemLogger;
 using Microsoft.Extensions.Logging;
 using Spectre.Console;

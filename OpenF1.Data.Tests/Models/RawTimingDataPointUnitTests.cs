@@ -1,4 +1,3 @@
-using System;
 namespace OpenF1.Data.Tests;
 
 public class RawTimingDataPointUnitTests
