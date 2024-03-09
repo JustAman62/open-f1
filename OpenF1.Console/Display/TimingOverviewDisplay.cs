@@ -1,4 +1,3 @@
-using Microsoft.EntityFrameworkCore.Query.SqlExpressions;
 using OpenF1.Data;
 using Spectre.Console;
 using Spectre.Console.Rendering;
@@ -98,7 +97,10 @@ public class TimingOverviewDisplay(
                         ? new Style(background: Color.Yellow)
                         : Style.Plain
                 ),
-                new Text($"{stint.Compound?[0]} {stint.TotalLaps}", GetStyle(stint))
+                new Columns(
+                    new Text($"{stint.Compound?[0]}", GetStyle(stint)),
+                    new Text($"{stint.TotalLaps, 2}")
+                )
             );
         }
 
@@ -123,10 +125,15 @@ public class TimingOverviewDisplay(
         return _normal;
     }
 
-    [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE0046:Convert to conditional expression", Justification = "Harder to read")]
+    [System.Diagnostics.CodeAnalysis.SuppressMessage(
+        "Style",
+        "IDE0046:Convert to conditional expression",
+        Justification = "Harder to read"
+    )]
     private Style GetStyle(TimingAppDataPoint.Driver.Stint stint)
     {
-        if (stint is null) return _normal;
+        if (stint is null)
+            return _normal;
 
         return stint.Compound switch
         {

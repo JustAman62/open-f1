@@ -1,8 +1,8 @@
 namespace OpenF1.Console;
 
-public class SwitchToTImingOverviewInputHandler(State state) : IInputHandler
+public class SwitchToTimingOverviewInputHandler(State state) : IInputHandler
 {
-    public Screen[]? ApplicableScreens => [Screen.Main];
+    public Screen[]? ApplicableScreens => [Screen.Main, Screen.TimingHistory];
 
     public ConsoleKey ConsoleKey => ConsoleKey.O;
 

@@ -16,4 +16,10 @@
 		<ProjectReference Include="..\OpenF1.Data\OpenF1.Data.csproj" />
 	</ItemGroup>
 
+  <ItemGroup>
+	  <None Update="*.flf">
+	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+	  </None>
+  </ItemGroup>
+
 </Project>

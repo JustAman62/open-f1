@@ -22,9 +22,6 @@
 		<ProjectReference Include="..\OpenF1.Data\OpenF1.Data.csproj" />
 	</ItemGroup>
 	<ItemGroup>
-	  <None Remove="Processing\" />
-	</ItemGroup>
-	<ItemGroup>
 	  <None Update="TimingData.json">
 	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 	  </None>
