@@ -1,6 +1,5 @@
 ﻿using AutoMapper.EquivalencyExpression;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.DependencyInjection.Extensions;
 using OpenF1.Data.AutoMapper;
 
 namespace OpenF1.Data;

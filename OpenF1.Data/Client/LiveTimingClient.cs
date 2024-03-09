@@ -103,6 +103,15 @@ public sealed class LiveTimingClient(
         }
         ProcessData("TimingData", obj["TimingData"]?.ToString(), DateTimeOffset.UtcNow);
 
+        var stintLinesToProcess = obj["TimingAppData"]?["Lines"]?.AsObject() ?? [];
+        foreach (var (_, line) in stintLinesToProcess)
+        {
+            if (line?["Stints"] is null)
+                continue;
+            line["Stints"] = ArrayToIndexedDictionary(line["Stints"]!);
+        }
+        ProcessData("TimingAppData", obj["TimingAppData"]?.ToString(), DateTimeOffset.UtcNow);
+
         var raceControlMessages = obj["RaceControlMessages"]?["Messages"];
         if (raceControlMessages is not null)
         {

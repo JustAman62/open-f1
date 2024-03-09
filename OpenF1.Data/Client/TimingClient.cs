@@ -29,6 +29,9 @@ public abstract class TimingClient(IEnumerable<IProcessor> processors, ILogger l
             case "TimingData":
                 SendToProcessor<TimingDataPoint>(data);
                 break;
+            case "TimingAppData":
+                SendToProcessor<TimingAppDataPoint>(data);
+                break;
             case "DriverList":
                 SendToProcessor<DriverListDataPoint>(data);
                 break;

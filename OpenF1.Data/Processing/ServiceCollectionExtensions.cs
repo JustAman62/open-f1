@@ -11,8 +11,9 @@ public static partial class ServiceCollectionExtensions
             .AddProcessor<HeartbeatDataPoint, HeartbeatProcessor>()
             .AddProcessor<RaceControlMessageDataPoint, RaceControlMessageProcessor>()
             .AddProcessor<TimingDataPoint, TimingDataProcessor>()
+            .AddProcessor<TimingAppDataPoint, TimingAppDataProcessor>()
             .AddProcessor<LapCountDataPoint, LapCountProcessor>()
-            .AddProcessor<DriverListDataPoint, DriverListDataProcessor>();
+            .AddProcessor<DriverListDataPoint, DriverListProcessor>();
             
         return collection;
     }

@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using Spectre.Console;
 using Spectre.Console.Rendering;
 
@@ -9,6 +10,8 @@ public class ConsoleLoop(
     IEnumerable<IInputHandler> inputHandlers
 )
 {
+    private const long TargetFrameTimeMs = 100;
+
     public async Task ExecuteAsync()
     {
         var contentPanel = new Panel("Open F1").Expand().SafeBorder() as IRenderable;
@@ -19,10 +22,11 @@ public class ConsoleLoop(
         layout["Footer"].Size = 3;
 
         AnsiConsole.Cursor.Hide();
-
+        var stopwatch = Stopwatch.StartNew();
         while (true)
         {
-            await ShowAndHandleInputs(layout);
+            stopwatch.Restart();
+            await ShowAndHandleInputs(layout).ConfigureAwait(false);
 
             if (state.CurrentScreen == Screen.Shutdown)
             {
@@ -32,14 +36,20 @@ public class ConsoleLoop(
 
             var display = displays.SingleOrDefault(x => x.Screen == state.CurrentScreen);
             contentPanel = display is not null
-                ? await display.GetContentAsync()
+                ? await display.GetContentAsync().ConfigureAwait(false)
                 : new Panel($"Unknown Display Selected: {state.CurrentScreen}").Expand();
 
             layout["Content"].Update(contentPanel);
+
             AnsiConsole.Clear();
             AnsiConsole.Write(layout);
 
-            await Task.Delay(25);
+            stopwatch.Stop();
+            var timeToDelay = TargetFrameTimeMs - stopwatch.ElapsedMilliseconds;
+            if (timeToDelay > 0)
+            {
+                await Task.Delay(TimeSpan.FromMilliseconds(timeToDelay)).ConfigureAwait(false);
+            }
         }
     }
 

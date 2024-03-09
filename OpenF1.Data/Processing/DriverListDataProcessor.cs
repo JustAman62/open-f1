@@ -2,7 +2,7 @@ using AutoMapper;
 
 namespace OpenF1.Data;
 
-public class DriverListDataProcessor(IMapper mapper) : IProcessor<DriverListDataPoint>
+public class DriverListProcessor(IMapper mapper) : IProcessor<DriverListDataPoint>
 {
     public DriverListDataPoint? Latest { get; private set; }
 

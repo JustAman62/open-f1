@@ -1,3 +1,4 @@
+using Microsoft.EntityFrameworkCore.Query.SqlExpressions;
 using OpenF1.Data;
 using Spectre.Console;
 using Spectre.Console.Rendering;
@@ -8,7 +9,8 @@ public class TimingOverviewDisplay(
     State state,
     RaceControlMessageProcessor raceControlMessages,
     TimingDataProcessor timingData,
-    DriverListDataProcessor driverList,
+    TimingAppDataProcessor timingAppData,
+    DriverListProcessor driverList,
     TrackStatusProcessor trackStatusProcessor,
     LapCountProcessor lapCountProcessor
 ) : IDisplay
@@ -42,7 +44,18 @@ public class TimingOverviewDisplay(
     private IRenderable GetTimingTower()
     {
         var table = new Table();
-        table.AddColumns("", "Gap", "Interval", "Best Lap", "Last Lap", "S1", "S2", "S3", "Pits");
+        table.AddColumns(
+            "",
+            "Gap",
+            "Interval",
+            "Best Lap",
+            "Last Lap",
+            "S1",
+            "S2",
+            "S3",
+            "Pits",
+            "Tyre"
+        );
         if (timingData.LatestLiveTimingDataPoint is null)
         {
             return new Text("No Timing");
@@ -54,6 +67,9 @@ public class TimingOverviewDisplay(
         )
         {
             var driver = driverList.Latest?.GetValueOrDefault(driverNumber) ?? new();
+            var appData = timingAppData.Latest?.Lines.GetValueOrDefault(driverNumber) ?? new();
+            var stint = appData.Stints.Last().Value;
+
             table.AddRow(
                 new Text($"{line.Position, 2} {driver.RacingNumber, 2} {driver.Tla}"),
                 new Text(line.GapToLeader ?? ""),
@@ -81,7 +97,8 @@ public class TimingOverviewDisplay(
                     line.InPit.GetValueOrDefault() || line.PitOut.GetValueOrDefault()
                         ? new Style(background: Color.Yellow)
                         : Style.Plain
-                )
+                ),
+                new Text($"{stint.Compound?[0]} {stint.TotalLaps}", GetStyle(stint))
             );
         }
 
@@ -104,6 +121,20 @@ public class TimingOverviewDisplay(
         if (time.PersonalFastest ?? false)
             return _personalBest;
         return _normal;
+    }
+
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE0046:Convert to conditional expression", Justification = "Harder to read")]
+    private Style GetStyle(TimingAppDataPoint.Driver.Stint stint)
+    {
+        if (stint is null) return _normal;
+
+        return stint.Compound switch
+        {
+            "HARD" => new Style(background: Color.Grey),
+            "MEDIUM" => new Style(background: Color.Yellow1),
+            "SOFT" => new Style(background: Color.Red),
+            _ => _normal
+        };
     }
 
     private IRenderable GetRaceControlPanel()
