@@ -9,9 +9,17 @@ public class ManageSessionDisplay(IJsonTimingClient jsonTimingClient, ILiveTimin
 
     public Task<IRenderable> GetContentAsync()
     {
+        var table = new Table();
+        table.AddColumn("Recent Data Points");
+        foreach (var item in liveTimingClient.RecentDataPoints)
+        {
+            table.AddRow(item.EscapeMarkup());
+        }
+
         var rows = new Rows(
             new Text($"Simulation Status: {jsonTimingClient.ExecuteTask?.Status.ToString() ?? "No Simulation Running"}"),
-            new Text($"Real Client Status: {liveTimingClient.Connection?.State.ToString() ?? "No Connection"}")
+            new Text($"Real Client Status: {liveTimingClient.Connection?.State.ToString() ?? "No Connection"}"),
+            table
         );
 
         return Task.FromResult<IRenderable>(new Panel(rows).Expand());

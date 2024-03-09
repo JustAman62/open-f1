@@ -18,6 +18,8 @@ public class ConsoleLoop(
         );
         layout["Footer"].Size = 3;
 
+        AnsiConsole.Cursor.Hide();
+
         while (true)
         {
             await ShowAndHandleInputs(layout);
@@ -37,7 +39,7 @@ public class ConsoleLoop(
             AnsiConsole.Clear();
             AnsiConsole.Write(layout);
 
-            await Task.Delay(20);
+            await Task.Delay(25);
         }
     }
 

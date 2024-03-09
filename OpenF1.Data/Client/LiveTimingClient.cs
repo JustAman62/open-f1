@@ -34,6 +34,8 @@ public sealed class LiveTimingClient(
 
     public HubConnection? Connection { get; private set; }
 
+    public Queue<string> RecentDataPoints { get; } = new();
+
     public async Task StartAsync()
     {
         Logger.LogInformation("Starting Live Timing client");
@@ -121,8 +123,26 @@ public sealed class LiveTimingClient(
         return JsonSerializer.SerializeToNode(dict)!;
     }
 
-    private void HandleData(string res) =>
+    private void HandleData(string res)
+    {
         File.AppendAllText("./SimulationData/HandleDataTest.txt", res);
+        
+        RecentDataPoints.Enqueue(res);
+        if (RecentDataPoints.Count > 5) RecentDataPoints.Dequeue();
+
+        var json = JsonNode.Parse(res);
+        var data = json?["A"];
+
+        if (data is null)
+            return;
+
+        if (data.AsArray().Count != 3)
+            return;
+
+        var eventData = data[1] is JsonValue ? data[1]!.ToString() : data[1]!.ToJsonString();
+
+        ProcessData(data[0]!.ToString(), eventData, DateTimeOffset.Parse(data[2]!.ToString()));
+    }
 
     private void DisposeConnection()
     {
