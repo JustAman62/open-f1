@@ -7,8 +7,8 @@ namespace OpenF1.Data;
 
 public sealed class LiveTimingClient : ILiveTimingClient, IDisposable
 {
-    private readonly string[] _topics = new[]
-    {
+    private readonly string[] _topics =
+    [
         "Heartbeat",
         // "CarData.z",
         // "Position.z",
@@ -24,7 +24,7 @@ public sealed class LiveTimingClient : ILiveTimingClient, IDisposable
         "SessionData",
         "LapCount",
         "TimingData"
-    };
+    ];
 
     private readonly ILogger<LiveTimingClient> _logger;
 

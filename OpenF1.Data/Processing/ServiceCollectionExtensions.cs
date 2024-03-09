@@ -7,8 +7,12 @@ public static partial class ServiceCollectionExtensions
     public static IServiceCollection AddLiveTimingProcessors(this IServiceCollection collection)
     {
         collection
+            .AddSingleton<IProcessor, TimingDataProcessor>()
             .AddSingleton<IProcessor<TimingDataPoint>, TimingDataProcessor>()
-            .AddSingleton<IProcessor<HeartbeatDataPoint>, HeartbeatProcessor>();
+            .AddSingleton<TimingDataProcessor>()
+            .AddSingleton<IProcessor, HeartbeatProcessor>()
+            .AddSingleton<IProcessor<HeartbeatDataPoint>, HeartbeatProcessor>()
+            .AddSingleton<HeartbeatProcessor>();
 
         return collection;
     }

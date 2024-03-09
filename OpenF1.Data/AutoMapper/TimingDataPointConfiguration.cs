@@ -9,19 +9,19 @@ public class TimingDataPointConfiguration : Profile
         CreateMap<TimingDataPoint, TimingDataPoint>()
             .ForAllMembers(opts => opts.Condition((_, _, member) => member != null));
 
-        CreateMap<TimingDataPoint.TimingData, TimingDataPoint.TimingData>()
+        CreateMap<TimingDataPoint, TimingDataPoint>()
             .ForAllMembers(opts => opts.Condition((_, _, member) => member != null));
 
-        CreateMap<Dictionary<string, TimingDataPoint.TimingData.Driver>, Dictionary<string, TimingDataPoint.TimingData.Driver>>()
+        CreateMap<Dictionary<string, TimingDataPoint.Driver>, Dictionary<string, TimingDataPoint.Driver>>()
             .ConvertUsing(DictionaryAdditiveMergeMap);
 
-        CreateMap<Dictionary<string, TimingDataPoint.TimingData.Driver.LapSectorTime>, Dictionary<string, TimingDataPoint.TimingData.Driver.LapSectorTime>>()
+        CreateMap<Dictionary<string, TimingDataPoint.Driver.LapSectorTime>, Dictionary<string, TimingDataPoint.Driver.LapSectorTime>>()
             .ConvertUsing(DictionaryAdditiveMergeMap);
 
-        CreateMap<TimingDataPoint.TimingData.Driver, TimingDataPoint.TimingData.Driver>()
+        CreateMap<TimingDataPoint.Driver, TimingDataPoint.Driver>()
             .ForAllMembers(opts => opts.Condition((_, _, member) => member != null));
 
-        CreateMap<TimingDataPoint.TimingData.Driver.LapSectorTime, TimingDataPoint.TimingData.Driver.LapSectorTime>()
+        CreateMap<TimingDataPoint.Driver.LapSectorTime, TimingDataPoint.Driver.LapSectorTime>()
             .ForAllMembers(opts => opts.Condition((_, _, member) => member != null));
     }
 

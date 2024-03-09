@@ -2,7 +2,7 @@ namespace OpenF1.Console;
 
 public class EscapeInputHandler(State state) : IInputHandler
 {
-    public Screen[]? ApplicableScreens => [Screen.Main];
+    public Screen[]? ApplicableScreens => Enum.GetValues<Screen>();
 
     public ConsoleKey ConsoleKey => ConsoleKey.Escape;
 

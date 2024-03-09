@@ -1,13 +1,17 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using OpenF1.Console;
+using OpenF1.Data;
 using Spectre.Console;
 
 var serviceCollection = new ServiceCollection()
     .AddOptions()
+    .AddLogging(configure => configure.ClearProviders())
     .AddSingleton<ConsoleLoop>()
     .AddSingleton<State>()
-    .AddSingleton<IInputHandler, EscapeInputHandler>()
-    .AddSingleton<IDisplay, MainDisplay>();
+    .AddInputHandlers()
+    .AddDisplays()
+    .AddLiveTimingProvider();
 
 var services = serviceCollection.BuildServiceProvider();
 
