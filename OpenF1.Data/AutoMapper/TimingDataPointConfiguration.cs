@@ -9,43 +9,25 @@ public class TimingDataPointConfiguration : Profile
         CreateMap<TimingDataPoint, TimingDataPoint>()
             .ForAllMembers(opts => opts.Condition((_, _, member) => member != null));
 
-        CreateMap<TimingDataPoint, TimingDataPoint>()
-            .ForAllMembers(opts => opts.Condition((_, _, member) => member != null));
+        CreateMap<
+            Dictionary<string, TimingDataPoint.Driver>,
+            Dictionary<string, TimingDataPoint.Driver>
+        >()
+            .ConvertUsing(MappingUtils.DictionaryAdditiveMergeMap);
 
-        CreateMap<Dictionary<string, TimingDataPoint.Driver>, Dictionary<string, TimingDataPoint.Driver>>()
-            .ConvertUsing(DictionaryAdditiveMergeMap);
-
-        CreateMap<Dictionary<string, TimingDataPoint.Driver.LapSectorTime>, Dictionary<string, TimingDataPoint.Driver.LapSectorTime>>()
-            .ConvertUsing(DictionaryAdditiveMergeMap);
+        CreateMap<
+            Dictionary<string, TimingDataPoint.Driver.LapSectorTime>,
+            Dictionary<string, TimingDataPoint.Driver.LapSectorTime>
+        >()
+            .ConvertUsing(MappingUtils.DictionaryAdditiveMergeMap);
 
         CreateMap<TimingDataPoint.Driver, TimingDataPoint.Driver>()
             .ForAllMembers(opts => opts.Condition((_, _, member) => member != null));
 
+        CreateMap<TimingDataPoint.Driver.BestLap, TimingDataPoint.Driver.BestLap>()
+            .ForAllMembers(opts => opts.Condition((_, _, member) => member != null));
+
         CreateMap<TimingDataPoint.Driver.LapSectorTime, TimingDataPoint.Driver.LapSectorTime>()
             .ForAllMembers(opts => opts.Condition((_, _, member) => member != null));
-    }
-
-    /// <summary>
-    /// Merge dictionaries in an additive way, where entries are always added/updated but never removed.
-    /// </summary>
-    /// <returns>The merged dictionary</returns>
-    public static Dictionary<TKey, TValue> DictionaryAdditiveMergeMap<TKey, TValue>(Dictionary<TKey, TValue> src, Dictionary<TKey, TValue> dest, ResolutionContext ctx) where TKey: notnull
-    {
-        if (src is null) return dest;
-        if (dest is null) return src;
-        foreach (var (k, v) in src)
-        {
-            if (dest.TryGetValue(k, out var existing))
-            {
-                // Map the existing value to itself to create a copy and prevent reference based bugs
-                // Bad for performance, but good to expectations of mapping
-                ctx.Mapper.Map(v, ctx.Mapper.Map<TValue>(existing));
-            }
-            else
-            {
-                dest.Add(ctx.Mapper.Map<TKey>(k), ctx.Mapper.Map<TValue>(v));
-            }
-        }
-        return dest;
     }
 }

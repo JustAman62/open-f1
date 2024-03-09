@@ -7,16 +7,21 @@ public static partial class ServiceCollectionExtensions
     public static IServiceCollection AddLiveTimingProcessors(this IServiceCollection collection)
     {
         collection
-            .AddSingleton<IProcessor>(x => x.GetRequiredService<TimingDataProcessor>())
-            .AddSingleton<IProcessor<TimingDataPoint>>(x => x.GetRequiredService<TimingDataProcessor>())
-            .AddSingleton<TimingDataProcessor>()
-            .AddSingleton<IProcessor>(x => x.GetRequiredService<RaceControlMessageProcessor>())
-            .AddSingleton<IProcessor<RaceControlMessageDataPoint>>(x => x.GetRequiredService<RaceControlMessageProcessor>())
-            .AddSingleton<RaceControlMessageProcessor>()
-            .AddSingleton<IProcessor>(x => x.GetRequiredService<HeartbeatProcessor>())
-            .AddSingleton<IProcessor<HeartbeatDataPoint>>(x => x.GetRequiredService<HeartbeatProcessor>())
-            .AddSingleton<HeartbeatProcessor>();
-
+            .AddProcessor<TrackStatusDataPoint, TrackStatusProcessor>()
+            .AddProcessor<HeartbeatDataPoint, HeartbeatProcessor>()
+            .AddProcessor<RaceControlMessageDataPoint, RaceControlMessageProcessor>()
+            .AddProcessor<TimingDataPoint, TimingDataProcessor>()
+            .AddProcessor<LapCountDataPoint, LapCountProcessor>()
+            .AddProcessor<DriverListDataPoint, DriverListDataProcessor>();
+            
         return collection;
     }
+
+    private static IServiceCollection AddProcessor<TDataPoint, TProcessor>(
+        this IServiceCollection services
+    ) where TProcessor: class, IProcessor<TDataPoint> =>
+        services
+            .AddSingleton<IProcessor>(x => x.GetRequiredService<TProcessor>())
+            .AddSingleton<IProcessor<TDataPoint>>(x => x.GetRequiredService<TProcessor>())
+            .AddSingleton<TProcessor>();
 }

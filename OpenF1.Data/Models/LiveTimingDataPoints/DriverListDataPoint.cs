@@ -1,0 +1,33 @@
+namespace OpenF1.Data;
+
+/// <summary>
+/// Sample:
+/// <c>
+/// "4": {
+///   "RacingNumber": "4",
+///   "BroadcastName": "L NORRIS",
+///   "FullName": "Lando NORRIS",
+///   "Tla": "NOR",
+///   "Line": 2,
+///   "TeamName": "McLaren",
+///   "TeamColour": "F58020",
+///   "FirstName": "Lando",
+///   "LastName": "Norris",
+///   "Reference": "LANNOR01",
+///   "HeadshotUrl": "https://www.formula1.com/content/dam/fom-website/drivers/L/LANNOR01_Lando_Norris/lannor01.png.transform/1col/image.png",
+///   "CountryCode": "GBR"
+/// }
+/// </c>
+/// </summary>
+public sealed class DriverListDataPoint : Dictionary<string, DriverListDataPoint.Driver>
+{
+    public sealed record Driver {
+        public string? RacingNumber { get; set; }
+        public string? BroadcastName { get; set; }
+        public string? FullName { get; set; }
+        public string? Tla { get; set; }
+        public int? Line { get; set; }
+        public string? TeamName { get; set; }
+        public string? TeamColour { get; set; }
+    }
+}
