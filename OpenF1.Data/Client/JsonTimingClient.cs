@@ -64,7 +64,7 @@ public class JsonTimingClient(ITimingService timingService, ILogger<JsonTimingCl
         }
         else
         {
-            logger.LogInformation($"Unable to calculate a delay for this simulation data");
+            logger.LogWarning($"Unable to calculate a delay for this simulation data");
         }
 
         // Handle the real-time data

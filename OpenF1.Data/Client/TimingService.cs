@@ -62,7 +62,7 @@ public class TimingService(IEnumerable<IProcessor> processors, ILogger<TimingSer
                 var timeToWait = timestampWithDelay - DateTimeOffset.UtcNow;
                 if (timestampWithDelay > DateTimeOffset.UtcNow && timeToWait > TimeSpan.Zero)
                 {
-                    Logger.LogInformation($"Delaying for {timeToWait}");
+                    Logger.LogDebug($"Delaying for {timeToWait}");
                     await Task.Delay(timeToWait, cancellationToken).ConfigureAwait(false);
                 }
                 ProcessData(res.type, res.data, res.timestamp);
@@ -113,7 +113,7 @@ public class TimingService(IEnumerable<IProcessor> processors, ILogger<TimingSer
 
     private void ProcessData(string type, string? data, DateTimeOffset timestamp)
     {
-        Logger.LogInformation($"Processing {type} data point for timestamp {timestamp} :: {data}");
+        Logger.LogInformation($"Processing {type} data point for timestamp {timestamp:s} :: {data}");
         if (data is null)
             return;
 

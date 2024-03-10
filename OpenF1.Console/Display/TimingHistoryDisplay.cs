@@ -7,7 +7,8 @@ namespace OpenF1.Console;
 public class TimingHistoryDisplay(
     State state,
     TimingDataProcessor timingData,
-    DriverListProcessor driverList
+    DriverListProcessor driverList,
+    LapCountProcessor lapCountProcessor
 ) : IDisplay
 {
     public Screen Screen => Screen.TimingHistory;
@@ -20,29 +21,38 @@ public class TimingHistoryDisplay(
     {
         var timingTower = GetTimingTower();
 
-        var layout = new Layout("Root").SplitRows(
-            new Layout("Timing Tower", timingTower)
-        );
+        var layout = new Layout("Root").SplitRows(new Layout("Timing Tower", timingTower));
 
         return Task.FromResult<IRenderable>(layout);
     }
 
     private IRenderable GetTimingTower()
     {
-        var table = new Table();
-        table.AddColumns("", "Gap", "Interval", "Last Lap", "S1", "S2", "S3");
         var drivers = timingData.DriversByLap.GetValueOrDefault(state.CursorOffset);
         if (drivers is null)
-        {
             return new Text($"No Data for Lap {state.CursorOffset}");
-        }
+
+        var table = new Table();
+        table.AddColumns(
+            $"LAP {state.CursorOffset, 2}/{lapCountProcessor.Latest?.TotalLaps}",
+            "Gap",
+            "Interval",
+            "Last Lap",
+            "S1",
+            "S2",
+            "S3"
+        );
+        table.NoBorder();
 
         foreach (var (driverNumber, line) in drivers.OrderBy(x => x.Value.Line))
         {
             var driver = driverList.Latest?.GetValueOrDefault(driverNumber) ?? new();
+            var teamColour = driver.TeamColour ?? "000000";
 
             table.AddRow(
-                new Text($"{line.Position, 2} {driver.RacingNumber, 2} {driver.Tla}"),
+                new Markup(
+                    $"{line.Position, 2} [#{teamColour}]{driver.RacingNumber, 2} {driver.Tla ?? "UNK"}[/]"
+                ),
                 new Text(line.GapToLeader ?? ""),
                 new Text(line.IntervalToPositionAhead?.Value ?? ""),
                 new Text(line.LastLapTime?.Value ?? "NULL", GetStyle(line.LastLapTime)),
@@ -60,8 +70,6 @@ public class TimingHistoryDisplay(
                 )
             );
         }
-
-        table.NoBorder();
 
         return table;
     }

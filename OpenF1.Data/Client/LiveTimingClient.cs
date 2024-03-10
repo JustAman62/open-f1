@@ -5,10 +5,9 @@ using Newtonsoft.Json.Linq;
 
 namespace OpenF1.Data;
 
-public sealed class LiveTimingClient(
-    ITimingService timingService,
-    ILogger<LiveTimingClient> logger
-): ILiveTimingClient, IDisposable
+public sealed class LiveTimingClient(ITimingService timingService, ILogger<LiveTimingClient> logger)
+    : ILiveTimingClient,
+        IDisposable
 {
     private readonly string[] _topics =
     [
@@ -34,6 +33,8 @@ public sealed class LiveTimingClient(
     public HubConnection? Connection { get; private set; }
 
     public Queue<string> RecentDataPoints { get; } = new();
+
+    private string _sessionKey = "UnknownSession";
 
     public async Task StartAsync()
     {
@@ -83,8 +84,15 @@ public sealed class LiveTimingClient(
 
     private void HandleSubscriptionResponse(string res)
     {
-        res = res.ReplaceLineEndings("");
-        File.WriteAllText("./SimulationData/SubscriptionResponseTest.txt", res);
+        var obj = JsonNode.Parse(res)?.AsObject();
+        var sessionInfo = obj?["SessionInfo"];
+        var location = sessionInfo?["Meeting"]?["Location"] ?? "UnknownLocation";
+        var sessionName = sessionInfo?["Name"] ?? "UnknownName";
+        _sessionKey = $"{location}_{sessionName}";
+
+        logger.LogInformation($"Found session key from subscription data: {_sessionKey}");
+
+        File.WriteAllText($"./SimulationData/{_sessionKey}/subscribe.txt", res);
 
         timingService.ProcessSubscriptionData(res);
     }
@@ -93,7 +101,10 @@ public sealed class LiveTimingClient(
     {
         try
         {
-            File.AppendAllText("./SimulationData/HandleDataTest.txt", res);
+            File.AppendAllText(
+                $"./SimulationData/{_sessionKey}/live.txt",
+                res.ReplaceLineEndings(string.Empty) + Environment.NewLine
+            );
 
             RecentDataPoints.Enqueue(res);
             if (RecentDataPoints.Count > 5)
@@ -110,7 +121,11 @@ public sealed class LiveTimingClient(
 
             var eventData = data[1] is JsonValue ? data[1]!.ToString() : data[1]!.ToJsonString();
 
-            timingService.EnqueueAsync(data[0]!.ToString(), eventData, DateTimeOffset.Parse(data[2]!.ToString()));
+            timingService.EnqueueAsync(
+                data[0]!.ToString(),
+                eventData,
+                DateTimeOffset.Parse(data[2]!.ToString())
+            );
         }
         catch (Exception ex)
         {
