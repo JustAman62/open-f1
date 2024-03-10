@@ -5,11 +5,15 @@ namespace OpenF1.Console;
 
 public class StartSimulatedSessionInputHandler(IJsonTimingClient jsonTimingClient) : IInputHandler
 {
-    public Screen[]? ApplicableScreens => [Screen.ManageSession];
+    public bool IsEnabled => true;
+
+    public Screen[] ApplicableScreens => [Screen.ManageSession];
 
     public ConsoleKey ConsoleKey => ConsoleKey.F;
 
     public string Description => "Start Simulation";
+
+    public int Sort => 2;
 
     public async Task ExecuteAsync(ConsoleKeyInfo consoleKeyInfo)
     {

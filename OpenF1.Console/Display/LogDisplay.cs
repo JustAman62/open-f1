@@ -31,25 +31,4 @@ public class LogDisplay(State state, InMemoryLogger inMemoryLogger, LogDisplayOp
         var rows = new Rows(rowTexts);
         return Task.FromResult<IRenderable>(new Panel(rows).Expand());
     }
-
-    public class LogDisplayInputHandler(LogDisplayOptions options) : IInputHandler
-    {
-        public Screen[]? ApplicableScreens => [Screen.Logs];
-
-        public ConsoleKey ConsoleKey => ConsoleKey.M;
-
-        public string Description => "Change Minimum Log Level";
-
-        public Task ExecuteAsync(ConsoleKeyInfo consoleKeyInfo)
-        {
-            options.MinimumLogLevel = options.MinimumLogLevel switch
-            {
-                LogLevel.Information => LogLevel.Warning,
-                LogLevel.Warning => LogLevel.Error,
-                _ => LogLevel.Information
-            };
-
-            return Task.CompletedTask;
-        }
-    }
 }

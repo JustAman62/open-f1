@@ -11,7 +11,8 @@ public class TimingOverviewDisplay(
     TimingAppDataProcessor timingAppData,
     DriverListProcessor driverList,
     TrackStatusProcessor trackStatusProcessor,
-    LapCountProcessor lapCountProcessor
+    LapCountProcessor lapCountProcessor,
+    ITimingService timingService
 ) : IDisplay
 {
     public Screen Screen => Screen.TimingOverview;
@@ -42,9 +43,12 @@ public class TimingOverviewDisplay(
 
     private IRenderable GetTimingTower()
     {
+        if (timingData.LatestLiveTimingDataPoint is null)
+            return new Text("No Timing");
+
         var table = new Table();
         table.AddColumns(
-            "",
+            $"LAP {lapCountProcessor.Latest?.CurrentLap,2}/{lapCountProcessor.Latest?.TotalLaps}",
             "Gap",
             "Interval",
             "Best Lap",
@@ -55,15 +59,8 @@ public class TimingOverviewDisplay(
             "Pits",
             "Tyre"
         );
-        if (timingData.LatestLiveTimingDataPoint is null)
-        {
-            return new Text("No Timing");
-        }
-        foreach (
-            var (driverNumber, line) in timingData.LatestLiveTimingDataPoint.Lines.OrderBy(x =>
-                x.Value.Line
-            )
-        )
+
+        foreach (var (driverNumber, line) in timingData.LatestLiveTimingDataPoint.GetOrderedLines())
         {
             var driver = driverList.Latest?.GetValueOrDefault(driverNumber) ?? new();
             var appData = timingAppData.Latest?.Lines.GetValueOrDefault(driverNumber) ?? new();
@@ -71,7 +68,9 @@ public class TimingOverviewDisplay(
             var teamColour = driver.TeamColour ?? "000000";
 
             table.AddRow(
-                new Markup($"{line.Position, 2}[#{teamColour} on #{teamColour}]_[/][#{teamColour}]{driver.RacingNumber, 2} {driver.Tla ?? "UNK"}[/]"),
+                new Markup(
+                    $"{line.Position, 2} [#{teamColour}]{driver.RacingNumber, 2} {driver.Tla ?? "UNK"}[/]"
+                ),
                 new Text(line.GapToLeader ?? ""),
                 new Text(line.IntervalToPositionAhead?.Value ?? ""),
                 new Text(line.BestLapTime?.Value ?? "NULL"),
@@ -139,8 +138,10 @@ public class TimingOverviewDisplay(
         return stint.Compound switch
         {
             "HARD" => new Style(background: Color.Grey),
-            "MEDIUM" => new Style(background: Color.Yellow1),
+            "MEDIUM" => new Style(background: Color.Yellow),
             "SOFT" => new Style(background: Color.Red),
+            "INTER" => new Style(background: Color.Green),
+            "WET" => new Style(background: Color.Blue),
             _ => _normal
         };
     }
@@ -149,8 +150,9 @@ public class TimingOverviewDisplay(
     {
         var table = new Table();
         table.NoBorder();
-        table.AddColumns("Timestamp", "Message");
+        table.Expand();
         table.HideHeaders();
+        table.AddColumns("Timestamp", "Message");
 
         var messages = raceControlMessages
             .RaceControlMessages.Messages.OrderByDescending(x => x.Value.Utc)
@@ -171,14 +173,6 @@ public class TimingOverviewDisplay(
     private IRenderable GetStatusPanel()
     {
         var items = new List<IRenderable>();
-        if (lapCountProcessor.Latest is not null)
-        {
-            items.Add(
-                new Text(
-                    $"LAP {lapCountProcessor.Latest.CurrentLap}/{lapCountProcessor.Latest.TotalLaps}"
-                )
-            );
-        }
 
         if (trackStatusProcessor.Latest is not null)
         {
@@ -186,6 +180,7 @@ public class TimingOverviewDisplay(
             {
                 "1" => new Style(background: Color.Green),
                 "2" => new Style(background: Color.Yellow),
+                "4" => new Style(background: Color.Yellow),
                 _ => Style.Plain
             };
             items.Add(
@@ -195,6 +190,9 @@ public class TimingOverviewDisplay(
                 )
             );
         }
+
+        items.Add(new Text($@"Delayed By"));
+        items.Add(new Text($@"{timingService.Delay:d\.hh\:mm\:ss}"));
 
         var rows = new Rows(items);
         return new Panel(rows) { Header = new PanelHeader("Status"), Expand = true };

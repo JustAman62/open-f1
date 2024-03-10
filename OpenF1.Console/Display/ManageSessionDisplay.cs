@@ -16,6 +16,8 @@ public class ManageSessionDisplay(
         var table = new Table();
 
         _ = table.AddColumns("Type", "Data", "Timestamp");
+        table.Expand();
+
         var queueSnapshot = timingService.GetQueueSnapshot();
         queueSnapshot.Reverse();
         foreach (var (type, data, timestamp) in queueSnapshot)
@@ -34,7 +36,9 @@ public class ManageSessionDisplay(
             new Text(
                 $"Real Client Status: {liveTimingClient.Connection?.State.ToString() ?? "No Connection"}"
             ),
-            new Text($"Delay: {timingService.Delay} / Simulation Time: {DateTimeOffset.UtcNow - timingService.Delay:s}"),
+            new Text(
+                $"Delay: {timingService.Delay} / Simulation Time: {DateTimeOffset.UtcNow - timingService.Delay:s}"
+            ),
             new Text($"Items in Queue: {timingService.GetRemainingWorkItems()}"),
             new Text($"Queue State:"),
             table

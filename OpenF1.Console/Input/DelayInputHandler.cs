@@ -4,11 +4,15 @@ namespace OpenF1.Console;
 
 public class IncreaseDelayInputHandler(ITimingService timingService) : IInputHandler
 {
-    public Screen[]? ApplicableScreens => Enum.GetValues<Screen>();
+    public bool IsEnabled => true;
+
+    public Screen[] ApplicableScreens => [Screen.ManageSession, Screen.TimingOverview];
 
     public ConsoleKey ConsoleKey => ConsoleKey.RightArrow;
 
     public string Description => "Increase Delay";
+
+    public int Sort => 20;
 
     public Task ExecuteAsync(ConsoleKeyInfo consoleKeyInfo)
     {
@@ -20,11 +24,15 @@ public class IncreaseDelayInputHandler(ITimingService timingService) : IInputHan
 
 public class DecreaseDelayInputHandler(ITimingService timingService) : IInputHandler
 {
-    public Screen[]? ApplicableScreens => Enum.GetValues<Screen>();
+    public bool IsEnabled => true;
+
+    public Screen[] ApplicableScreens => [Screen.ManageSession, Screen.TimingOverview];
 
     public ConsoleKey ConsoleKey => ConsoleKey.LeftArrow;
 
     public string Description => "Decrease Delay";
+
+    public int Sort => 21;
 
     public Task ExecuteAsync(ConsoleKeyInfo consoleKeyInfo)
     {

@@ -1,4 +1,5 @@
 using System.Diagnostics;
+using System.Security.Cryptography;
 using Spectre.Console;
 using Spectre.Console.Rendering;
 
@@ -19,7 +20,7 @@ public class ConsoleLoop(
             new Layout("Content", contentPanel).Ratio(10),
             new Layout("Footer")
         );
-        layout["Footer"].Size = 3;
+        layout["Footer"].Size = 2;
 
         AnsiConsole.Cursor.Hide();
         var stopwatch = Stopwatch.StartNew();
@@ -61,20 +62,15 @@ public class ConsoleLoop(
         }
     }
 
-    public async Task ShowAndHandleInputs(Layout layout)
+    private async Task ShowAndHandleInputs(Layout layout)
     {
         var commandDescriptions = inputHandlers
-            .Where(x =>
-                x.ApplicableScreens is null || x.ApplicableScreens.Contains(state.CurrentScreen)
-            )
-            .Select(x => $"[{x.ConsoleKey}] {x.Description}");
-        var footerPanel = new Panel(
-            new Markup(string.Join(' ', commandDescriptions).EscapeMarkup())
-        )
-        {
-            Header = new PanelHeader("Commands")
-        };
-        layout["Footer"].Update(footerPanel.Expand());
+            .Where(x => x.IsEnabled && x.ApplicableScreens.Contains(state.CurrentScreen))
+            .OrderBy(x => x.Sort)
+            .Select(x => $"[{GetConsoleKeyCharacter(x.ConsoleKey)}] {x.Description}");
+
+        var columns = new Columns(commandDescriptions.Select(x => new Text(x)));
+        layout["Footer"].Update(columns);
 
         if (System.Console.KeyAvailable)
         {
@@ -91,4 +87,15 @@ public class ConsoleLoop(
             await Task.WhenAll(tasks);
         }
     }
+
+    private string GetConsoleKeyCharacter(ConsoleKey consoleKey) =>
+        consoleKey switch
+        {
+            ConsoleKey.Escape => "Esc",
+            ConsoleKey.UpArrow => "▲",
+            ConsoleKey.DownArrow => "▼",
+            ConsoleKey.LeftArrow => "◄",
+            ConsoleKey.RightArrow => "►",
+            _ => consoleKey.ToString()
+        };
 }

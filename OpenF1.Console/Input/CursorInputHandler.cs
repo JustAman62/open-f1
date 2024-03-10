@@ -2,11 +2,15 @@ namespace OpenF1.Console;
 
 public sealed class CursorUpInputHandler(State state) : IInputHandler
 {
-    public Screen[]? ApplicableScreens => state.CursorOffset == 0 ? [] : Enum.GetValues<Screen>();
+    public bool IsEnabled => state.CursorOffset != 0;
+
+    public Screen[] ApplicableScreens => Enum.GetValues<Screen>();
 
     public ConsoleKey ConsoleKey => ConsoleKey.UpArrow;
 
     public string Description => "Up";
+
+    public int Sort => 11;
 
     public Task ExecuteAsync(ConsoleKeyInfo consoleKeyInfo)
     {
@@ -30,12 +34,16 @@ public sealed class CursorUpInputHandler(State state) : IInputHandler
 
 public sealed class CursorDownInputHandler(State state) : IInputHandler
 {
-    public Screen[]? ApplicableScreens =>
+    public bool IsEnabled => true;
+
+    public Screen[] ApplicableScreens =>
         Enum.GetValues<Screen>().Where(x => x != Screen.Main).ToArray();
 
     public ConsoleKey ConsoleKey => ConsoleKey.DownArrow;
 
-    public string Description => $"Down {state.CursorOffset}";
+    public string Description => $"Down ({state.CursorOffset})";
+
+    public int Sort => 10;
 
     public Task ExecuteAsync(ConsoleKeyInfo consoleKeyInfo)
     {
