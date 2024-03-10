@@ -9,8 +9,6 @@ public interface ILiveTimingClient
 {
     public HubConnection? Connection { get; }
 
-    public Queue<string> RecentDataPoints { get; }
-
     /// <summary>
     /// Starts the timing client, which establishes a connection to the real F1 live timing data source.
     /// </summary>

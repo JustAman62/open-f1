@@ -1,5 +1,4 @@
-﻿using System.Text.Json;
-using System.Text.Json.Nodes;
+﻿using System.Text.Json.Nodes;
 using Microsoft.AspNet.SignalR.Client;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json.Linq;
@@ -7,9 +6,9 @@ using Newtonsoft.Json.Linq;
 namespace OpenF1.Data;
 
 public sealed class LiveTimingClient(
-    IEnumerable<IProcessor> processors,
+    ITimingService timingService,
     ILogger<LiveTimingClient> logger
-) : TimingClient(processors, logger), ILiveTimingClient, IDisposable
+): ILiveTimingClient, IDisposable
 {
     private readonly string[] _topics =
     [
@@ -38,7 +37,7 @@ public sealed class LiveTimingClient(
 
     public async Task StartAsync()
     {
-        Logger.LogInformation("Starting Live Timing client");
+        logger.LogInformation("Starting Live Timing client");
 
         if (Connection is not null)
             throw new InvalidOperationException("Timing client already has an open connection.");
@@ -60,15 +59,15 @@ public sealed class LiveTimingClient(
         Connection.EnsureReconnecting();
 
         Connection.Error += (ex) =>
-            Logger.LogError(ex, "Error in live timing client: {}", ex.ToString());
-        Connection.Reconnecting += () => Logger.LogWarning("Live timing client is reconnecting");
+            logger.LogError(ex, "Error in live timing client: {}", ex.ToString());
+        Connection.Reconnecting += () => logger.LogWarning("Live timing client is reconnecting");
         Connection.Received += HandleData;
 
         var proxy = Connection.CreateHubProxy("Streaming");
 
         await Connection.Start();
 
-        Logger.LogInformation("Subscribing to lots of topics");
+        logger.LogInformation("Subscribing to lots of topics");
 
         await proxy.Invoke(
             "Subscribe",
@@ -78,7 +77,8 @@ public sealed class LiveTimingClient(
 
         var res = await proxy.Invoke<JObject>("Subscribe", new[] { _topics });
         HandleSubscriptionResponse(res.ToString());
-        Logger.LogInformation("Started Live Timing client");
+        await timingService.StartAsync();
+        logger.LogInformation("Started Live Timing client");
     }
 
     private void HandleSubscriptionResponse(string res)
@@ -86,72 +86,36 @@ public sealed class LiveTimingClient(
         res = res.ReplaceLineEndings("");
         File.WriteAllText("./SimulationData/SubscriptionResponseTest.txt", res);
 
-        var obj = JsonNode.Parse(res)?.AsObject();
-        if (obj is null)
-            return;
-
-        ProcessData("Heartbeat", obj["Heartbeat"]?.ToString(), DateTimeOffset.UtcNow);
-        ProcessData("DriverList", obj["DriverList"]?.ToString(), DateTimeOffset.UtcNow);
-        ProcessData("TrackStatus", obj["TrackStatus"]?.ToString(), DateTimeOffset.UtcNow);
-        ProcessData("LapCount", obj["LapCount"]?.ToString(), DateTimeOffset.UtcNow);
-
-        var linesToProcess = obj["TimingData"]?["Lines"]?.AsObject() ?? [];
-        foreach (var (_, line) in linesToProcess)
-        {
-            if (line?["Sectors"] is null)
-                continue;
-            line["Sectors"] = ArrayToIndexedDictionary(line["Sectors"]!);
-        }
-        ProcessData("TimingData", obj["TimingData"]?.ToString(), DateTimeOffset.UtcNow);
-
-        var stintLinesToProcess = obj["TimingAppData"]?["Lines"]?.AsObject() ?? [];
-        foreach (var (_, line) in stintLinesToProcess)
-        {
-            if (line?["Stints"] is null)
-                continue;
-            line["Stints"] = ArrayToIndexedDictionary(line["Stints"]!);
-        }
-        ProcessData("TimingAppData", obj["TimingAppData"]?.ToString(), DateTimeOffset.UtcNow);
-
-        var raceControlMessages = obj["RaceControlMessages"]?["Messages"];
-        if (raceControlMessages is not null)
-        {
-            obj["RaceControlMessages"]!["Messages"] = ArrayToIndexedDictionary(raceControlMessages);
-        }
-        ProcessData(
-            "RaceControlMessages",
-            obj["RaceControlMessages"]?.ToString(),
-            DateTimeOffset.UtcNow
-        );
-    }
-
-    private JsonNode ArrayToIndexedDictionary(JsonNode node)
-    {
-        var dict = node.AsArray()
-            .Select((val, idx) => (idx, val))
-            .ToDictionary(x => x.idx.ToString(), x => x.val);
-        return JsonSerializer.SerializeToNode(dict)!;
+        timingService.ProcessSubscriptionData(res);
     }
 
     private void HandleData(string res)
     {
-        File.AppendAllText("./SimulationData/HandleDataTest.txt", res);
-        
-        RecentDataPoints.Enqueue(res);
-        if (RecentDataPoints.Count > 5) RecentDataPoints.Dequeue();
+        try
+        {
+            File.AppendAllText("./SimulationData/HandleDataTest.txt", res);
 
-        var json = JsonNode.Parse(res);
-        var data = json?["A"];
+            RecentDataPoints.Enqueue(res);
+            if (RecentDataPoints.Count > 5)
+                RecentDataPoints.Dequeue();
 
-        if (data is null)
-            return;
+            var json = JsonNode.Parse(res);
+            var data = json?["A"];
 
-        if (data.AsArray().Count != 3)
-            return;
+            if (data is null)
+                return;
 
-        var eventData = data[1] is JsonValue ? data[1]!.ToString() : data[1]!.ToJsonString();
+            if (data.AsArray().Count != 3)
+                return;
 
-        ProcessData(data[0]!.ToString(), eventData, DateTimeOffset.Parse(data[2]!.ToString()));
+            var eventData = data[1] is JsonValue ? data[1]!.ToString() : data[1]!.ToJsonString();
+
+            timingService.Enqueue(data[0]!.ToString(), eventData, DateTimeOffset.Parse(data[2]!.ToString()));
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex, "Failed to handle live timing data: {res}", res);
+        }
     }
 
     private void DisposeConnection()
@@ -166,6 +130,7 @@ public sealed class LiveTimingClient(
         {
             DisposeConnection();
             _disposedValue = true;
+            timingService.StopAsync();
         }
         GC.SuppressFinalize(this);
     }

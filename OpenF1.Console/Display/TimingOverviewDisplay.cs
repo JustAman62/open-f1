@@ -72,8 +72,8 @@ public class TimingOverviewDisplay(
             table.AddRow(
                 new Columns(
                     new Text($"{line.Position, 2}"),
-                    new Markup($"{driver.TeamColour} {driver.RacingNumber, 2}"),
-                    new Text(driver.Tla ?? "UNK")
+                    new Markup($"[#{driver.TeamColour}] {driver.RacingNumber, 2}"),
+                    new Text($"{driver.Tla ?? "UNK"}[/]")
                 ),
                 new Text(line.GapToLeader ?? ""),
                 new Text(line.IntervalToPositionAhead?.Value ?? ""),

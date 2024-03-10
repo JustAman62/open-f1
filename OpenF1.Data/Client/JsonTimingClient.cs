@@ -1,50 +1,85 @@
 using System.Text.Json.Nodes;
 using Microsoft.Extensions.Logging;
-using OpenF1.Data;
 
-public class JsonTimingClient(IEnumerable<IProcessor> processors, ILogger<JsonTimingClient> logger)
-    : TimingClient(processors, logger),
-        IJsonTimingClient
+namespace OpenF1.Data;
+
+public class JsonTimingClient(ITimingService timingService, ILogger<JsonTimingClient> logger)
+    : IJsonTimingClient
 {
-    private string _fileName = "";
+    private string _directory = "";
     private CancellationTokenSource _cts = new();
 
     public Task? ExecuteTask { get; private set; }
 
-    public IEnumerable<string> GetFileNames() => Directory.GetFiles("./SimulationData");
+    /// <inheritdoc />
+    public IEnumerable<string> GetDirectoryNames() =>
+        Directory
+            .GetDirectories("./SimulationData")
+            .Where(x =>
+                Directory
+                    .GetFiles(x)
+                    .All(fileName =>
+                        fileName.EndsWith("live.txt") || fileName.EndsWith("subscribe.txt")
+                    )
+            );
 
-    public Task StartAsync(string fileName)
+    public async Task StartAsync(string directory)
     {
-        _fileName = fileName;
+        _directory = directory;
         _cts.Cancel();
         _cts = new CancellationTokenSource();
         ExecuteTask = Task.Run(() => ExecuteAsync(_cts.Token), _cts.Token);
-        return Task.CompletedTask;
+        await timingService.StartAsync();
     }
 
-    public Task StopAsync()
+    public async Task StopAsync()
     {
         _cts.Cancel();
         ExecuteTask = null;
-        return Task.CompletedTask;
+        await timingService.StopAsync();
     }
 
     public async Task ExecuteAsync(CancellationToken cancellationToken)
     {
-        var lines = File.ReadLinesAsync(_fileName, cancellationToken);
+        // Handle the dump of data we receive at subscription time
+        var subscriptionData = await File.ReadAllTextAsync(
+                Path.Join(_directory, "/subscribe.txt"),
+                cancellationToken
+            )
+            .ConfigureAwait(false);
 
-        await foreach (var line in lines)
+        timingService.ProcessSubscriptionData(subscriptionData);
+
+        // Handle the real-time data
+        var lines = File.ReadLines(Path.Join(_directory, "/live.txt"));
+
+        // Calculate the delay we need to make this simulation real-time
+        var (_, _, firstTimestamp) = ProcessLine(lines.First());
+        timingService.Delay = DateTimeOffset.UtcNow - firstTimestamp;
+        logger.LogInformation($"Calculated a delay of {timingService.Delay} between now and {firstTimestamp:s}");
+
+        foreach (var line in lines)
         {
             try
             {
-                var data = JsonNode.Parse(line);
-                var parts = data?["A"]?.AsArray() ?? data!.AsArray();
-                ProcessData(parts[0]!.ToString(), parts[1]!.ToString(), DateTimeOffset.Parse(parts[2]!.ToString()));
+                var (type, data, timestamp) = ProcessLine(line);
+                timingService.Enqueue(type, data, timestamp);
             }
             catch (Exception ex)
             {
-                Logger.LogError(ex, $"Failed to handle data: {line}");
+                logger.LogError(ex, $"Failed to handle data: {line}");
             }
         }
+    }
+
+    private (string type, string? data, DateTimeOffset timestamp) ProcessLine(string line)
+    {
+        var data = JsonNode.Parse(line);
+        var parts = data?["A"]?.AsArray() ?? data!.AsArray();
+        return (
+            parts[0]!.ToString(),
+            parts[1]!.ToString(),
+            DateTimeOffset.Parse(parts[2]!.ToString())
+        );
     }
 }

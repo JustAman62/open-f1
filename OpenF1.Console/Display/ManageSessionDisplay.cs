@@ -3,22 +3,37 @@ using OpenF1.Data;
 using Spectre.Console;
 using Spectre.Console.Rendering;
 
-public class ManageSessionDisplay(IJsonTimingClient jsonTimingClient, ILiveTimingClient liveTimingClient) : IDisplay
+public class ManageSessionDisplay(
+    ITimingService timingService,
+    IJsonTimingClient jsonTimingClient,
+    ILiveTimingClient liveTimingClient
+) : IDisplay
 {
     public Screen Screen => Screen.ManageSession;
 
     public Task<IRenderable> GetContentAsync()
     {
         var table = new Table();
-        table.AddColumn("Recent Data Points");
-        foreach (var item in liveTimingClient.RecentDataPoints.ToList())
+
+        _ = table.AddColumns("Type", "Data", "Timestamp");
+        foreach (var (type, data, timestamp) in timingService.GetQueueSnapshot())
         {
-            table.AddRow(item.EscapeMarkup());
+            _ = table.AddRow(
+                type.EscapeMarkup(),
+                data?.EscapeMarkup() ?? "",
+                timestamp.ToString("s")
+            );
         }
 
         var rows = new Rows(
-            new Text($"Simulation Status: {jsonTimingClient.ExecuteTask?.Status.ToString() ?? "No Simulation Running"}"),
-            new Text($"Real Client Status: {liveTimingClient.Connection?.State.ToString() ?? "No Connection"}"),
+            new Text(
+                $"Simulation Status: {jsonTimingClient.ExecuteTask?.Status.ToString() ?? "No Simulation Running"}"
+            ),
+            new Text(
+                $"Real Client Status: {liveTimingClient.Connection?.State.ToString() ?? "No Connection"}"
+            ),
+            new Text($"Delay: {timingService.Delay}"),
+            new Text($"Queue State:"),
             table
         );
 
