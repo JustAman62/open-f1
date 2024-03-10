@@ -1,3 +1,4 @@
+using System.Text.Json;
 using System.Text.Json.Nodes;
 using Microsoft.Extensions.Logging;
 
@@ -8,6 +9,7 @@ public class JsonTimingClient(ITimingService timingService, ILogger<JsonTimingCl
 {
     private string _directory = "";
     private CancellationTokenSource _cts = new();
+    private Thread? _thread;
 
     public Task? ExecuteTask { get; private set; }
 
@@ -28,7 +30,7 @@ public class JsonTimingClient(ITimingService timingService, ILogger<JsonTimingCl
         _directory = directory;
         _cts.Cancel();
         _cts = new CancellationTokenSource();
-        ExecuteTask = Task.Run(() => ExecuteAsync(_cts.Token), _cts.Token);
+        ExecuteTask = Task.Factory.StartNew(() => ExecuteAsync(_cts.Token));
         await timingService.StartAsync();
     }
 
@@ -50,20 +52,30 @@ public class JsonTimingClient(ITimingService timingService, ILogger<JsonTimingCl
 
         timingService.ProcessSubscriptionData(subscriptionData);
 
+        var subscriptionHeartbeat = JsonNode
+            .Parse(subscriptionData)
+            ?["Heartbeat"]?.Deserialize<HeartbeatDataPoint>();
+        if (subscriptionHeartbeat is not null)
+        {
+            timingService.Delay = DateTimeOffset.UtcNow - subscriptionHeartbeat.Utc;
+            logger.LogInformation(
+                $"Calculated a delay of {timingService.Delay} between now and {subscriptionHeartbeat.Utc:s}"
+            );
+        }
+        else
+        {
+            logger.LogInformation($"Unable to calculate a delay for this simulation data");
+        }
+
         // Handle the real-time data
-        var lines = File.ReadLines(Path.Join(_directory, "/live.txt"));
+        var lines = File.ReadLinesAsync(Path.Join(_directory, "/live.txt"), cancellationToken);
 
-        // Calculate the delay we need to make this simulation real-time
-        var (_, _, firstTimestamp) = ProcessLine(lines.First());
-        timingService.Delay = DateTimeOffset.UtcNow - firstTimestamp;
-        logger.LogInformation($"Calculated a delay of {timingService.Delay} between now and {firstTimestamp:s}");
-
-        foreach (var line in lines)
+        await foreach (var line in lines)
         {
             try
             {
                 var (type, data, timestamp) = ProcessLine(line);
-                timingService.Enqueue(type, data, timestamp);
+                await timingService.EnqueueAsync(type, data, timestamp).ConfigureAwait(false);
             }
             catch (Exception ex)
             {
@@ -74,12 +86,12 @@ public class JsonTimingClient(ITimingService timingService, ILogger<JsonTimingCl
 
     private (string type, string? data, DateTimeOffset timestamp) ProcessLine(string line)
     {
-        var data = JsonNode.Parse(line);
-        var parts = data?["A"]?.AsArray() ?? data!.AsArray();
-        return (
-            parts[0]!.ToString(),
-            parts[1]!.ToString(),
-            DateTimeOffset.Parse(parts[2]!.ToString())
-        );
+        var json = JsonNode.Parse(line);
+        var parts = json?["A"]?.AsArray() ?? json!.AsArray();
+        var data =
+            parts[1]!.GetValueKind() == JsonValueKind.Object
+                ? parts[1]!.ToJsonString()
+                : parts[1]!.ToString();
+        return (parts[0]!.ToString(), data, DateTimeOffset.Parse(parts[2]!.ToString()));
     }
 }

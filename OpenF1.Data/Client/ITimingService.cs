@@ -9,7 +9,9 @@ public interface ITimingService
 
     public List<(string type, string? data, DateTimeOffset timestamp)> GetQueueSnapshot();
 
-    public void Enqueue(string type, string? data, DateTimeOffset timestamp);
+    public Task EnqueueAsync(string type, string? data, DateTimeOffset timestamp);
+
+    public int GetRemainingWorkItems();
 
     public void ProcessSubscriptionData(string res);
 }

@@ -68,13 +68,10 @@ public class TimingOverviewDisplay(
             var driver = driverList.Latest?.GetValueOrDefault(driverNumber) ?? new();
             var appData = timingAppData.Latest?.Lines.GetValueOrDefault(driverNumber) ?? new();
             var stint = appData.Stints.LastOrDefault().Value;
+            var teamColour = driver.TeamColour ?? "000000";
 
             table.AddRow(
-                new Columns(
-                    new Text($"{line.Position, 2}"),
-                    new Markup($"[#{driver.TeamColour}] {driver.RacingNumber, 2}"),
-                    new Text($"{driver.Tla ?? "UNK"}[/]")
-                ),
+                new Markup($"{line.Position, 2}[#{teamColour} on #{teamColour}]_[/][#{teamColour}]{driver.RacingNumber, 2} {driver.Tla ?? "UNK"}[/]"),
                 new Text(line.GapToLeader ?? ""),
                 new Text(line.IntervalToPositionAhead?.Value ?? ""),
                 new Text(line.BestLapTime?.Value ?? "NULL"),

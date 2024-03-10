@@ -7,7 +7,7 @@ public class StartSimulatedSessionInputHandler(IJsonTimingClient jsonTimingClien
 {
     public Screen[]? ApplicableScreens => [Screen.ManageSession];
 
-    public ConsoleKey ConsoleKey => ConsoleKey.S;
+    public ConsoleKey ConsoleKey => ConsoleKey.F;
 
     public string Description => "Start Simulation";
 

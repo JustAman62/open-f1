@@ -110,7 +110,7 @@ public sealed class LiveTimingClient(
 
             var eventData = data[1] is JsonValue ? data[1]!.ToString() : data[1]!.ToJsonString();
 
-            timingService.Enqueue(data[0]!.ToString(), eventData, DateTimeOffset.Parse(data[2]!.ToString()));
+            timingService.EnqueueAsync(data[0]!.ToString(), eventData, DateTimeOffset.Parse(data[2]!.ToString()));
         }
         catch (Exception ex)
         {

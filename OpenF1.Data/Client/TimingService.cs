@@ -1,6 +1,7 @@
 using System.Collections.Concurrent;
 using System.Text.Json;
 using System.Text.Json.Nodes;
+using System.Threading.Channels;
 using Microsoft.Extensions.Logging;
 using OpenF1.Data;
 
@@ -9,7 +10,9 @@ public class TimingService(IEnumerable<IProcessor> processors, ILogger<TimingSer
 {
     private CancellationTokenSource _cts = new();
     private Task? _executeTask;
-    private ConcurrentQueue<(string type, string? data, DateTimeOffset timestamp)> _workItems = new();
+    private ConcurrentQueue<(string type, string? data, DateTimeOffset timestamp)> _recent = new();
+    private Channel<(string type, string? data, DateTimeOffset timestamp)> _workItems =
+        Channel.CreateUnbounded<(string type, string? data, DateTimeOffset timestamp)>();
     private static readonly JsonSerializerOptions _jsonSerializerOptions =
         new(JsonSerializerDefaults.Web)
         {
@@ -24,7 +27,7 @@ public class TimingService(IEnumerable<IProcessor> processors, ILogger<TimingSer
     {
         _cts.Cancel();
         _cts = new();
-        _executeTask = Task.Run(() => ExecuteAsync(_cts.Token));
+        _executeTask = Task.Factory.StartNew(() => ExecuteAsync(_cts.Token));
         return Task.CompletedTask;
     }
 
@@ -35,25 +38,32 @@ public class TimingService(IEnumerable<IProcessor> processors, ILogger<TimingSer
         return Task.CompletedTask;
     }
 
-    public void Enqueue(string type, string? data, DateTimeOffset timestamp) =>
-        _workItems.Enqueue((type, data, timestamp));
+    public async Task EnqueueAsync(string type, string? data, DateTimeOffset timestamp) =>
+        await _workItems.Writer.WriteAsync((type, data, timestamp));
 
     public List<(string type, string? data, DateTimeOffset timestamp)> GetQueueSnapshot() =>
-        _workItems.ToList();
+        _recent.ToList();
+
+    public int GetRemainingWorkItems() => _workItems.Reader.Count;
 
     private async Task ExecuteAsync(CancellationToken cancellationToken)
     {
         while (!cancellationToken.IsCancellationRequested)
         {
-            if (_workItems.TryDequeue(out var res))
+            if (_workItems.Reader.TryRead(out var res))
             {
+                _recent.Enqueue(res);
+                if (_recent.Count > 5)
+                    _recent.TryDequeue(out _);
+
                 // Add a delay to the message timestamp,
                 // then figure out how long we have to wait for to be the wall clock time
                 var timestampWithDelay = res.timestamp + Delay;
-                var timeToWait = DateTimeOffset.UtcNow - timestampWithDelay;
-                if (timeToWait > TimeSpan.Zero)
+                var timeToWait = timestampWithDelay - DateTimeOffset.UtcNow;
+                if (timestampWithDelay > DateTimeOffset.UtcNow && timeToWait > TimeSpan.Zero)
                 {
-                    await Task.Delay(timeToWait).ConfigureAwait(false);
+                    Logger.LogInformation($"Delaying for {timeToWait}");
+                    await Task.Delay(timeToWait, cancellationToken).ConfigureAwait(false);
                 }
                 ProcessData(res.type, res.data, res.timestamp);
             }
