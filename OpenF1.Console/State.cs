@@ -1,7 +1,18 @@
+using Spectre.Console;
+
 namespace OpenF1.Console;
 
 public record State
 {
-    public Screen CurrentScreen { get; set; } = Screen.Main;
+    private Screen _screen = Screen.Main;
+
+    public Screen CurrentScreen { 
+        get => _screen;
+        set {
+            AnsiConsole.Clear();
+            _screen = value;
+        }
+    }
+
     public int CursorOffset { get; set; } = 0;
 }

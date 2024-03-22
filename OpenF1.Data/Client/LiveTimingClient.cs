@@ -92,8 +92,8 @@ public sealed class LiveTimingClient(ITimingService timingService, ILogger<LiveT
 
         logger.LogInformation($"Found session key from subscription data: {_sessionKey}");
 
+        Directory.CreateDirectory($"./SimulationData/{_sessionKey}");
         File.WriteAllText($"./SimulationData/{_sessionKey}/subscribe.txt", res);
-
         timingService.ProcessSubscriptionData(res);
     }
 
