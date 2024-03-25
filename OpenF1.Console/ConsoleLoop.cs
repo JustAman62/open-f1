@@ -51,6 +51,7 @@ public class ConsoleLoop(
             layout["Content"].Update(contentPanel);
 
             AnsiConsole.Cursor.SetPosition(0, 0);
+            AnsiConsole.Cursor.Hide();
             AnsiConsole.Write(layout);
 
             stopwatch.Stop();
