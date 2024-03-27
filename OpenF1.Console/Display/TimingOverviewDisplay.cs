@@ -17,9 +17,10 @@ public class TimingOverviewDisplay(
 {
     public Screen Screen => Screen.TimingOverview;
 
-    private Style _personalBest = new(background: Color.Green);
-    private Style _overallBest = new(background: Color.Purple);
-    private Style _normal = new();
+    private readonly Style _personalBest = new(foreground: Color.Black, background: Color.Green);
+    private readonly Style _overallBest = new(foreground: Color.Black, background: Color.Purple);
+    private readonly Style _normal = new(foreground: Color.White);
+    private readonly Style _invert = new(foreground: Color.Black, background: Color.White);
 
     public Task<IRenderable> GetContentAsync()
     {
@@ -48,7 +49,7 @@ public class TimingOverviewDisplay(
 
         var table = new Table();
         table.AddColumns(
-            $"LAP {lapCountProcessor.Latest?.CurrentLap,2}/{lapCountProcessor.Latest?.TotalLaps}",
+            $"LAP {lapCountProcessor.Latest?.CurrentLap, 2}/{lapCountProcessor.Latest?.TotalLaps}",
             "Gap",
             "Interval",
             "Best Lap",
@@ -57,7 +58,12 @@ public class TimingOverviewDisplay(
             "S2",
             "S3",
             "Pits",
-            "Tyre"
+            "Tyre",
+            "Compare"
+        );
+
+        var comparisonDataPoint = timingData.LatestLiveTimingDataPoint.Lines.FirstOrDefault(x =>
+            x.Value.Line == state.CursorOffset
         );
 
         foreach (var (driverNumber, line) in timingData.LatestLiveTimingDataPoint.GetOrderedLines())
@@ -67,12 +73,21 @@ public class TimingOverviewDisplay(
             var stint = appData.Stints.LastOrDefault().Value;
             var teamColour = driver.TeamColour ?? "000000";
 
+            var isComparisonLine = line == comparisonDataPoint.Value;
+            var lineStyle = isComparisonLine
+                ? _invert
+                : _normal;
+
             table.AddRow(
                 new Markup(
-                    $"{line.Position, 2} [#{teamColour}]{driver.RacingNumber, 2} {driver.Tla ?? "UNK"}[/]"
+                    $"{line.Position, 2} [#{teamColour}]{driver.RacingNumber, 2} {driver.Tla ?? "UNK"}[/]",
+                    lineStyle
                 ),
-                new Text(line.GapToLeader ?? ""),
-                new Text(line.IntervalToPositionAhead?.Value ?? ""),
+                new Text($"{line.GapToLeader, 7}", lineStyle),
+                new Text(
+                    $"{line.IntervalToPositionAhead?.Value, 8}",
+                    GetStyle(line.IntervalToPositionAhead, isComparisonLine)
+                ),
                 new Text(line.BestLapTime?.Value ?? "NULL"),
                 new Text(line.LastLapTime?.Value ?? "NULL", GetStyle(line.LastLapTime)),
                 new Text(
@@ -92,15 +107,13 @@ public class TimingOverviewDisplay(
                         ? "IN PITS"
                         : line.PitOut.GetValueOrDefault()
                             ? "PIT OUT"
-                            : line.NumberOfPitStops.ToString()!,
+                            : $"{line.NumberOfPitStops, 4}",
                     line.InPit.GetValueOrDefault() || line.PitOut.GetValueOrDefault()
-                        ? new Style(background: Color.Yellow)
+                        ? new Style(foreground: Color.Black, background: Color.Yellow)
                         : Style.Plain
                 ),
-                new Columns(
-                    new Text($"{stint?.Compound?[0]}", GetStyle(stint)),
-                    new Text($"{stint?.TotalLaps, 2}")
-                )
+                new Text($"{stint?.Compound?[0]} {stint?.TotalLaps, 2}", GetStyle(stint)),
+                GetGapBetweenLines(comparisonDataPoint.Value, line)
             );
         }
 
@@ -137,13 +150,51 @@ public class TimingOverviewDisplay(
 
         return stint.Compound switch
         {
-            "HARD" => new Style(background: Color.Grey),
-            "MEDIUM" => new Style(background: Color.Yellow),
-            "SOFT" => new Style(background: Color.Red),
-            "INTER" => new Style(background: Color.Green),
-            "WET" => new Style(background: Color.Blue),
+            "HARD" => new Style(foreground: Color.White, background: Color.Grey),
+            "MEDIUM" => new Style(foreground: Color.Black, background: Color.Yellow),
+            "SOFT" => new Style(foreground: Color.Black, background: Color.Red),
+            "INTER" => new Style(foreground: Color.Black, background: Color.Green),
+            "WET" => new Style(foreground: Color.Black, background: Color.Blue),
             _ => _normal
         };
+    }
+
+    private Style GetStyle(TimingDataPoint.Driver.Interval? interval, bool isComparisonLine)
+    {
+        if (interval is null)
+            return _normal;
+        
+        var foreground = Color.White;
+        var background = Color.Black;
+
+        if (isComparisonLine)
+        {
+            foreground = Color.Black;
+            background = Color.White;
+        }
+
+        if (interval.IntervalSeconds() < 1)
+        {
+            foreground = Color.Green3;
+        }
+
+        return new Style(foreground: foreground, background: background);
+    }
+
+    private IRenderable GetGapBetweenLines(TimingDataPoint.Driver? from, TimingDataPoint.Driver to)
+    {
+        if (from == to)
+        {
+            return new Text("-------");
+        }
+
+        if (from?.GapToLeaderSeconds() is not null && to.GapToLeaderSeconds() is not null)
+        {
+            var gap = to.GapToLeaderSeconds() - from.GapToLeaderSeconds();
+            return new Text($"{(gap > 0 ? "+" : "")}{gap, 3}".PadLeft(7));
+        }
+
+        return new Text("");
     }
 
     private IRenderable GetRaceControlPanel()
