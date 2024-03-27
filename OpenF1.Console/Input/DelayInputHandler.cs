@@ -6,11 +6,11 @@ public class IncreaseDelayInputHandler(ITimingService timingService) : IInputHan
 {
     public bool IsEnabled => true;
 
-    public Screen[] ApplicableScreens => [Screen.ManageSession, Screen.TimingOverview];
+    public Screen[] ApplicableScreens => [Screen.ManageSession, Screen.TimingTower];
 
     public ConsoleKey ConsoleKey => ConsoleKey.RightArrow;
 
-    public string Description => "Increase Delay";
+    public string Description => "Delay+";
 
     public int Sort => 20;
 
@@ -26,11 +26,11 @@ public class DecreaseDelayInputHandler(ITimingService timingService) : IInputHan
 {
     public bool IsEnabled => true;
 
-    public Screen[] ApplicableScreens => [Screen.ManageSession, Screen.TimingOverview];
+    public Screen[] ApplicableScreens => [Screen.ManageSession, Screen.TimingTower];
 
     public ConsoleKey ConsoleKey => ConsoleKey.LeftArrow;
 
-    public string Description => "Decrease Delay";
+    public string Description => "Delay-";
 
     public int Sort => 21;
 

@@ -5,6 +5,6 @@ public enum Screen {
     Shutdown,
     ManageSession,
     Logs,
-    TimingOverview,
+    TimingTower,
     TimingHistory
 }

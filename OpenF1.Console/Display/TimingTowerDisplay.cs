@@ -4,7 +4,7 @@ using Spectre.Console.Rendering;
 
 namespace OpenF1.Console;
 
-public class TimingOverviewDisplay(
+public class TimingTowerDisplay(
     State state,
     RaceControlMessageProcessor raceControlMessages,
     TimingDataProcessor timingData,
@@ -15,7 +15,7 @@ public class TimingOverviewDisplay(
     ITimingService timingService
 ) : IDisplay
 {
-    public Screen Screen => Screen.TimingOverview;
+    public Screen Screen => Screen.TimingTower;
 
     private readonly Style _personalBest = new(foreground: Color.Black, background: Color.Green);
     private readonly Style _overallBest = new(foreground: Color.Black, background: Color.Purple);

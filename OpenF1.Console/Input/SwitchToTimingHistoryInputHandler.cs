@@ -4,7 +4,7 @@ public class SwitchToTimingHistoryInputHandler(State state) : IInputHandler
 {
     public bool IsEnabled => true;
     
-    public Screen[] ApplicableScreens => [Screen.Main, Screen.TimingOverview];
+    public Screen[] ApplicableScreens => [Screen.Main, Screen.TimingTower];
 
     public ConsoleKey ConsoleKey => ConsoleKey.H;
 

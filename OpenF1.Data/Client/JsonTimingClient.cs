@@ -9,7 +9,6 @@ public class JsonTimingClient(ITimingService timingService, ILogger<JsonTimingCl
 {
     private string _directory = "";
     private CancellationTokenSource _cts = new();
-    private Thread? _thread;
 
     public Task? ExecuteTask { get; private set; }
 

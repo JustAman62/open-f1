@@ -1,6 +1,6 @@
 namespace OpenF1.Console;
 
-public class SwitchToTimingOverviewInputHandler(State state) : IInputHandler
+public class SwitchToTimingTowerInputHandler(State state) : IInputHandler
 {
     public bool IsEnabled => true;
     
@@ -8,13 +8,13 @@ public class SwitchToTimingOverviewInputHandler(State state) : IInputHandler
 
     public ConsoleKey ConsoleKey => ConsoleKey.O;
 
-    public string Description => "Timing Overview";
+    public string Description => "Timing Tower";
 
     public int Sort => 52;
 
     public Task ExecuteAsync(ConsoleKeyInfo consoleKeyInfo)
     {
-        state.CurrentScreen = Screen.TimingOverview;
+        state.CurrentScreen = Screen.TimingTower;
         return Task.CompletedTask;
     }
 }
