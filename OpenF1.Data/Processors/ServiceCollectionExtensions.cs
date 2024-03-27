@@ -13,6 +13,7 @@ public static partial class ServiceCollectionExtensions
             .AddProcessor<TimingDataPoint, TimingDataProcessor>()
             .AddProcessor<TimingAppDataPoint, TimingAppDataProcessor>()
             .AddProcessor<LapCountDataPoint, LapCountProcessor>()
+            .AddProcessor<WeatherDataPoint, WeatherProcessor>()
             .AddProcessor<DriverListDataPoint, DriverListProcessor>();
             
         return collection;

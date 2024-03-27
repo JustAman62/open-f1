@@ -6,7 +6,7 @@ public class IncreaseDelayInputHandler(ITimingService timingService) : IInputHan
 {
     public bool IsEnabled => true;
 
-    public Screen[] ApplicableScreens => [Screen.ManageSession, Screen.TimingTower];
+    public Screen[] ApplicableScreens => [Screen.ManageSession, Screen.TimingTower, Screen.RaceControl];
 
     public ConsoleKey ConsoleKey => ConsoleKey.RightArrow;
 
@@ -26,7 +26,7 @@ public class DecreaseDelayInputHandler(ITimingService timingService) : IInputHan
 {
     public bool IsEnabled => true;
 
-    public Screen[] ApplicableScreens => [Screen.ManageSession, Screen.TimingTower];
+    public Screen[] ApplicableScreens => [Screen.ManageSession, Screen.TimingTower, Screen.RaceControl];
 
     public ConsoleKey ConsoleKey => ConsoleKey.LeftArrow;
 

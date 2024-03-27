@@ -6,5 +6,6 @@ public enum Screen {
     ManageSession,
     Logs,
     TimingTower,
-    TimingHistory
+    TimingHistory,
+    RaceControl
 }

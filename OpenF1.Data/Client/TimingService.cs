@@ -80,6 +80,7 @@ public class TimingService(IEnumerable<IProcessor> processors, ILogger<TimingSer
         ProcessData("DriverList", obj["DriverList"]?.ToString(), DateTimeOffset.UtcNow);
         ProcessData("TrackStatus", obj["TrackStatus"]?.ToString(), DateTimeOffset.UtcNow);
         ProcessData("LapCount", obj["LapCount"]?.ToString(), DateTimeOffset.UtcNow);
+        ProcessData("WeatherData", obj["WeatherData"]?.ToString(), DateTimeOffset.UtcNow);
 
         var linesToProcess = obj["TimingData"]?["Lines"]?.AsObject() ?? [];
         foreach (var (_, line) in linesToProcess)
@@ -139,6 +140,9 @@ public class TimingService(IEnumerable<IProcessor> processors, ILogger<TimingSer
                 break;
             case "LapCount":
                 SendToProcessor<LapCountDataPoint>(data);
+                break;
+            case "WeatherData":
+                SendToProcessor<WeatherDataPoint>(data);
                 break;
         }
     }
