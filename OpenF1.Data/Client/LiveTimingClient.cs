@@ -70,12 +70,6 @@ public sealed class LiveTimingClient(ITimingService timingService, ILogger<LiveT
 
         logger.LogInformation("Subscribing to lots of topics");
 
-        await proxy.Invoke(
-            "Subscribe",
-            (string a) => Console.WriteLine("SessionInfo " + a),
-            new[] { new[] { "SessionInfo" } }
-        );
-
         var res = await proxy.Invoke<JObject>("Subscribe", new[] { _topics });
         HandleSubscriptionResponse(res.ToString());
         await timingService.StartAsync();
