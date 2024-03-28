@@ -4,6 +4,7 @@
   <PropertyGroup>
     <Authors>Aman Dhoot</Authors>
     <Company>Open F1</Company>
+    <Product>Open F1</Product>
     <TargetFramework>net8.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>

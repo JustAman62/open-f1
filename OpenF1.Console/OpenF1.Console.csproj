@@ -5,6 +5,7 @@
     <PackageId>openf1-console</PackageId>
     <PackageReadmeFile>README.md</PackageReadmeFile>
     <TargetName>openf1-console</TargetName>
+    <PackageTags>formula1;f1;livetiming;timing;tui;terminal-ui</PackageTags>
   </PropertyGroup>
 
   <ItemGroup>

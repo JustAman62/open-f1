@@ -4,6 +4,7 @@
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <PackageId>OpenF1.Data</PackageId>
     <PackageReadmeFile>README.md</PackageReadmeFile>
+    <PackageTags>formula1;f1;livetiming;timing</PackageTags>
   </PropertyGroup>
 
   <ItemGroup>
