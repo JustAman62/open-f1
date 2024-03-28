@@ -8,6 +8,7 @@
     <ToolCommandName>openf1-console</ToolCommandName>
     <PackAsTool>true</PackAsTool>
     <PackageTags>formula1;f1;livetiming;timing;tui;terminal-ui</PackageTags>
+    <GenerateRuntimeConfigurationFiles>true</GenerateRuntimeConfigurationFiles>
   </PropertyGroup>
 
   <ItemGroup>
