@@ -1,11 +1,15 @@
 using System.Text.Json;
 using System.Text.Json.Nodes;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 
 namespace OpenF1.Data;
 
-public class JsonTimingClient(ITimingService timingService, ILogger<JsonTimingClient> logger)
-    : IJsonTimingClient
+public class JsonTimingClient(
+    ITimingService timingService,
+    IOptions<LiveTimingOptions> options,
+    ILogger<JsonTimingClient> logger
+) : IJsonTimingClient
 {
     private string _directory = "";
     private CancellationTokenSource _cts = new();
@@ -15,7 +19,7 @@ public class JsonTimingClient(ITimingService timingService, ILogger<JsonTimingCl
     /// <inheritdoc />
     public IEnumerable<string> GetDirectoryNames() =>
         Directory
-            .GetDirectories("./SimulationData")
+            .GetDirectories(options.Value.DataDirectory)
             .Where(x =>
                 Directory
                     .GetFiles(x)

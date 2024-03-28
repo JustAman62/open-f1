@@ -13,6 +13,7 @@ public class TimingService(IEnumerable<IProcessor> processors, ILogger<TimingSer
     private ConcurrentQueue<(string type, string? data, DateTimeOffset timestamp)> _recent = new();
     private Channel<(string type, string? data, DateTimeOffset timestamp)> _workItems =
         Channel.CreateUnbounded<(string type, string? data, DateTimeOffset timestamp)>();
+
     private static readonly JsonSerializerOptions _jsonSerializerOptions =
         new(JsonSerializerDefaults.Web)
         {
@@ -21,6 +22,7 @@ public class TimingService(IEnumerable<IProcessor> processors, ILogger<TimingSer
         };
 
     public TimeSpan Delay { get; set; } = TimeSpan.Zero;
+
     public ILogger Logger { get; } = logger;
 
     public Task StartAsync()
@@ -114,7 +116,9 @@ public class TimingService(IEnumerable<IProcessor> processors, ILogger<TimingSer
 
     private void ProcessData(string type, string? data, DateTimeOffset timestamp)
     {
-        Logger.LogInformation($"Processing {type} data point for timestamp {timestamp:s} :: {data}");
+        Logger.LogInformation(
+            $"Processing {type} data point for timestamp {timestamp:s} :: {data}"
+        );
         if (data is null || !Enum.TryParse<LiveTimingDataType>(type, out var liveTimingDataType))
             return;
 

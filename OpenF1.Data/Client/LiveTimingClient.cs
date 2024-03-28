@@ -1,13 +1,16 @@
 ﻿using System.Text.Json.Nodes;
 using Microsoft.AspNet.SignalR.Client;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using Newtonsoft.Json.Linq;
 
 namespace OpenF1.Data;
 
-public sealed class LiveTimingClient(ITimingService timingService, ILogger<LiveTimingClient> logger)
-    : ILiveTimingClient,
-        IDisposable
+public sealed class LiveTimingClient(
+    ITimingService timingService,
+    IOptions<LiveTimingOptions> options,
+    ILogger<LiveTimingClient> logger
+) : ILiveTimingClient, IDisposable
 {
     private readonly string[] _topics =
     [
@@ -82,12 +85,12 @@ public sealed class LiveTimingClient(ITimingService timingService, ILogger<LiveT
         var sessionInfo = obj?["SessionInfo"];
         var location = sessionInfo?["Meeting"]?["Location"] ?? "UnknownLocation";
         var sessionName = sessionInfo?["Name"] ?? "UnknownName";
-        _sessionKey = $"{location}_{sessionName}";
+        _sessionKey = $"{location}_{sessionName}".Replace(' ', '_');
 
         logger.LogInformation($"Found session key from subscription data: {_sessionKey}");
 
-        Directory.CreateDirectory($"./SimulationData/{_sessionKey}");
-        File.WriteAllText($"./SimulationData/{_sessionKey}/subscribe.txt", res);
+        Directory.CreateDirectory($"{options.Value.DataDirectory}/{_sessionKey}");
+        File.WriteAllText(Path.Join(options.Value.DataDirectory, $"{_sessionKey}/subscribe.txt"), res);
         timingService.ProcessSubscriptionData(res);
     }
 
@@ -96,7 +99,7 @@ public sealed class LiveTimingClient(ITimingService timingService, ILogger<LiveT
         try
         {
             File.AppendAllText(
-                $"./SimulationData/{_sessionKey}/live.txt",
+                Path.Join(options.Value.DataDirectory, $"{_sessionKey}/live.txt"),
                 res.ReplaceLineEndings(string.Empty) + Environment.NewLine
             );
 
