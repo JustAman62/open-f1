@@ -115,33 +115,33 @@ public class TimingService(IEnumerable<IProcessor> processors, ILogger<TimingSer
     private void ProcessData(string type, string? data, DateTimeOffset timestamp)
     {
         Logger.LogInformation($"Processing {type} data point for timestamp {timestamp:s} :: {data}");
-        if (data is null)
+        if (data is null || !Enum.TryParse<LiveTimingDataType>(type, out var liveTimingDataType))
             return;
 
-        switch (type)
+        switch (liveTimingDataType)
         {
-            case "Heartbeat":
+            case LiveTimingDataType.Heartbeat:
                 SendToProcessor<HeartbeatDataPoint>(data);
                 break;
-            case "RaceControlMessages":
+            case LiveTimingDataType.RaceControlMessages:
                 SendToProcessor<RaceControlMessageDataPoint>(data);
                 break;
-            case "TimingData":
+            case LiveTimingDataType.TimingData:
                 SendToProcessor<TimingDataPoint>(data);
                 break;
-            case "TimingAppData":
+            case LiveTimingDataType.TimingAppData:
                 SendToProcessor<TimingAppDataPoint>(data);
                 break;
-            case "DriverList":
+            case LiveTimingDataType.DriverList:
                 SendToProcessor<DriverListDataPoint>(data);
                 break;
-            case "TrackStatus":
+            case LiveTimingDataType.TrackStatus:
                 SendToProcessor<TrackStatusDataPoint>(data);
                 break;
-            case "LapCount":
+            case LiveTimingDataType.LapCount:
                 SendToProcessor<LapCountDataPoint>(data);
                 break;
-            case "WeatherData":
+            case LiveTimingDataType.WeatherData:
                 SendToProcessor<WeatherDataPoint>(data);
                 break;
         }

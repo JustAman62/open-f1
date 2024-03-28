@@ -411,3 +411,6 @@ obj
 **/bin/**
 **/obj/**
 *.db
+
+data
+config.json

@@ -1,10 +1,10 @@
 namespace OpenF1.Data;
 
-public interface IProcessor
-{
-}
+public interface IProcessor { }
 
 public interface IProcessor<T> : IProcessor
 {
-    void Process(T data);
+    public Type InputType => typeof(T);
+
+    public void Process(T data);
 }
