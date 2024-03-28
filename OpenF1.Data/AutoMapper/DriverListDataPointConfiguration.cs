@@ -13,6 +13,6 @@ public class DriverListDataPointConfiguration : Profile
             Dictionary<string, DriverListDataPoint.Driver>,
             Dictionary<string, DriverListDataPoint.Driver>
         >()
-            .ConvertUsing(MappingUtils.DictionaryAdditiveMergeMap);
+            .ConvertUsingDictionaryMerge();
     }
 }

@@ -13,13 +13,13 @@ public class TimingDataPointConfiguration : Profile
             Dictionary<string, TimingDataPoint.Driver>,
             Dictionary<string, TimingDataPoint.Driver>
         >()
-            .ConvertUsing(MappingUtils.DictionaryAdditiveMergeMap);
+            .ConvertUsingDictionaryMerge();
 
         CreateMap<
             Dictionary<string, TimingDataPoint.Driver.LapSectorTime>,
             Dictionary<string, TimingDataPoint.Driver.LapSectorTime>
         >()
-            .ConvertUsing(MappingUtils.DictionaryAdditiveMergeMap);
+            .ConvertUsingDictionaryMerge();
 
         CreateMap<TimingDataPoint.Driver, TimingDataPoint.Driver>()
             .ForAllMembers(opts => opts.Condition((_, _, member) => member != null));

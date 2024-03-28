@@ -19,8 +19,11 @@ namespace OpenF1.Data;
 /// }
 /// </c>
 /// </summary>
-public sealed class DriverListDataPoint : Dictionary<string, DriverListDataPoint.Driver>
+public sealed class DriverListDataPoint : Dictionary<string, DriverListDataPoint.Driver>, ILiveTimingDataPoint
 {
+    /// <inheritdoc />
+    public LiveTimingDataType LiveTimingDataType => LiveTimingDataType.DriverList;
+
     public sealed record Driver {
         public string? RacingNumber { get; set; }
         public string? BroadcastName { get; set; }

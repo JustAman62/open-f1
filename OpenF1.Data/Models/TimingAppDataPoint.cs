@@ -22,8 +22,11 @@ namespace OpenF1.Data;
 ///   }
 /// }
 /// </summary>
-public sealed record TimingAppDataPoint
+public sealed record TimingAppDataPoint: ILiveTimingDataPoint
 {
+    /// <inheritdoc />
+    public LiveTimingDataType LiveTimingDataType => LiveTimingDataType.TimingAppData;
+
     public Dictionary<string, Driver> Lines { get; set; } = new();
 
     public sealed record Driver

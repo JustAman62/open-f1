@@ -2,8 +2,11 @@ using System.Text.Json;
 
 namespace OpenF1.Data;
 
-public sealed record TimingDataPoint
+public sealed record TimingDataPoint: ILiveTimingDataPoint
 {
+    /// <inheritdoc />
+    public LiveTimingDataType LiveTimingDataType => LiveTimingDataType.TimingData;
+
     public Dictionary<string, Driver> Lines { get; set; } = new();
 
     public sealed record Driver

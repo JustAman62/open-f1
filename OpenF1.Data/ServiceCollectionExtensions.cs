@@ -11,7 +11,6 @@ public static partial class ServiceCollectionExtensions
         collection
             .AddAutoMapper(cfg => cfg.AddCollectionMappers(), typeof(TimingDataPointConfiguration).Assembly)
             .AddLiveTimingClient()
-            .AddSessionProvider()
             .AddLiveTimingProcessors();
 
         return collection;

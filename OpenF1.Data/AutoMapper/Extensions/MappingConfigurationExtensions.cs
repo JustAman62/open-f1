@@ -2,13 +2,25 @@ using AutoMapper;
 
 namespace OpenF1.Data;
 
-public static class MappingUtils
+public static class MappingConfigurationExtensions
 {
+    public static IMappingExpression<
+        Dictionary<TKey, TValue>,
+        Dictionary<TKey, TValue>
+    > ConvertUsingDictionaryMerge<TKey, TValue>(
+        this IMappingExpression<Dictionary<TKey, TValue>, Dictionary<TKey, TValue>> expression
+    )
+        where TKey : notnull
+    {
+        expression.ConvertUsing(DictionaryAdditiveMergeMap);
+        return expression;
+    }
+
     /// <summary>
     /// Merge dictionaries in an additive way, where entries are always added/updated but never removed.
     /// </summary>
     /// <returns>The merged dictionary</returns>
-    public static Dictionary<TKey, TValue> DictionaryAdditiveMergeMap<TKey, TValue>(
+    private static Dictionary<TKey, TValue> DictionaryAdditiveMergeMap<TKey, TValue>(
         Dictionary<TKey, TValue> src,
         Dictionary<TKey, TValue> dest,
         ResolutionContext ctx
@@ -23,8 +35,6 @@ public static class MappingUtils
         {
             if (dest.TryGetValue(k, out var existing))
             {
-                // Map the existing value to itself to create a copy and prevent reference based bugs
-                // Bad for performance, but good to expectations of mapping
                 ctx.Mapper.Map(v, existing);
             }
             else
