@@ -7,6 +7,12 @@
       "commands": [
         "dotnet-csharpier"
       ]
+    },
+    "nbgv": {
+      "version": "3.6.133",
+      "commands": [
+        "nbgv"
+      ]
     }
   }
 }
