@@ -2,6 +2,9 @@
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
+    <PackageId>openf1-console</PackageId>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <TargetName>openf1-console</TargetName>
   </PropertyGroup>
 
   <ItemGroup>
@@ -18,9 +21,10 @@
 	</ItemGroup>
 
   <ItemGroup>
-	  <None Update="*.flf">
+	  <None Update="*.flf" Pack="true">
 	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 	  </None>
+    <None Include="../README.md" Pack="true" PackagePath="\"/>
   </ItemGroup>
 
 </Project>
