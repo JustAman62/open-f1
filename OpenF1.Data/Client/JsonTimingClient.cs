@@ -17,8 +17,10 @@ public class JsonTimingClient(
     public Task? ExecuteTask { get; private set; }
 
     /// <inheritdoc />
-    public IEnumerable<string> GetDirectoryNames() =>
-        Directory
+    public IEnumerable<string> GetDirectoryNames()
+    {
+        Directory.CreateDirectory(options.Value.DataDirectory);
+        return Directory
             .GetDirectories(options.Value.DataDirectory)
             .Where(x =>
                 Directory
@@ -27,6 +29,7 @@ public class JsonTimingClient(
                         fileName.EndsWith("live.txt") || fileName.EndsWith("subscribe.txt")
                     )
             );
+    }
 
     public async Task StartAsync(string directory)
     {

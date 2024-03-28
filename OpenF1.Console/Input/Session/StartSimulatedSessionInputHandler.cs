@@ -1,9 +1,13 @@
+using Microsoft.Extensions.Options;
 using OpenF1.Data;
 using Spectre.Console;
 
 namespace OpenF1.Console;
 
-public class StartSimulatedSessionInputHandler(IJsonTimingClient jsonTimingClient) : IInputHandler
+public class StartSimulatedSessionInputHandler(
+    IJsonTimingClient jsonTimingClient,
+    IOptions<LiveTimingOptions> options
+) : IInputHandler
 {
     public bool IsEnabled => true;
 
@@ -18,10 +22,15 @@ public class StartSimulatedSessionInputHandler(IJsonTimingClient jsonTimingClien
     public async Task ExecuteAsync(ConsoleKeyInfo consoleKeyInfo)
     {
         var directories = jsonTimingClient.GetDirectoryNames();
+        var title = $"""
+            Select the data directory to run the simulation from. 
+            If you cannot see your directory here, ensure that it contains both a file named subscribe.txt and live.txt.
+            To change this directory, set the OPENF1_DATADIRECTORY environment variable.
+            Configured Directory: {options.Value.DataDirectory}
+            """;
+
         var prompt = new SelectionPrompt<string>()
-            .Title(
-                "Choose which directory to run the simulation from. If you cannot see your directory here, ensure that it contains both a file named subscribe.txt and live.txt."
-            )
+            .Title(title)
             .AddChoices(directories)
             .AddChoices("Cancel");
 

@@ -6,7 +6,7 @@ using OpenF1.Console;
 using OpenF1.Data;
 
 var configuration = new ConfigurationBuilder()
-    .AddJsonFile(Path.Join(LiveTimingOptions.BaseDirectory, "config.json"))
+    .AddJsonFile(Path.Join(LiveTimingOptions.BaseDirectory, "config.json"), optional: true)
     .AddEnvironmentVariables("OPENF1_")
     .Build();
 
