@@ -1,4 +1,3 @@
-using System.Reflection;
 using Spectre.Console;
 using Spectre.Console.Rendering;
 
@@ -10,7 +9,7 @@ public class MainDisplay() : IDisplay
 
     private readonly FigletFont _font = FigletFont.Load(
         Path.Join(
-            Directory.GetParent(Assembly.GetExecutingAssembly().Location)!.FullName,
+            Directory.GetParent(AppContext.BaseDirectory)!.FullName,
             "/slant.flf"
         )
     );
