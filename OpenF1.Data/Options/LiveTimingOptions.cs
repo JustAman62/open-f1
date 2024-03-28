@@ -5,8 +5,6 @@ namespace OpenF1.Data;
 /// </summary>
 public record LiveTimingOptions
 {
-    public static string ConfigurationSectionName => "LiveTiming";
-
     public static string BaseDirectory =>
         Path.Join(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), "open-f1");
 

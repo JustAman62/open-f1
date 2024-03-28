@@ -7,7 +7,7 @@ namespace OpenF1.Data;
 
 public static partial class ServiceCollectionExtensions
 {
-    public static IServiceCollection AddLiveTiming(this IServiceCollection collection, IConfigurationSection configuration)
+    public static IServiceCollection AddLiveTiming(this IServiceCollection collection, IConfiguration configuration)
     {
         collection
             .Configure<LiveTimingOptions>(configuration)
