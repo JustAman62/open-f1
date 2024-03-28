@@ -12,7 +12,7 @@ public class RawTimingDataPointUnitTests
 
         // Assert
         Assert.NotNull(result);
-        Assert.Equal("SessionName", result.SessionName);
+        Assert.Equal("Session Name", result.SessionName);
         Assert.Equal(expectedEventType, result.EventType);
         Assert.Equal(expectedData, result.EventData);
         Assert.Equal(expectedDateTime, result.LoggedDateTime.ToUniversalTime().ToString("u"));
