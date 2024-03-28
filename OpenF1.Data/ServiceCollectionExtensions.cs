@@ -6,7 +6,7 @@ namespace OpenF1.Data;
 
 public static partial class ServiceCollectionExtensions
 {
-    public static IServiceCollection AddLiveTimingProvider(this IServiceCollection collection)
+    public static IServiceCollection AddLiveTiming(this IServiceCollection collection)
     {
         collection
             .AddAutoMapper(cfg => cfg.AddCollectionMappers(), typeof(TimingDataPointConfiguration).Assembly)

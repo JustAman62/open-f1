@@ -12,7 +12,7 @@ var serviceCollection = new ServiceCollection()
     .AddSingleton<State>()
     .AddInputHandlers()
     .AddDisplays()
-    .AddLiveTimingProvider();
+    .AddLiveTiming();
 
 var services = serviceCollection.BuildServiceProvider();
 
