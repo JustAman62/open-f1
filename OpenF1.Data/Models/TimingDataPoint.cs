@@ -19,6 +19,8 @@ public sealed record TimingDataPoint: ILiveTimingDataPoint
         public string? GapToLeader { get; set; }
         public Interval? IntervalToPositionAhead { get; set; }
 
+        public Stat? Stats { get; set; }
+
         public int? Line { get; set; }
         public string? Position { get; set; }
 
@@ -57,6 +59,12 @@ public sealed record TimingDataPoint: ILiveTimingDataPoint
         {
             public string? Value { get; set; }
             public int? Lap { get; set; }
+        }
+
+        public sealed record Stat
+        {
+            public string? TimeDiffToFastest { get; set; }
+            public string? TimeDifftoPositionAhead { get; set; }
         }
 
         public override string ToString() => JsonSerializer.Serialize(this);

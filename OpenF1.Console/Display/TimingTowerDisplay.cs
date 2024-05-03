@@ -57,7 +57,7 @@ public class TimingTowerDisplay(
             "S1",
             "S2",
             "S3",
-            "Pits",
+            "Pit",
             "Tyre",
             "Compare"
         );
@@ -74,9 +74,7 @@ public class TimingTowerDisplay(
             var teamColour = driver.TeamColour ?? "000000";
 
             var isComparisonLine = line == comparisonDataPoint.Value;
-            var lineStyle = isComparisonLine
-                ? _invert
-                : _normal;
+            var lineStyle = isComparisonLine ? _invert : _normal;
 
             table.AddRow(
                 new Markup(
@@ -91,26 +89,28 @@ public class TimingTowerDisplay(
                 new Text(line.BestLapTime?.Value ?? "NULL"),
                 new Text(line.LastLapTime?.Value ?? "NULL", GetStyle(line.LastLapTime)),
                 new Text(
-                    line.Sectors.GetValueOrDefault("0")?.Value ?? "",
+                    line.Sectors.GetValueOrDefault("0")?.Value ?? "      ",
                     GetStyle(line.Sectors.GetValueOrDefault("0"))
                 ),
                 new Text(
-                    line.Sectors.GetValueOrDefault("1")?.Value ?? "",
+                    line.Sectors.GetValueOrDefault("1")?.Value ?? "      ",
                     GetStyle(line.Sectors.GetValueOrDefault("1"))
                 ),
                 new Text(
-                    line.Sectors.GetValueOrDefault("2")?.Value ?? "",
+                    line.Sectors.GetValueOrDefault("2")?.Value ?? "      ",
                     GetStyle(line.Sectors.GetValueOrDefault("2"))
                 ),
                 new Text(
                     line.InPit.GetValueOrDefault()
-                        ? "IN PITS"
+                        ? "IN"
                         : line.PitOut.GetValueOrDefault()
-                            ? "PIT OUT"
-                            : $"{line.NumberOfPitStops, 4}",
-                    line.InPit.GetValueOrDefault() || line.PitOut.GetValueOrDefault()
+                            ? "OUT"
+                            : $"{line.NumberOfPitStops, 3}",
+                    line.InPit.GetValueOrDefault()
                         ? new Style(foreground: Color.Black, background: Color.Yellow)
-                        : Style.Plain
+                        : line.PitOut.GetValueOrDefault()
+                            ? new Style(foreground: Color.Black, background: Color.Green)
+                            : Style.Plain
                 ),
                 new Text($"{stint?.Compound?[0]} {stint?.TotalLaps, 2}", GetStyle(stint)),
                 GetGapBetweenLines(comparisonDataPoint.Value, line)
@@ -163,7 +163,7 @@ public class TimingTowerDisplay(
     {
         if (interval is null)
             return _normal;
-        
+
         var foreground = Color.White;
         var background = Color.Black;
 
