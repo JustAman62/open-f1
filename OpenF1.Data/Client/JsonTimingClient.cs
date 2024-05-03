@@ -25,9 +25,10 @@ public class JsonTimingClient(
             .Where(x =>
                 Directory
                     .GetFiles(x)
-                    .All(fileName =>
-                        fileName.EndsWith("live.txt") || fileName.EndsWith("subscribe.txt")
-                    )
+                    .Any(x => x.EndsWith("live.txt", StringComparison.OrdinalIgnoreCase))
+                && Directory
+                    .GetFiles(x)
+                    .Any(x => x.EndsWith("subscribe.txt", StringComparison.OrdinalIgnoreCase))
             );
     }
 
@@ -49,44 +50,51 @@ public class JsonTimingClient(
 
     public async Task ExecuteAsync(CancellationToken cancellationToken)
     {
-        // Handle the dump of data we receive at subscription time
-        var subscriptionData = await File.ReadAllTextAsync(
-                Path.Join(_directory, "/subscribe.txt"),
-                cancellationToken
-            )
-            .ConfigureAwait(false);
-
-        timingService.ProcessSubscriptionData(subscriptionData);
-
-        var subscriptionHeartbeat = JsonNode
-            .Parse(subscriptionData)
-            ?["Heartbeat"]?.Deserialize<HeartbeatDataPoint>();
-        if (subscriptionHeartbeat is not null)
+        try
         {
-            timingService.Delay = DateTimeOffset.UtcNow - subscriptionHeartbeat.Utc;
-            logger.LogInformation(
-                $"Calculated a delay of {timingService.Delay} between now and {subscriptionHeartbeat.Utc:s}"
-            );
-        }
-        else
-        {
-            logger.LogWarning($"Unable to calculate a delay for this simulation data");
-        }
+            // Handle the dump of data we receive at subscription time
+            var subscriptionData = await File.ReadAllTextAsync(
+                    Path.Join(_directory, "/subscribe.txt"),
+                    cancellationToken
+                )
+                .ConfigureAwait(false);
 
-        // Handle the real-time data
-        var lines = File.ReadLinesAsync(Path.Join(_directory, "/live.txt"), cancellationToken);
+            timingService.ProcessSubscriptionData(subscriptionData);
 
-        await foreach (var line in lines)
-        {
-            try
+            var subscriptionHeartbeat = JsonNode
+                .Parse(subscriptionData)
+                ?["Heartbeat"]?.Deserialize<HeartbeatDataPoint>();
+            if (subscriptionHeartbeat is not null)
             {
-                var (type, data, timestamp) = ProcessLine(line);
-                await timingService.EnqueueAsync(type, data, timestamp).ConfigureAwait(false);
+                timingService.Delay = DateTimeOffset.UtcNow - subscriptionHeartbeat.Utc;
+                logger.LogInformation(
+                    $"Calculated a delay of {timingService.Delay} between now and {subscriptionHeartbeat.Utc:s}"
+                );
             }
-            catch (Exception ex)
+            else
             {
-                logger.LogError(ex, $"Failed to handle data: {line}");
+                logger.LogError($"Unable to calculate a delay for this simulation data");
             }
+
+            // Handle the real-time data
+            var lines = File.ReadLinesAsync(Path.Join(_directory, "/live.txt"), cancellationToken);
+
+            await foreach (var line in lines)
+            {
+                try
+                {
+                    var (type, data, timestamp) = ProcessLine(line);
+                    await timingService.EnqueueAsync(type, data, timestamp).ConfigureAwait(false);
+                }
+                catch (Exception ex)
+                {
+                    logger.LogError(ex, $"Failed to handle data: {line}");
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex, "Failed to handle subscription or live data");
         }
     }
 

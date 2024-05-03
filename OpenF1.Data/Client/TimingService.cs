@@ -54,20 +54,27 @@ public class TimingService(IEnumerable<IProcessor> processors, ILogger<TimingSer
         {
             if (_workItems.Reader.TryRead(out var res))
             {
-                _recent.Enqueue(res);
-                if (_recent.Count > 5)
-                    _recent.TryDequeue(out _);
-
-                // Add a delay to the message timestamp,
-                // then figure out how long we have to wait for to be the wall clock time
-                var timestampWithDelay = res.timestamp + Delay;
-                var timeToWait = timestampWithDelay - DateTimeOffset.UtcNow;
-                if (timestampWithDelay > DateTimeOffset.UtcNow && timeToWait > TimeSpan.Zero)
+                try
                 {
-                    Logger.LogDebug($"Delaying for {timeToWait}");
-                    await Task.Delay(timeToWait, cancellationToken).ConfigureAwait(false);
+                    _recent.Enqueue(res);
+                    if (_recent.Count > 5)
+                        _recent.TryDequeue(out _);
+
+                    // Add a delay to the message timestamp,
+                    // then figure out how long we have to wait for to be the wall clock time
+                    var timestampWithDelay = res.timestamp + Delay;
+                    var timeToWait = timestampWithDelay - DateTimeOffset.UtcNow;
+                    if (timestampWithDelay > DateTimeOffset.UtcNow && timeToWait > TimeSpan.Zero)
+                    {
+                        Logger.LogDebug($"Delaying for {timeToWait}");
+                        await Task.Delay(timeToWait, cancellationToken).ConfigureAwait(false);
+                    }
+                    ProcessData(res.type, res.data, res.timestamp);
                 }
-                ProcessData(res.type, res.data, res.timestamp);
+                catch (Exception ex)
+                {
+                    Logger.LogError(ex, $"Failed to process data {res}");
+                }
             }
         }
     }
@@ -83,6 +90,7 @@ public class TimingService(IEnumerable<IProcessor> processors, ILogger<TimingSer
         ProcessData("TrackStatus", obj["TrackStatus"]?.ToString(), DateTimeOffset.UtcNow);
         ProcessData("LapCount", obj["LapCount"]?.ToString(), DateTimeOffset.UtcNow);
         ProcessData("WeatherData", obj["WeatherData"]?.ToString(), DateTimeOffset.UtcNow);
+        ProcessData("SessionInfo", obj["SessionInfo"]?.ToString(), DateTimeOffset.UtcNow);
 
         var linesToProcess = obj["TimingData"]?["Lines"]?.AsObject() ?? [];
         foreach (var (_, line) in linesToProcess)
@@ -116,9 +124,7 @@ public class TimingService(IEnumerable<IProcessor> processors, ILogger<TimingSer
 
     private void ProcessData(string type, string? data, DateTimeOffset timestamp)
     {
-        Logger.LogInformation(
-            $"Processing {type} data point for timestamp {timestamp:s} :: {data}"
-        );
+        Logger.LogDebug($"Processing {type} data point for timestamp {timestamp:s} :: {data}");
         if (data is null || !Enum.TryParse<LiveTimingDataType>(type, out var liveTimingDataType))
             return;
 
@@ -147,6 +153,9 @@ public class TimingService(IEnumerable<IProcessor> processors, ILogger<TimingSer
                 break;
             case LiveTimingDataType.WeatherData:
                 SendToProcessor<WeatherDataPoint>(data);
+                break;
+            case LiveTimingDataType.SessionInfo:
+                SendToProcessor<SessionInfoDataPoint>(data);
                 break;
         }
     }

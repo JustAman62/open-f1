@@ -11,4 +11,7 @@ public static class TimingDataPointExtensions
 
     public static decimal? IntervalSeconds(this TimingDataPoint.Driver.Interval interval) =>
         decimal.TryParse(interval?.Value, out var seconds) ? seconds : null;
+
+    public static bool IsRace(this SessionInfoDataPoint? sessionInfo) =>
+        sessionInfo?.Name?.Contains("Race") ?? true;
 }

@@ -12,6 +12,7 @@ public class TimingTowerDisplay(
     DriverListProcessor driverList,
     TrackStatusProcessor trackStatusProcessor,
     LapCountProcessor lapCountProcessor,
+    SessionInfoProcessor sessionInfoProcessor,
     ITimingService timingService
 ) : IDisplay
 {
@@ -26,7 +27,9 @@ public class TimingTowerDisplay(
     {
         var statusPanel = GetStatusPanel();
         var raceControlPanel = GetRaceControlPanel();
-        var timingTower = GetTimingTower();
+        var timingTower = sessionInfoProcessor.Latest.IsRace()
+            ? GetRaceTimingTower()
+            : GetRaceTimingTower();
 
         var layout = new Layout("Root").SplitRows(
             new Layout("Timing Tower", timingTower),
@@ -42,7 +45,7 @@ public class TimingTowerDisplay(
         return Task.FromResult<IRenderable>(layout);
     }
 
-    private IRenderable GetTimingTower()
+    private IRenderable GetRaceTimingTower()
     {
         if (timingData.LatestLiveTimingDataPoint is null)
             return new Text("No Timing");
@@ -89,23 +92,23 @@ public class TimingTowerDisplay(
                 new Text(line.BestLapTime?.Value ?? "NULL"),
                 new Text(line.LastLapTime?.Value ?? "NULL", GetStyle(line.LastLapTime)),
                 new Text(
-                    line.Sectors.GetValueOrDefault("0")?.Value ?? "      ",
+                    line.Sectors.GetValueOrDefault("0")?.Value?.PadLeft(6) ?? "      ",
                     GetStyle(line.Sectors.GetValueOrDefault("0"))
                 ),
                 new Text(
-                    line.Sectors.GetValueOrDefault("1")?.Value ?? "      ",
+                    line.Sectors.GetValueOrDefault("1")?.Value?.PadLeft(6) ?? "      ",
                     GetStyle(line.Sectors.GetValueOrDefault("1"))
                 ),
                 new Text(
-                    line.Sectors.GetValueOrDefault("2")?.Value ?? "      ",
+                    line.Sectors.GetValueOrDefault("2")?.Value?.PadLeft(6) ?? "      ",
                     GetStyle(line.Sectors.GetValueOrDefault("2"))
                 ),
                 new Text(
                     line.InPit.GetValueOrDefault()
-                        ? "IN"
+                        ? "IN "
                         : line.PitOut.GetValueOrDefault()
                             ? "OUT"
-                            : $"{line.NumberOfPitStops, 3}",
+                            : $"{line.NumberOfPitStops, 2}",
                     line.InPit.GetValueOrDefault()
                         ? new Style(foreground: Color.Black, background: Color.Yellow)
                         : line.PitOut.GetValueOrDefault()
