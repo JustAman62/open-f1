@@ -13,13 +13,13 @@ public class TimingTowerDisplay(
     TrackStatusProcessor trackStatusProcessor,
     LapCountProcessor lapCountProcessor,
     SessionInfoProcessor sessionInfoProcessor,
-    ITimingService timingService,
+    ITimingService timingService
 ) : IDisplay
 {
     public Screen Screen => Screen.TimingTower;
 
-    private readonly Style _personalBest = new(foreground: Color.Black, background: Color.Green);
-    private readonly Style _overallBest = new(foreground: Color.Black, background: Color.Purple);
+    private readonly Style _personalBest = new(foreground: Color.White, background: new Color(0, 118, 0));
+    private readonly Style _overallBest = new(foreground: Color.White, background: new Color(118, 0, 118));
     private readonly Style _normal = new(foreground: Color.White);
     private readonly Style _invert = new(foreground: Color.Black, background: Color.White);
 
@@ -209,10 +209,10 @@ public class TimingTowerDisplay(
                     line.InPit.GetValueOrDefault()
                         ? new Style(foreground: Color.Black, background: Color.Yellow)
                         : line.PitOut.GetValueOrDefault()
-                            ? new Style(foreground: Color.Black, background: Color.Green)
+                            ? _personalBest
                             : Style.Plain
                 ),
-                new Text($"{stint?.Compound?[0]} {stint?.TotalLaps, 2}", GetStyle(stint))
+                new Text($"{stint?.Compound?[0] ?? 'X'} {stint?.TotalLaps, 2}", GetStyle(stint))
             );
         }
 
@@ -258,8 +258,8 @@ public class TimingTowerDisplay(
         return stint.Compound switch
         {
             "HARD" => new Style(foreground: Color.White, background: Color.Grey),
-            "MEDIUM" => new Style(foreground: Color.Black, background: Color.Yellow),
-            "SOFT" => new Style(foreground: Color.Black, background: Color.Red),
+            "MEDIUM" => new Style(foreground: Color.White, background: Color.Yellow),
+            "SOFT" => new Style(foreground: Color.White, background: Color.Red),
             "INTER" => new Style(foreground: Color.Black, background: Color.Green),
             "WET" => new Style(foreground: Color.Black, background: Color.Blue),
             _ => _normal
@@ -336,9 +336,9 @@ public class TimingTowerDisplay(
         {
             var style = trackStatusProcessor.Latest.Status switch
             {
-                "1" => new Style(background: Color.Green),
-                "2" => new Style(background: Color.Yellow),
-                "4" => new Style(background: Color.Yellow),
+                "1" => _personalBest,
+                "2" => new Style(foreground: Color.White, background: Color.Yellow),
+                "4" => new Style(foreground: Color.White, background: Color.Yellow),
                 _ => Style.Plain
             };
             items.Add(
