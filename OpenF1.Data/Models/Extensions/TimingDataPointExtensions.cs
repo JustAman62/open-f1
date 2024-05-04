@@ -15,12 +15,12 @@ public static class TimingDataPointExtensions
         decimal.TryParse(interval?.Value, out var seconds) ? seconds : null;
 
     public static TimeSpan? ToTimeSpan(this TimingDataPoint.Driver.BestLap lap) =>
-        TimeSpan.TryParseExact(lap.Value, "m\\:ss\\.fff", CultureInfo.InvariantCulture, out var result)
+        TimeSpan.TryParseExact(lap.Value, ["m\\:ss\\.fff", "ss\\.fff"], CultureInfo.InvariantCulture, out var result)
             ? result
             : null;
 
     public static TimeSpan? ToTimeSpan(this TimingDataPoint.Driver.LapSectorTime lap) =>
-        TimeSpan.TryParseExact(lap.Value, "m\\:ss\\.fff", CultureInfo.InvariantCulture, out var result)
+        TimeSpan.TryParseExact(lap.Value, ["m\\:ss\\.fff", "ss\\.fff"], CultureInfo.InvariantCulture, out var result)
             ? result
             : null;
 

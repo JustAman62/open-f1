@@ -13,7 +13,7 @@ public class TimingTowerDisplay(
     TrackStatusProcessor trackStatusProcessor,
     LapCountProcessor lapCountProcessor,
     SessionInfoProcessor sessionInfoProcessor,
-    ITimingService timingService
+    ITimingService timingService,
 ) : IDisplay
 {
     public Screen Screen => Screen.TimingTower;
@@ -89,7 +89,7 @@ public class TimingTowerDisplay(
                     $"{line.IntervalToPositionAhead?.Value, 8}",
                     GetStyle(line.IntervalToPositionAhead, isComparisonLine)
                 ),
-                new Text(line.BestLapTime?.Value ?? "NULL"),
+                new Text(line.BestLapTime?.Value ?? "NULL", _normal),
                 new Text(line.LastLapTime?.Value ?? "NULL", GetStyle(line.LastLapTime)),
                 new Text(
                     line.Sectors.GetValueOrDefault("0")?.Value?.PadLeft(6) ?? "      ",
@@ -147,6 +147,16 @@ public class TimingTowerDisplay(
 
         var bestDriver = timingData.LatestLiveTimingDataPoint.GetOrderedLines().First();
 
+        var bestSector1 = timingData
+            .BestLaps.DefaultIfEmpty()
+            .Min(x => x.Value?.Sectors.GetValueOrDefault("0")?.ToTimeSpan() ?? TimeSpan.MaxValue);
+        var bestSector2 = timingData
+            .BestLaps.DefaultIfEmpty()
+            .Min(x => x.Value?.Sectors.GetValueOrDefault("1")?.ToTimeSpan() ?? TimeSpan.MaxValue);
+        var bestSector3 = timingData
+            .BestLaps.DefaultIfEmpty()
+            .Min(x => x.Value?.Sectors.GetValueOrDefault("2")?.ToTimeSpan() ?? TimeSpan.MaxValue);
+
         foreach (var (driverNumber, line) in timingData.LatestLiveTimingDataPoint.GetOrderedLines())
         {
             var driver = driverList.Latest?.GetValueOrDefault(driverNumber) ?? new();
@@ -155,29 +165,28 @@ public class TimingTowerDisplay(
             var bestLap = timingData.BestLaps.GetValueOrDefault(driverNumber);
             var teamColour = driver.TeamColour ?? "000000";
 
-            var gapToLeader = (line.BestLapTime.ToTimeSpan() - bestDriver.Value.BestLapTime.ToTimeSpan())?.TotalSeconds;
+            var gapToLeader = (
+                line.BestLapTime.ToTimeSpan() - bestDriver.Value.BestLapTime.ToTimeSpan()
+            )?.TotalSeconds;
 
             table.AddRow(
                 new Markup(
                     $"{line.Position, 2} [#{teamColour}]{driver.RacingNumber, 2} {driver.Tla ?? "UNK"}[/]",
                     _normal
                 ),
-                new Text(
-                    $"{(gapToLeader > 0 ? "+" : "")}{gapToLeader:f3}".PadLeft(7),
-                    _normal
-                ),
-                new Text(line.BestLapTime?.Value ?? "NULL"),
+                new Text($"{(gapToLeader > 0 ? "+" : "")}{gapToLeader:f3}".PadLeft(7), _normal),
+                new Text(line.BestLapTime?.Value ?? "NULL", _normal),
                 new Text(
                     bestLap?.Sectors.GetValueOrDefault("0")?.Value?.PadLeft(6) ?? "      ",
-                    GetStyle(bestLap?.Sectors.GetValueOrDefault("0"))
+                    GetStyle(bestLap?.Sectors.GetValueOrDefault("0"), bestSector1)
                 ),
                 new Text(
                     bestLap?.Sectors.GetValueOrDefault("1")?.Value?.PadLeft(6) ?? "      ",
-                    GetStyle(bestLap?.Sectors.GetValueOrDefault("1"))
+                    GetStyle(bestLap?.Sectors.GetValueOrDefault("1"), bestSector2)
                 ),
                 new Text(
                     bestLap?.Sectors.GetValueOrDefault("2")?.Value?.PadLeft(6) ?? "      ",
-                    GetStyle(bestLap?.Sectors.GetValueOrDefault("2"))
+                    GetStyle(bestLap?.Sectors.GetValueOrDefault("2"), bestSector3)
                 ),
                 new Text(
                     line.Sectors.GetValueOrDefault("0")?.Value?.PadLeft(6) ?? "      ",
@@ -217,13 +226,21 @@ public class TimingTowerDisplay(
         "IDE0046:Convert to conditional expression",
         Justification = "Harder to read"
     )]
-    private Style GetStyle(TimingDataPoint.Driver.LapSectorTime? time)
+    private Style GetStyle(TimingDataPoint.Driver.LapSectorTime? time, TimeSpan? bestSector = null)
     {
-        if (time is null)
+        if (string.IsNullOrWhiteSpace(time?.Value))
             return _normal;
-        if (time.OverallFastest ?? false)
+
+        if (bestSector == time?.ToTimeSpan())
             return _overallBest;
-        if (time.PersonalFastest ?? false)
+
+        // If we are checking against a best sector, don't style it unless it is fasted
+        if (bestSector.HasValue)
+            return _normal;
+
+        if (time?.OverallFastest ?? false)
+            return _overallBest;
+        if (time?.PersonalFastest ?? false)
             return _personalBest;
         return _normal;
     }
