@@ -11,6 +11,7 @@ public static partial class ServiceCollectionExtensions
     /// Adds the services required to support processing live timing data.
     /// A <see cref="ILiveTimingClient"/> is registered to support ingesting live timing data from the live feed.
     /// A <see cref="IJsonTimingClient"/> is registered to support ingesting previously recorded timing data from JSON files.
+    /// A <see cref="INotifyService"/> is registered to support sending notifications for when interesting data changes happen.
     /// </summary>
     /// <param name="collection">The <see cref="IServiceCollection"/> to add services to.</param>
     /// <param name="configuration">The <see cref="IConfiguration"/> to bind <see cref="LiveTimingOptions"/></param>
@@ -21,7 +22,8 @@ public static partial class ServiceCollectionExtensions
             .Configure<LiveTimingOptions>(configuration)
             .AddAutoMapper(cfg => cfg.AddCollectionMappers(), typeof(TimingDataPointConfiguration).Assembly)
             .AddLiveTimingClient()
-            .AddLiveTimingProcessors();
+            .AddLiveTimingProcessors()
+            .AddSingleton<INotifyService, NotifyService>();
 
         return collection;
     }

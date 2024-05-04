@@ -1,6 +1,6 @@
 namespace OpenF1.Data;
 
-public class RaceControlMessageProcessor : IProcessor<RaceControlMessageDataPoint>
+public class RaceControlMessageProcessor(INotifyService notifyService) : IProcessor<RaceControlMessageDataPoint>
 {
     public RaceControlMessageDataPoint RaceControlMessages { get; private set; } = new();
 
@@ -8,7 +8,12 @@ public class RaceControlMessageProcessor : IProcessor<RaceControlMessageDataPoin
     {
         foreach (var message in data.Messages)
         {
-            RaceControlMessages.Messages.TryAdd(message.Key, message.Value);
+            var added = RaceControlMessages.Messages.TryAdd(message.Key, message.Value);
+            if (added)
+            {
+                // New race control messages are important, so alert the user
+                notifyService.SendNotification();
+            }
         }
     }
 }

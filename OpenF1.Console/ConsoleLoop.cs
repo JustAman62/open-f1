@@ -1,5 +1,4 @@
 using System.Diagnostics;
-using System.Security.Cryptography;
 using Spectre.Console;
 using Spectre.Console.Rendering;
 

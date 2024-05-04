@@ -21,6 +21,10 @@ var serviceCollection = new ServiceCollection()
 
 var services = serviceCollection.BuildServiceProvider();
 
+var notifyService = services.GetRequiredService<INotifyService>();
+// When notifications are received, send a ASCII BEL to the console to make a noise to alert the user.
+notifyService.RegisterNotificationHandler(() => Console.Write("\u0007"));
+
 var consoleLoop = services.GetRequiredService<ConsoleLoop>();
 
 await consoleLoop.ExecuteAsync();
