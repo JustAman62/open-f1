@@ -13,5 +13,6 @@ public static class TimingDataPointExtensions
         decimal.TryParse(interval?.Value, out var seconds) ? seconds : null;
 
     public static bool IsRace(this SessionInfoDataPoint? sessionInfo) =>
-        sessionInfo?.Name?.Contains("Race") ?? true;
+        (sessionInfo?.Name?.EndsWith("Race") ?? true)
+        || (sessionInfo?.Name?.EndsWith("Sprint") ?? true);
 }
