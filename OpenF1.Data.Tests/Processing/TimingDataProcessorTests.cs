@@ -17,10 +17,7 @@ public class TimingDataProcessorTests
             cfg.AddCollectionMappers();
             cfg.AddProfile<TimingDataPointConfiguration>();
         }).CreateMapper();
-        var processor = new TimingDataProcessor(
-            mapper,
-            Substitute.For<ILogger<TimingDataProcessor>>()
-        );
+        var processor = new TimingDataProcessor(mapper);
 
         var data = new List<TimingDataPoint>()
         {
@@ -71,10 +68,7 @@ public class TimingDataProcessorTests
             cfg.AddCollectionMappers();
             cfg.AddProfile<TimingDataPointConfiguration>();
         }).CreateMapper();
-        var processor = new TimingDataProcessor(
-            mapper,
-            Substitute.For<ILogger<TimingDataProcessor>>()
-        );
+        var processor = new TimingDataProcessor(mapper);
 
         var initialBestLapTime = "1:34.678";
         var fasterBestLapTime = "1:20.123";
@@ -132,10 +126,7 @@ public class TimingDataProcessorTests
             cfg.AddCollectionMappers();
             cfg.AddProfile<TimingDataPointConfiguration>();
         }).CreateMapper();
-        var processor = new TimingDataProcessor(
-            mapper,
-            Substitute.For<ILogger<TimingDataProcessor>>()
-        );
+        var processor = new TimingDataProcessor(mapper);
 
         var initialBestLapTime = "1:34.678";
         var slowerBestLapTime = "1:50.123";

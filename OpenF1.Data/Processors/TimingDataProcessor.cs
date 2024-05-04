@@ -4,7 +4,7 @@ using Microsoft.Extensions.Logging;
 
 namespace OpenF1.Data;
 
-public class TimingDataProcessor(IMapper mapper, ILogger<TimingDataProcessor> logger)
+public class TimingDataProcessor(IMapper mapper)
     : IProcessor<TimingDataPoint>
 {
     /// <summary>
@@ -51,7 +51,6 @@ public class TimingDataProcessor(IMapper mapper, ILogger<TimingDataProcessor> lo
                 // Check for an existing best lap for this driver. If its faster, update it.
                 if (BestLaps.TryGetValue(driverNumber, out var existingBestLap))
                 {
-                    logger.LogWarning($"ExistingLap: {existingBestLap}");
                     var newLapTimeSpan = cloned.BestLapTime?.ToTimeSpan();
                     var existingBestLapTimeSpan = existingBestLap.BestLapTime.ToTimeSpan();
                     if (
