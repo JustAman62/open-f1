@@ -89,8 +89,17 @@ public sealed class LiveTimingClient(
 
         logger.LogInformation($"Found session key from subscription data: {_sessionKey}");
 
-        Directory.CreateDirectory($"{options.Value.DataDirectory}/{_sessionKey}");
-        File.WriteAllText(Path.Join(options.Value.DataDirectory, $"{_sessionKey}/subscribe.txt"), res);
+        var filePath = Path.Join(options.Value.DataDirectory, $"{_sessionKey}/subscribe.txt");
+        if (!File.Exists(filePath))
+        {
+            Directory.CreateDirectory($"{options.Value.DataDirectory}/{_sessionKey}");
+            File.WriteAllText(filePath, res);
+        }
+        else
+        {
+            logger.LogError("Data Subscription file already exists, will not create a new one");
+        }
+
         timingService.ProcessSubscriptionData(res);
     }
 
