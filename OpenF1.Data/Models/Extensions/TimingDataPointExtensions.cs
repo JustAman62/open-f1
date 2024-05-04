@@ -1,3 +1,5 @@
+using System.Globalization;
+
 namespace OpenF1.Data;
 
 public static class TimingDataPointExtensions
@@ -11,6 +13,16 @@ public static class TimingDataPointExtensions
 
     public static decimal? IntervalSeconds(this TimingDataPoint.Driver.Interval interval) =>
         decimal.TryParse(interval?.Value, out var seconds) ? seconds : null;
+
+    public static TimeSpan? ToTimeSpan(this TimingDataPoint.Driver.BestLap lap) =>
+        TimeSpan.TryParseExact(lap.Value, "m\\:ss\\.fff", CultureInfo.InvariantCulture, out var result)
+            ? result
+            : null;
+
+    public static TimeSpan? ToTimeSpan(this TimingDataPoint.Driver.LapSectorTime lap) =>
+        TimeSpan.TryParseExact(lap.Value, "m\\:ss\\.fff", CultureInfo.InvariantCulture, out var result)
+            ? result
+            : null;
 
     public static bool IsRace(this SessionInfoDataPoint? sessionInfo) =>
         (sessionInfo?.Name?.EndsWith("Race") ?? true)

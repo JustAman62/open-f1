@@ -6,11 +6,11 @@
             "type": "coreclr",
             "request": "launch",
             "preLaunchTask": "build",
-            "program": "${workspaceFolder}/OpenF1.Console/bin/Debug/net8.0/OpenF1.Console.dll",
+            "program": "${workspaceFolder}/OpenF1.Console/bin/Debug/net8.0/openf1-console.dll",
             "args": [],
             "cwd": "${workspaceFolder}/OpenF1.Console/",
             "stopAtEntry": false,
-            "console": "integratedTerminal"
+            "console": "integratedTerminal"            
         }
     ]
 }

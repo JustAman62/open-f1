@@ -37,7 +37,7 @@ public class JsonTimingClient(
         _directory = directory;
         _cts.Cancel();
         _cts = new CancellationTokenSource();
-        ExecuteTask = Task.Factory.StartNew(() => ExecuteAsync(_cts.Token));
+        ExecuteTask = Task.Factory.StartNew(() => ExecuteAsync(_cts.Token), TaskCreationOptions.LongRunning);
         await timingService.StartAsync();
     }
 

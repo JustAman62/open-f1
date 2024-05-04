@@ -29,7 +29,7 @@ public class TimingService(IEnumerable<IProcessor> processors, ILogger<TimingSer
     {
         _cts.Cancel();
         _cts = new();
-        _executeTask = Task.Factory.StartNew(() => ExecuteAsync(_cts.Token));
+        _executeTask = Task.Factory.StartNew(() => ExecuteAsync(_cts.Token), TaskCreationOptions.LongRunning);
         return Task.CompletedTask;
     }
 
@@ -162,15 +162,35 @@ public class TimingService(IEnumerable<IProcessor> processors, ILogger<TimingSer
 
     private void SendToProcessor<T>(string data)
     {
-        var json = JsonNode.Parse(data);
-        if (json is null)
-            return;
+        try
+        {
+            var json = JsonNode.Parse(data);
+            if (json is null)
+                return;
 
-        // Remove the _kf property, it's not needed and breaks deserialization
-        json["_kf"] = null;
+            // Remove the _kf property, it's not needed and breaks deserialization
+            json["_kf"] = null;
 
-        var model = json.Deserialize<T>(_jsonSerializerOptions)!;
-        processors.OfType<IProcessor<T>>().ToList().ForEach(x => x.Process(model));
+            var model = json.Deserialize<T>(_jsonSerializerOptions)!;
+            processors
+                .OfType<IProcessor<T>>()
+                .ToList()
+                .ForEach(x =>
+                {
+                    try
+                    {
+                        x.Process(model);
+                    }
+                    catch (Exception ex)
+                    {
+                        Logger.LogError(ex, "Failed to process data inside processor");
+                    }
+                });
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError(ex, "Failed to send data to processor: {}", data);
+        }
     }
 
     private JsonNode ArrayToIndexedDictionary(JsonNode node)

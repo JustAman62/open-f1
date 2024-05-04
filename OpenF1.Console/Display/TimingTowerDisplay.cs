@@ -29,7 +29,7 @@ public class TimingTowerDisplay(
         var raceControlPanel = GetRaceControlPanel();
         var timingTower = sessionInfoProcessor.Latest.IsRace()
             ? GetRaceTimingTower()
-            : GetRaceTimingTower();
+            : GetNonRaceTimingTower();
 
         var layout = new Layout("Root").SplitRows(
             new Layout("Timing Tower", timingTower),
@@ -117,6 +117,93 @@ public class TimingTowerDisplay(
                 ),
                 new Text($"{stint?.Compound?[0]} {stint?.TotalLaps, 2}", GetStyle(stint)),
                 GetGapBetweenLines(comparisonDataPoint.Value, line)
+            );
+        }
+
+        table.NoBorder();
+
+        return table;
+    }
+
+    private IRenderable GetNonRaceTimingTower()
+    {
+        if (timingData.LatestLiveTimingDataPoint is null)
+            return new Text("No Timing");
+
+        var table = new Table();
+        table.AddColumns(
+            sessionInfoProcessor.Latest.Name ?? "Unknown Session",
+            "Gap",
+            "Best Lap",
+            "BS1",
+            "BS2",
+            "BS3",
+            "S1",
+            "S2",
+            "S3",
+            "Pit",
+            "Tyre"
+        );
+
+        var bestDriver = timingData.LatestLiveTimingDataPoint.GetOrderedLines().First();
+
+        foreach (var (driverNumber, line) in timingData.LatestLiveTimingDataPoint.GetOrderedLines())
+        {
+            var driver = driverList.Latest?.GetValueOrDefault(driverNumber) ?? new();
+            var appData = timingAppData.Latest?.Lines.GetValueOrDefault(driverNumber) ?? new();
+            var stint = appData.Stints.LastOrDefault().Value;
+            var bestLap = timingData.BestLaps.GetValueOrDefault(driverNumber);
+            var teamColour = driver.TeamColour ?? "000000";
+
+            var gapToLeader = (line.BestLapTime.ToTimeSpan() - bestDriver.Value.BestLapTime.ToTimeSpan())?.TotalSeconds;
+
+            table.AddRow(
+                new Markup(
+                    $"{line.Position, 2} [#{teamColour}]{driver.RacingNumber, 2} {driver.Tla ?? "UNK"}[/]",
+                    _normal
+                ),
+                new Text(
+                    $"{(gapToLeader > 0 ? "+" : "")}{gapToLeader:f3}".PadLeft(7),
+                    _normal
+                ),
+                new Text(line.BestLapTime?.Value ?? "NULL"),
+                new Text(
+                    bestLap?.Sectors.GetValueOrDefault("0")?.Value?.PadLeft(6) ?? "      ",
+                    GetStyle(bestLap?.Sectors.GetValueOrDefault("0"))
+                ),
+                new Text(
+                    bestLap?.Sectors.GetValueOrDefault("1")?.Value?.PadLeft(6) ?? "      ",
+                    GetStyle(bestLap?.Sectors.GetValueOrDefault("1"))
+                ),
+                new Text(
+                    bestLap?.Sectors.GetValueOrDefault("2")?.Value?.PadLeft(6) ?? "      ",
+                    GetStyle(bestLap?.Sectors.GetValueOrDefault("2"))
+                ),
+                new Text(
+                    line.Sectors.GetValueOrDefault("0")?.Value?.PadLeft(6) ?? "      ",
+                    GetStyle(line.Sectors.GetValueOrDefault("0"))
+                ),
+                new Text(
+                    line.Sectors.GetValueOrDefault("1")?.Value?.PadLeft(6) ?? "      ",
+                    GetStyle(line.Sectors.GetValueOrDefault("1"))
+                ),
+                new Text(
+                    line.Sectors.GetValueOrDefault("2")?.Value?.PadLeft(6) ?? "      ",
+                    GetStyle(line.Sectors.GetValueOrDefault("2"))
+                ),
+                new Text(
+                    line.InPit.GetValueOrDefault()
+                        ? "IN "
+                        : line.PitOut.GetValueOrDefault()
+                            ? "OUT"
+                            : $"{line.NumberOfPitStops, 2}",
+                    line.InPit.GetValueOrDefault()
+                        ? new Style(foreground: Color.Black, background: Color.Yellow)
+                        : line.PitOut.GetValueOrDefault()
+                            ? new Style(foreground: Color.Black, background: Color.Green)
+                            : Style.Plain
+                ),
+                new Text($"{stint?.Compound?[0]} {stint?.TotalLaps, 2}", GetStyle(stint))
             );
         }
 
