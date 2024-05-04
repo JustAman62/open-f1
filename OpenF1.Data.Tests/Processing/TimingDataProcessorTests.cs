@@ -1,5 +1,7 @@
 using AutoMapper;
 using AutoMapper.EquivalencyExpression;
+using Microsoft.Extensions.Logging;
+using NSubstitute;
 using OpenF1.Data.AutoMapper;
 
 namespace OpenF1.Data.Tests;
@@ -15,7 +17,10 @@ public class TimingDataProcessorTests
             cfg.AddCollectionMappers();
             cfg.AddProfile<TimingDataPointConfiguration>();
         }).CreateMapper();
-        var processor = new TimingDataProcessor(mapper);
+        var processor = new TimingDataProcessor(
+            mapper,
+            Substitute.For<ILogger<TimingDataProcessor>>()
+        );
 
         var data = new List<TimingDataPoint>()
         {
@@ -36,10 +41,7 @@ public class TimingDataProcessorTests
             {
                 Lines = new Dictionary<string, TimingDataPoint.Driver>()
                 {
-                    ["1"] = new()
-                    {
-                        InPit = false,
-                    }
+                    ["1"] = new() { InPit = false, }
                 }
             }
         };
@@ -58,5 +60,127 @@ public class TimingDataProcessorTests
         Assert.False(line.InPit);
         Assert.Equal("+1.000", line.GapToLeader);
         Assert.Equal("1.11", line.BestLapTime.Value);
+    }
+
+    [Fact]
+    public void VerifyBestLapUpdatesOnImprovement()
+    {
+        // Arrange
+        var mapper = new MapperConfiguration(cfg =>
+        {
+            cfg.AddCollectionMappers();
+            cfg.AddProfile<TimingDataPointConfiguration>();
+        }).CreateMapper();
+        var processor = new TimingDataProcessor(
+            mapper,
+            Substitute.For<ILogger<TimingDataProcessor>>()
+        );
+
+        var initialBestLapTime = "1:34.678";
+        var fasterBestLapTime = "1:20.123";
+
+        var data = new List<TimingDataPoint>()
+        {
+            new()
+            {
+                Lines = new Dictionary<string, TimingDataPoint.Driver>()
+                {
+                    ["1"] = new()
+                    {
+                        Line = 1,
+                        NumberOfLaps = 1,
+                        BestLapTime = new() { Value = initialBestLapTime }
+                    }
+                }
+            },
+            new()
+            {
+                Lines = new Dictionary<string, TimingDataPoint.Driver>()
+                {
+                    ["1"] = new()
+                    {
+                        NumberOfLaps = 2,
+                        BestLapTime = new() { Value = fasterBestLapTime }
+                    }
+                }
+            }
+        };
+
+        // Act
+        foreach (var dataPoint in data)
+        {
+            processor.Process(dataPoint);
+        }
+
+        // Assert
+        Assert.NotNull(processor.LatestLiveTimingDataPoint);
+        Assert.NotEmpty(processor.LatestLiveTimingDataPoint.Lines);
+
+        var line = processor.LatestLiveTimingDataPoint.Lines["1"];
+        Assert.Equal(1, line.Line);
+        Assert.Equal(fasterBestLapTime, line.BestLapTime.Value);
+
+        Assert.Equal(fasterBestLapTime, processor.BestLaps["1"].BestLapTime.Value);
+    }
+
+    [Fact]
+    public void VerifyBestLapDoesNotUpdateOnSlowerLap()
+    {
+        // Arrange
+        var mapper = new MapperConfiguration(cfg =>
+        {
+            cfg.AddCollectionMappers();
+            cfg.AddProfile<TimingDataPointConfiguration>();
+        }).CreateMapper();
+        var processor = new TimingDataProcessor(
+            mapper,
+            Substitute.For<ILogger<TimingDataProcessor>>()
+        );
+
+        var initialBestLapTime = "1:34.678";
+        var slowerBestLapTime = "1:50.123";
+
+        var data = new List<TimingDataPoint>()
+        {
+            new()
+            {
+                Lines = new Dictionary<string, TimingDataPoint.Driver>()
+                {
+                    ["1"] = new()
+                    {
+                        Line = 1,
+                        NumberOfLaps = 1,
+                        BestLapTime = new() { Value = initialBestLapTime }
+                    }
+                }
+            },
+            new()
+            {
+                Lines = new Dictionary<string, TimingDataPoint.Driver>()
+                {
+                    ["1"] = new()
+                    {
+                        NumberOfLaps = 2,
+                        BestLapTime = new() { Value = slowerBestLapTime }
+                    }
+                }
+            }
+        };
+
+        // Act
+        foreach (var dataPoint in data)
+        {
+            processor.Process(dataPoint);
+        }
+
+        // Assert
+        Assert.NotNull(processor.LatestLiveTimingDataPoint);
+        Assert.NotEmpty(processor.LatestLiveTimingDataPoint.Lines);
+
+        var line = processor.LatestLiveTimingDataPoint.Lines["1"];
+        Assert.Equal(1, line.Line);
+        Assert.Equal(slowerBestLapTime, line.BestLapTime.Value);
+
+        Assert.Equal(initialBestLapTime, processor.BestLaps["1"].BestLapTime.Value);
     }
 }
