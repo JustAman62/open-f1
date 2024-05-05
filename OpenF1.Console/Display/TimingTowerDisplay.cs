@@ -18,8 +18,10 @@ public class TimingTowerDisplay(
 {
     public Screen Screen => Screen.TimingTower;
 
-    private readonly Style _personalBest = new(foreground: Color.White, background: new Color(0, 118, 0));
-    private readonly Style _overallBest = new(foreground: Color.White, background: new Color(118, 0, 118));
+    private readonly Style _personalBest =
+        new(foreground: Color.White, background: new Color(0, 118, 0));
+    private readonly Style _overallBest =
+        new(foreground: Color.White, background: new Color(118, 0, 118));
     private readonly Style _normal = new(foreground: Color.White);
     private readonly Style _invert = new(foreground: Color.Black, background: Color.White);
 
@@ -62,7 +64,8 @@ public class TimingTowerDisplay(
             "S3",
             "Pit",
             "Tyre",
-            "Compare"
+            "Compare",
+            "Driver"
         );
 
         var comparisonDataPoint = timingData.LatestLiveTimingDataPoint.Lines.FirstOrDefault(x =>
@@ -116,7 +119,11 @@ public class TimingTowerDisplay(
                             : Style.Plain
                 ),
                 new Text($"{stint?.Compound?[0]} {stint?.TotalLaps, 2}", GetStyle(stint)),
-                GetGapBetweenLines(comparisonDataPoint.Value, line)
+                GetGapBetweenLines(comparisonDataPoint.Value, line),
+                new Markup(
+                    $"[#{teamColour}]{driver.RacingNumber, 2} {driver.Tla ?? "UNK"}[/]",
+                    lineStyle
+                )
             );
         }
 
@@ -142,7 +149,8 @@ public class TimingTowerDisplay(
             "S2",
             "S3",
             "Pit",
-            "Tyre"
+            "Tyre",
+            "Driver"
         );
 
         var bestDriver = timingData.LatestLiveTimingDataPoint.GetOrderedLines().First();
@@ -212,7 +220,11 @@ public class TimingTowerDisplay(
                             ? _personalBest
                             : Style.Plain
                 ),
-                new Text($"{stint?.Compound?[0] ?? 'X'} {stint?.TotalLaps, 2}", GetStyle(stint))
+                new Text($"{stint?.Compound?[0] ?? 'X'} {stint?.TotalLaps, 2}", GetStyle(stint)),
+                new Markup(
+                    $"[#{teamColour}]{driver.RacingNumber, 2} {driver.Tla ?? "UNK"}[/]",
+                    _normal
+                )
             );
         }
 
@@ -258,7 +270,7 @@ public class TimingTowerDisplay(
         return stint.Compound switch
         {
             "HARD" => new Style(foreground: Color.White, background: Color.Grey),
-            "MEDIUM" => new Style(foreground: Color.White, background: Color.Yellow),
+            "MEDIUM" => new Style(foreground: Color.Black, background: Color.Yellow),
             "SOFT" => new Style(foreground: Color.White, background: Color.Red),
             "INTER" => new Style(foreground: Color.Black, background: Color.Green),
             "WET" => new Style(foreground: Color.Black, background: Color.Blue),
@@ -292,7 +304,7 @@ public class TimingTowerDisplay(
     {
         if (from == to)
         {
-            return new Text("-------");
+            return new Text("-------", _invert);
         }
 
         if (from?.GapToLeaderSeconds() is not null && to.GapToLeaderSeconds() is not null)
