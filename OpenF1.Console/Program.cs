@@ -1,9 +1,12 @@
-﻿using InMemLogger;
+﻿using System.Runtime.InteropServices;
+using System.Runtime.Loader;
+using InMemLogger;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using OpenF1.Console;
 using OpenF1.Data;
+using Spectre.Console;
 
 var configuration = new ConfigurationBuilder()
     .AddJsonFile(Path.Join(LiveTimingOptions.BaseDirectory, "config.json"), optional: true)
@@ -26,5 +29,18 @@ var notifyService = services.GetRequiredService<INotifyService>();
 notifyService.RegisterNotificationHandler(() => Console.Write("\u0007"));
 
 var consoleLoop = services.GetRequiredService<ConsoleLoop>();
+
+// Register handler for exists and SIGTERM to clean up on app exit
+AppDomain.CurrentDomain.ProcessExit += UnloadOnSigTerm;
+Console.CancelKeyPress += UnloadOnSigTerm;
+
+void UnloadOnSigTerm(object? sender, EventArgs e)
+{
+    // Cleanup our running services and reset terminal config
+    consoleLoop.Stop();
+    Console.Clear();
+    Console.WriteLine("Exiting openf1-console...");
+    AnsiConsole.Cursor.Show();
+}
 
 await consoleLoop.ExecuteAsync();

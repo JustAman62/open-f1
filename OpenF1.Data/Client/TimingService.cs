@@ -52,23 +52,34 @@ public class TimingService(IEnumerable<IProcessor> processors, ILogger<TimingSer
     {
         while (!cancellationToken.IsCancellationRequested)
         {
-            if (_workItems.Reader.TryRead(out var res))
+            if (_workItems.Reader.TryPeek(out var res))
             {
                 try
                 {
+                    // Add a delay to the message timestamp,
+                    // then figure out how long we have to wait for it to be the wall clock time
+                    var timestampWithDelay = res.timestamp + Delay;
+                    var timeToWait = timestampWithDelay - DateTimeOffset.UtcNow;
+                    if (timeToWait > TimeSpan.Zero)
+                    {
+                        if (timeToWait > TimeSpan.FromSeconds(1))
+                        {
+                            // If we have to wait for more than a second, then wait for just a second and repeat the loop.
+                            // This way if the Delay is reduced by the user, we can react to it after at most a second.
+                            Logger.LogDebug($"Delaying for 1 second");
+                            await Task.Delay(TimeSpan.FromSeconds(1), cancellationToken).ConfigureAwait(false);
+                            continue;
+                        }
+                        
+                        Logger.LogDebug($"Delaying for {timeToWait}");
+                        await Task.Delay(timeToWait, cancellationToken).ConfigureAwait(false);
+                    }
+
                     _recent.Enqueue(res);
                     if (_recent.Count > 5)
                         _recent.TryDequeue(out _);
 
-                    // Add a delay to the message timestamp,
-                    // then figure out how long we have to wait for to be the wall clock time
-                    var timestampWithDelay = res.timestamp + Delay;
-                    var timeToWait = timestampWithDelay - DateTimeOffset.UtcNow;
-                    if (timestampWithDelay > DateTimeOffset.UtcNow && timeToWait > TimeSpan.Zero)
-                    {
-                        Logger.LogDebug($"Delaying for {timeToWait}");
-                        await Task.Delay(timeToWait, cancellationToken).ConfigureAwait(false);
-                    }
+                    res = await _workItems.Reader.ReadAsync();
                     ProcessData(res.type, res.data, res.timestamp);
                 }
                 catch (Exception ex)

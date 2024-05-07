@@ -10,10 +10,13 @@ public class ConsoleLoop(
     IEnumerable<IInputHandler> inputHandlers
 )
 {
+    private CancellationTokenSource _cts = new CancellationTokenSource();
     private const long TargetFrameTimeMs = 100;
 
     public async Task ExecuteAsync()
     {
+        _cts = new CancellationTokenSource();
+
         var contentPanel = new Panel("Open F1").Expand().SafeBorder() as IRenderable;
         var layout = new Layout("Root").SplitRows(
             new Layout("Content", contentPanel).Ratio(10),
@@ -22,8 +25,9 @@ public class ConsoleLoop(
         layout["Footer"].Size = 2;
 
         AnsiConsole.Cursor.Hide();
+        
         var stopwatch = Stopwatch.StartNew();
-        while (true)
+        while (!_cts.IsCancellationRequested)
         {
             stopwatch.Restart();
             await ShowAndHandleInputs(layout).ConfigureAwait(false);
@@ -60,6 +64,12 @@ public class ConsoleLoop(
                 await Task.Delay(TimeSpan.FromMilliseconds(timeToDelay)).ConfigureAwait(false);
             }
         }
+    }
+
+    public void Stop()
+    {
+        _cts.Cancel();
+        _cts = new CancellationTokenSource();
     }
 
     private async Task ShowAndHandleInputs(Layout layout)
