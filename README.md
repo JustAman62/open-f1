@@ -57,7 +57,12 @@ Standalone executables are attached to each GitHub release. Download the executa
 
 ```sh
 # Download the latest executable (in this case for macos-arm64)
-curl https://github.com/BrownKnight/open-f1/releases/latest/download/openf1-console-macos-arm64 -o ./openf1-console
+curl https://github.com/BrownKnight/open-f1/releases/latest/download/openf1-console-macos-arm64 -o ./openf1-console -L
+
+# On MacOS, you'll likely need to sign the executable as otherwise it'll be blocked. 
+# WARNING: If you don't understand why this needs to be done, you probably shouldn't do this and instead use the NuGet based installation method above.
+#          Signing the executable yourself removes any integrity checks that signing usually provides.
+codesign -s - ./openf1-console
 
 # Execute openf1-console to start the TUI
 ./openf1-console
