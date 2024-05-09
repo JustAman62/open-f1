@@ -11,6 +11,7 @@ The `OpenF1.Data` library is provided to facilitate connectivity with the F1 Liv
   - [Getting Started with `openf1-console`](#getting-started-with-openf1-console)
     - [Installation](#installation)
       - [Install and run as a dotnet tool](#install-and-run-as-a-dotnet-tool)
+    - [Install and run the standalone executable](#install-and-run-the-standalone-executable)
       - [Run directly from Source](#run-directly-from-source)
     - [Start Timing for a Live Session](#start-timing-for-a-live-session)
     - [Start Timing for a Pre-recorded Session](#start-timing-for-a-pre-recorded-session)
@@ -49,6 +50,18 @@ openf1-console
 ```
 
 This method is recommended as it is easy to keep the app updated using `dotnet tool update -g openf1-console`.
+
+### Install and run the standalone executable
+
+Standalone executables are attached to each GitHub release. Download the executable for your system OS/architecture and simply run it directly
+
+```sh
+# Download the latest executable (in this case for macos-arm64)
+curl https://github.com/BrownKnight/open-f1/releases/latest/download/openf1-console-macos-arm64 -o ./openf1-console
+
+# Execute openf1-console to start the TUI
+./openf1-console
+```
 
 #### Run directly from Source
 
