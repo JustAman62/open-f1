@@ -31,5 +31,5 @@ jobs:
     - name: Upload MaxOS arm64 to Release
       uses: svenstaro/upload-release-action@v2
       with:
-        file: osx-arm64-output
+        file: osx-arm64-output/openf1-console
         asset_name: openf1-console-macos-arm64
