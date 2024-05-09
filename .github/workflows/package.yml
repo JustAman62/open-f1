@@ -23,14 +23,14 @@ jobs:
     - name: Restore dependencies
       run: dotnet restore
     - name: Publish
-      run: dotnet publish --no-restore
+      run: dotnet publish --no-restore /p:PublicRelease=true
     - name: Pack
-      run: dotnet pack --no-build
+      run: dotnet pack --no-build /p:PublicRelease=true
     - name: Push Packages
       run: dotnet nuget push "**/*.nupkg" --source https://api.nuget.org/v3/index.json --api-key ${{ secrets.NUGET_API_KEY }} --skip-duplicate
 
     - name: Create MacOS arm64 Package
-      run: dotnet publish -r osx-arm64 --self-contained true -p:PublishSingleFile=true OpenF1.Console/OpenF1.Console.csproj -o osx-arm64-output
+      run: dotnet publish -r osx-arm64 --self-contained true -p:PublishSingleFile=true -p:PublicRelease=true OpenF1.Console/OpenF1.Console.csproj -o osx-arm64-output
     - name: Upload MacOS arm64 to Release
       uses: svenstaro/upload-release-action@v2
       with:
