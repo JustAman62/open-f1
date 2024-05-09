@@ -25,9 +25,10 @@
 	</ItemGroup>
 
   <ItemGroup>
-	  <None Update="*.flf" Pack="true">
-	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-	  </None>
+    <EmbeddedResource Include="*.flf" />
+	</ItemGroup>
+
+  <ItemGroup>
     <None Include="../README.md" Pack="true" PackagePath="\"/>
   </ItemGroup>
 
