@@ -32,9 +32,9 @@ jobs:
     - name: Create MacOS arm64 Package
       run: dotnet publish -r osx-arm64 --self-contained true -p:PublishSingleFile=true OpenF1.Console/OpenF1.Console.csproj -o osx-arm64-output
     - name: Upload MacOS arm64 to Release
-      uses: xresloader/upload-to-github-release@v1
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      uses: svenstaro/upload-release-action@v2
       with:
-        file: "osx-arm64-output/openf1-console"
-        tags: true
+        repo_token: ${{ secrets.GITHUB_TOKEN }}
+        file: osx-arm64-output/openf1-console
+        asset_name: openf1-console-macos-arm64
+        tag: ${{ github.ref }}
