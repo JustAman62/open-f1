@@ -58,7 +58,8 @@ public class RaceControlDisplay(
         return new Panel(table)
         {
             Header = new PanelHeader("Race Control Messages"),
-            Expand = true
+            Expand = true,
+            Border = BoxBorder.Rounded
         };
     }
 
@@ -86,7 +87,12 @@ public class RaceControlDisplay(
         }
 
         var rows = new Rows(items);
-        return new Panel(rows) { Header = new PanelHeader("Status"), Expand = true };
+        return new Panel(rows)
+        {
+            Header = new PanelHeader("Status"),
+            Expand = true,
+            Border = BoxBorder.Rounded
+        };
     }
 
     private IRenderable GetClockPanel()
@@ -100,7 +106,12 @@ public class RaceControlDisplay(
         };
 
         var rows = new Rows(items);
-        return new Panel(rows) { Header = new PanelHeader("Clock"), Expand = true };
+        return new Panel(rows)
+        {
+            Header = new PanelHeader("Clock"),
+            Expand = true,
+            Border = BoxBorder.Rounded
+        };
     }
 
     private IRenderable GetWeatherPanel()
@@ -115,6 +126,11 @@ public class RaceControlDisplay(
         };
 
         var rows = new Rows(items);
-        return new Panel(rows) { Header = new PanelHeader("Weather"), Expand = true };
+        return new Panel(rows)
+        {
+            Header = new PanelHeader("Weather"),
+            Expand = true,
+            Border = BoxBorder.Rounded
+        };
     }
 }
