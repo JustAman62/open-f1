@@ -44,7 +44,7 @@ public sealed class LiveTimingClient(
         logger.LogInformation("Starting Live Timing client");
 
         if (Connection is not null)
-            throw new InvalidOperationException("Timing client already has an open connection.");
+            logger.LogWarning("Live timing connection already exists, restarting it");
 
         // Fetch the cookie value that is hardcoded below
         // Leaving this here to show how I did it. I don't think I need to change the value yet.
@@ -107,9 +107,12 @@ public sealed class LiveTimingClient(
     {
         try
         {
+            // Remove line endings and indents to optimise the size of the string when saved to file
+            res = res.ReplaceLineEndings(string.Empty).Replace("    ", string.Empty);
+
             File.AppendAllText(
                 Path.Join(options.Value.DataDirectory, $"{_sessionKey}/live.txt"),
-                res.ReplaceLineEndings(string.Empty) + Environment.NewLine
+                res + Environment.NewLine
             );
 
             RecentDataPoints.Enqueue(res);
