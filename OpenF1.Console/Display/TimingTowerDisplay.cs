@@ -34,7 +34,9 @@ public class TimingTowerDisplay(
             : GetNonRaceTimingTower();
 
         var layout = new Layout("Root").SplitRows(
-            new Layout("Timing Tower", timingTower),
+            new Layout("Content").SplitColumns(
+                new Layout("Timing Tower", timingTower).Size(System.Console.WindowWidth)
+            ),
             new Layout("Info").SplitColumns(
                 new Layout("Status", statusPanel),
                 new Layout("Race Control Messages", raceControlPanel)
@@ -57,11 +59,8 @@ public class TimingTowerDisplay(
             $"LAP {lapCountProcessor.Latest?.CurrentLap, 2}/{lapCountProcessor.Latest?.TotalLaps}",
             "Gap",
             "Interval",
-            string.Empty,
             "Best Lap",
-            string.Empty,
             "Last Lap",
-            string.Empty,
             "S1",
             "S2",
             "S3",
@@ -95,11 +94,8 @@ public class TimingTowerDisplay(
                     $"{line.IntervalToPositionAhead?.Value, 8}",
                     GetStyle(line.IntervalToPositionAhead, isComparisonLine)
                 ),
-                new Text(string.Empty),
                 new Text(line.BestLapTime?.Value ?? "NULL", _normal),
-                new Text(string.Empty),
                 new Text(line.LastLapTime?.Value ?? "NULL", GetStyle(line.LastLapTime)),
-                new Text(string.Empty),
                 new Text(
                     line.Sectors.GetValueOrDefault("0")?.Value?.PadLeft(6) ?? "      ",
                     GetStyle(line.Sectors.GetValueOrDefault("0"))
@@ -133,7 +129,8 @@ public class TimingTowerDisplay(
             );
         }
 
-        table.NoBorder();
+        table.SimpleBorder();
+        table.Expand = true;
 
         return table;
     }
@@ -141,22 +138,19 @@ public class TimingTowerDisplay(
     private IRenderable GetNonRaceTimingTower()
     {
         if (timingData.LatestLiveTimingDataPoint is null)
-            return new Text("No Timing");
+            return new Text("No Timing Available");
 
         var table = new Table();
         table.AddColumns(
             sessionInfoProcessor.Latest.Name?.ToFixedWidth(9) ?? "Unknown ",
             "Gap",
             "Best Lap",
-            string.Empty,
             "BS1",
             "BS2",
             "BS3",
-            string.Empty,
             "S1",
             "S2",
             "S3",
-            string.Empty,
             "Pit",
             "Tyre",
             "Driver"
@@ -193,7 +187,6 @@ public class TimingTowerDisplay(
                 ),
                 new Text($"{(gapToLeader > 0 ? "+" : "")}{gapToLeader:f3}".PadLeft(7), _normal),
                 new Text(line.BestLapTime?.Value ?? "NULL", _normal),
-                new Text(string.Empty),
                 new Text(
                     bestLap?.Sectors.GetValueOrDefault("0")?.Value?.PadLeft(6) ?? "      ",
                     GetStyle(bestLap?.Sectors.GetValueOrDefault("0"), bestSector1)
@@ -206,7 +199,6 @@ public class TimingTowerDisplay(
                     bestLap?.Sectors.GetValueOrDefault("2")?.Value?.PadLeft(6) ?? "      ",
                     GetStyle(bestLap?.Sectors.GetValueOrDefault("2"), bestSector3)
                 ),
-                new Text(string.Empty),
                 new Text(
                     line.Sectors.GetValueOrDefault("0")?.Value?.PadLeft(6) ?? "      ",
                     GetStyle(line.Sectors.GetValueOrDefault("0"))
@@ -219,7 +211,6 @@ public class TimingTowerDisplay(
                     line.Sectors.GetValueOrDefault("2")?.Value?.PadLeft(6) ?? "      ",
                     GetStyle(line.Sectors.GetValueOrDefault("2"))
                 ),
-                new Text(string.Empty),
                 new Text(
                     line.InPit.GetValueOrDefault()
                         ? "IN "
@@ -240,7 +231,9 @@ public class TimingTowerDisplay(
             );
         }
 
-        table.NoBorder();
+        table.SimpleBorder();
+        table.Expand();
+        table.Width = System.Console.WindowWidth;
 
         return table;
     }

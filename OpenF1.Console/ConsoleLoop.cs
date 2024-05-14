@@ -17,9 +17,9 @@ public class ConsoleLoop(
     {
         _cts = new CancellationTokenSource();
 
-        var contentPanel = new Panel("Open F1").Expand().SafeBorder() as IRenderable;
+        var contentPanel = new Panel("Open F1").Expand().RoundedBorder() as IRenderable;
         var layout = new Layout("Root").SplitRows(
-            new Layout("Content", contentPanel).Ratio(10),
+            new Layout("Content", contentPanel),
             new Layout("Footer")
         );
         layout["Footer"].Size = 2;

@@ -15,7 +15,7 @@ public class MainDisplay() : IDisplay
     public Task<IRenderable> GetContentAsync()
     {
         var text = new FigletText(_font, "OPEN F1").Centered();
-        var panel = new Panel(text).Expand().SafeBorder();
+        var panel = new Panel(text).Expand().RoundedBorder();
 
         return Task.FromResult<IRenderable>(panel);
     }
