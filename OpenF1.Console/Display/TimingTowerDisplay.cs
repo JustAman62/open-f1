@@ -55,20 +55,25 @@ public class TimingTowerDisplay(
             return new Text("No Timing");
 
         var table = new Table();
-        table.AddColumns(
-            $"LAP {lapCountProcessor.Latest?.CurrentLap, 2}/{lapCountProcessor.Latest?.TotalLaps}",
-            "Gap",
-            "Interval",
-            "Best Lap",
-            "Last Lap",
-            "S1",
-            "S2",
-            "S3",
-            "Pit",
-            "Tyre",
-            "Compare",
-            "Driver"
-        );
+        table
+            .AddColumns(
+                $"LAP {lapCountProcessor.Latest?.CurrentLap, 2}/{lapCountProcessor.Latest?.TotalLaps}",
+                "Gap    ",
+                "Interval",
+                "Best Lap",
+                "Last Lap",
+                "S1",
+                "S2",
+                "S3",
+                "Pit",
+                "Tyre",
+                "Compare",
+                "Driver"
+            )
+            .RemoveColumnPadding();
+
+        // Increase padding between lap and sector times to clearly mark them
+        table.Columns[5].Padding = new Padding(1);
 
         var comparisonDataPoint = timingData.LatestLiveTimingDataPoint.Lines.FirstOrDefault(x =>
             x.Value.Line == state.CursorOffset
@@ -89,7 +94,7 @@ public class TimingTowerDisplay(
                     $"{line.Position, 2} [#{teamColour}]{driver.RacingNumber, 2} {driver.Tla ?? "UNK"}[/]",
                     lineStyle
                 ),
-                new Text($"{line.GapToLeader, 7}", lineStyle),
+                new Text($"{line.GapToLeader}", lineStyle),
                 new Text(
                     $"{line.IntervalToPositionAhead?.Value, 8}",
                     GetStyle(line.IntervalToPositionAhead, isComparisonLine)
@@ -141,20 +146,26 @@ public class TimingTowerDisplay(
             return new Text("No Timing Available");
 
         var table = new Table();
-        table.AddColumns(
-            sessionInfoProcessor.Latest.Name?.ToFixedWidth(9) ?? "Unknown ",
-            "Gap",
-            "Best Lap",
-            "BS1",
-            "BS2",
-            "BS3",
-            "S1",
-            "S2",
-            "S3",
-            "Pit",
-            "Tyre",
-            "Driver"
-        );
+        table
+            .AddColumns(
+                sessionInfoProcessor.Latest.Name?.ToFixedWidth(9) ?? "Unknown ",
+                "Gap    ",
+                "Best Lap",
+                "BS1",
+                "BS2",
+                "BS3",
+                "S1",
+                "S2",
+                "S3",
+                "Pit",
+                "Tyre",
+                "Driver"
+            )
+            .RemoveColumnPadding();
+
+        // Increase padding between sets of sectors to clearly mark them
+        table.Columns[3].Padding = new Padding(1);
+        table.Columns[6].Padding = new Padding(1);
 
         var bestDriver = timingData.LatestLiveTimingDataPoint.GetOrderedLines().First();
 
