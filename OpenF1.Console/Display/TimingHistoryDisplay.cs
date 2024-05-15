@@ -13,9 +13,11 @@ public class TimingHistoryDisplay(
 {
     public Screen Screen => Screen.TimingHistory;
 
-    private Style _personalBest = new(background: Color.Green);
-    private Style _overallBest = new(background: Color.Purple);
-    private Style _normal = new();
+    private readonly Style _personalBest =
+        new(foreground: Color.White, background: new Color(0, 118, 0));
+    private readonly Style _overallBest =
+        new(foreground: Color.White, background: new Color(118, 0, 118));
+    private Style _normal = new(foreground: Color.White);
 
     public Task<IRenderable> GetContentAsync()
     {
@@ -28,33 +30,41 @@ public class TimingHistoryDisplay(
 
     private IRenderable GetTimingTower()
     {
-        var drivers = timingData.DriversByLap.GetValueOrDefault(state.CursorOffset);
-        if (drivers is null)
-            return new Text($"No Data for Lap {state.CursorOffset}");
+        var selectedLapNumber = state.CursorOffset + 1;
+        var selectedLapDrivers = timingData.DriversByLap.GetValueOrDefault(selectedLapNumber);
+        var previousLapDrivers = timingData.DriversByLap.GetValueOrDefault(selectedLapNumber - 1);
+
+        if (selectedLapDrivers is null)
+            return new Text($"No Data for Lap {selectedLapNumber}");
 
         var table = new Table();
         table.AddColumns(
-            $"LAP {state.CursorOffset, 2}/{lapCountProcessor.Latest?.TotalLaps}",
+            $"LAP {selectedLapNumber, 2}/{lapCountProcessor.Latest?.TotalLaps}",
             "Gap",
             "Interval",
             "Last Lap",
             "S1",
             "S2",
-            "S3"
+            "S3",
+            " "
         );
-        table.NoBorder();
+        table.SimpleBorder();
+        table.RemoveColumnPadding();
 
-        foreach (var (driverNumber, line) in drivers.OrderBy(x => x.Value.Line))
+        foreach (var (driverNumber, line) in selectedLapDrivers.OrderBy(x => x.Value.Line))
         {
-            var driver = driverList.Latest?.GetValueOrDefault(driverNumber) ?? new();
-            var teamColour = driver.TeamColour ?? "000000";
+            var lap = driverList.Latest?.GetValueOrDefault(driverNumber) ?? new();
+            var previousLap = previousLapDrivers?.GetValueOrDefault(driverNumber) ?? new();
+            var teamColour = lap.TeamColour ?? "000000";
+
+            var positionChange = line.Line - previousLap.Line;
 
             table.AddRow(
                 new Markup(
-                    $"{line.Position, 2} [#{teamColour}]{driver.RacingNumber, 2} {driver.Tla ?? "UNK"}[/]"
+                    $"{line.Position, 2} [#{teamColour}]{lap.RacingNumber, 2} {lap.Tla ?? "UNK"}[/]"
                 ),
-                new Text(line.GapToLeader ?? ""),
-                new Text(line.IntervalToPositionAhead?.Value ?? ""),
+                new Markup($"{line.GapToLeader} {GetMarkedUp(line.GapToLeaderSeconds() - previousLap.GapToLeaderSeconds())}" ?? "", _normal),
+                new Markup($"{line.IntervalToPositionAhead?.Value} {GetMarkedUp(line.IntervalToPositionAhead?.IntervalSeconds() - previousLap.IntervalToPositionAhead?.IntervalSeconds())}" ?? "", _normal),
                 new Text(line.LastLapTime?.Value ?? "NULL", GetStyle(line.LastLapTime)),
                 new Text(
                     line.Sectors.GetValueOrDefault("0")?.Value ?? "",
@@ -67,12 +77,28 @@ public class TimingHistoryDisplay(
                 new Text(
                     line.Sectors.GetValueOrDefault("2")?.Value ?? "",
                     GetStyle(line.Sectors.GetValueOrDefault("2"))
-                )
+                ),
+                new Markup(GetPositionChangeMarkup(positionChange))
             );
         }
 
         return table;
     }
+
+    private string GetMarkedUp(decimal? time) => time switch
+    {
+        < 0 => $"[green]({time})[/]",
+        < 0.5m => $"[grey62](+{time})[/]",
+        null => "",
+        _ => $"[yellow](+{time})[/]",
+    };
+
+    private string GetPositionChangeMarkup(int? change) => change switch
+    {
+        < 0 => "[green]▲[/]",
+        > 0 => "[yellow]▼[/]",
+        _ => ""
+    };
 
     [System.Diagnostics.CodeAnalysis.SuppressMessage(
         "Style",
