@@ -1,12 +1,28 @@
 # open-f1
 
-open-f1 is a open source Live Timing client which integrates with the F1 Live Timing data stream. The client allows you to receive live data during F1 sessions. This data can be streamed in to a file for later processing, or processed live to show in live timing clients.
+open-f1 is a open source F1 Live Timing client.
+
+`openf1-console` is a TUI application which uses `OpenF1.Data` to show a Live Timing screen during sessions, and records the data for future session replays.
 
 The `OpenF1.Data` library is provided to facilitate connectivity with the F1 Live Timing data stream, and handle all the processing of the incoming data. It also allows for "simulated" streams, where previously recorded data streams can be played back to allow for easy development/testing.
 
-`openf1-console` is a TUI application which uses `OpenF1.Data` to show a basic Live Timing screen during sessions.
+Feature Highlights:
+
+- [Timing Tower](#timing-tower-during-a-race) showing for each driver:
+  - Live sector times, with colouring for personal/overall fastest
+  - Last & Best Lap
+  - Current tyre
+  - Age of current tyre
+  - Interval to driver in front
+  - Gap to leader
+  - Gap [between a selected driver](#using-a-cursor-to-display-relative-gap-for-a-specific-driver) and all other drivers (useful for monitoring pit windows)
+- [Race Control](#race-control-screen) messages including investigations, penalties, lap deletions, and weather
+- Lap-by-lap [Timing History](#using-a-cursor-to-view-timing-history-by-lap) to observe gaps over time
+
+## Table of Contents
 
 - [open-f1](#open-f1)
+  - [Table of Contents](#table-of-contents)
   - [Inspiration](#inspiration)
   - [Getting Started with `openf1-console`](#getting-started-with-openf1-console)
     - [Installation](#installation)
@@ -23,7 +39,7 @@ The `OpenF1.Data` library is provided to facilitate connectivity with the F1 Liv
   - [Data Recording and Replay](#data-recording-and-replay)
   - [OpenF1 Console in Action](#openf1-console-in-action)
     - [Timing Tower during a Race](#timing-tower-during-a-race)
-    - [Using a Cursor to Display Relative Interval for a Specific Driver](#using-a-cursor-to-display-relative-interval-for-a-specific-driver)
+    - [Using a Cursor to Display Relative Gap for a Specific Driver](#using-a-cursor-to-display-relative-gap-for-a-specific-driver)
     - [Race Control Screen](#race-control-screen)
     - [Using a Cursor to View Timing History by Lap](#using-a-cursor-to-view-timing-history-by-lap)
   - [Notice](#notice)
@@ -182,7 +198,7 @@ LAP 12/56 Gap     Interval Best Lap Last Lap S1     S2     S3     Pits    Tyre C
 [▼] Down (0)    [►] Delay+    [◄] Delay-   [R] Race Control     [H] Timing by Lap    [Esc] Return
 ```
 
-### Using a Cursor to Display Relative Interval for a Specific Driver
+### Using a Cursor to Display Relative Gap for a Specific Driver
 
 Use the cursor controlled by the `[▼] Down (1)` and `[▲] Up` actions in the `[O] Timing Tower` screen to select a specific driver (in this case Norris) to see the relative interval between that driver and all other. This is useful for determining where a driver will fall to after a pit stop, or looking at pit windows during under cuts.
 
