@@ -68,7 +68,8 @@ public class TimingTowerDisplay(
                 "Pit",
                 "Tyre",
                 "Compare",
-                "Driver"
+                "Driver",
+                " "
             )
             .RemoveColumnPadding();
 
@@ -79,12 +80,18 @@ public class TimingTowerDisplay(
             x.Value.Line == state.CursorOffset
         );
 
+        var lapNumber = lapCountProcessor.Latest?.CurrentLap ?? 0;
+
         foreach (var (driverNumber, line) in timingData.LatestLiveTimingDataPoint.GetOrderedLines())
         {
             var driver = driverList.Latest?.GetValueOrDefault(driverNumber) ?? new();
             var appData = timingAppData.Latest?.Lines.GetValueOrDefault(driverNumber) ?? new();
             var stint = appData.Stints.LastOrDefault().Value;
+            var previousLapDrivers = timingData.DriversByLap.GetValueOrDefault(line.NumberOfLaps - 1 ?? 0);
+            var previousLapLine = previousLapDrivers?.GetValueOrDefault(driverNumber) ?? new();
             var teamColour = driver.TeamColour ?? "000000";
+
+            var positionChange = line.Line - previousLapLine.Line;
 
             var isComparisonLine = line == comparisonDataPoint.Value;
             var lineStyle = isComparisonLine ? _invert : _normal;
@@ -130,7 +137,8 @@ public class TimingTowerDisplay(
                 new Markup(
                     $"[#{teamColour}]{driver.RacingNumber, 2} {driver.Tla ?? "UNK"}[/]",
                     lineStyle
-                )
+                ),
+                new Markup(GetPositionChangeMarkup(positionChange))
             );
         }
 
@@ -330,6 +338,13 @@ public class TimingTowerDisplay(
 
         return new Text("");
     }
+
+    private string GetPositionChangeMarkup(int? change) => change switch
+    {
+        < 0 => "[green]▲[/]",
+        > 0 => "[yellow]▼[/]",
+        _ => ""
+    };
 
     private IRenderable GetRaceControlPanel()
     {
