@@ -58,7 +58,7 @@ public class TimingTowerDisplay(
         table
             .AddColumns(
                 $"LAP {lapCountProcessor.Latest?.CurrentLap, 2}/{lapCountProcessor.Latest?.TotalLaps}",
-                "Gap    ",
+                "Gap   ",
                 "Interval",
                 "Best Lap",
                 "Last Lap",
@@ -73,7 +73,7 @@ public class TimingTowerDisplay(
             .RemoveColumnPadding();
 
         // Increase padding between lap and sector times to clearly mark them
-        table.Columns[5].Padding = new Padding(1);
+        table.Columns[5].Padding = new Padding(left: 1, 0, 0, 0);
 
         var comparisonDataPoint = timingData.LatestLiveTimingDataPoint.Lines.FirstOrDefault(x =>
             x.Value.Line == state.CursorOffset
@@ -94,7 +94,7 @@ public class TimingTowerDisplay(
                     $"{line.Position, 2} [#{teamColour}]{driver.RacingNumber, 2} {driver.Tla ?? "UNK"}[/]",
                     lineStyle
                 ),
-                new Text($"{line.GapToLeader}", lineStyle),
+                new Text($"{line.GapToLeader, 7}", lineStyle),
                 new Text(
                     $"{line.IntervalToPositionAhead?.Value, 8}",
                     GetStyle(line.IntervalToPositionAhead, isComparisonLine)
@@ -135,7 +135,7 @@ public class TimingTowerDisplay(
         }
 
         table.SimpleBorder();
-        table.Expand = true;
+        table.Expand();
 
         return table;
     }
@@ -164,8 +164,8 @@ public class TimingTowerDisplay(
             .RemoveColumnPadding();
 
         // Increase padding between sets of sectors to clearly mark them
-        table.Columns[3].Padding = new Padding(1);
-        table.Columns[6].Padding = new Padding(1);
+        table.Columns[3].Padding = new Padding(left: 1, 0, 0, 0);
+        table.Columns[6].Padding = new Padding(left: 1, 0, 0, 0);
 
         var bestDriver = timingData.LatestLiveTimingDataPoint.GetOrderedLines().First();
 
@@ -244,7 +244,6 @@ public class TimingTowerDisplay(
 
         table.SimpleBorder();
         table.Expand();
-        table.Width = System.Console.WindowWidth;
 
         return table;
     }
