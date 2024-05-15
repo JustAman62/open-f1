@@ -15,6 +15,7 @@ public class SwitchToTimingTowerInputHandler(State state) : IInputHandler
     public Task ExecuteAsync(ConsoleKeyInfo consoleKeyInfo)
     {
         state.CurrentScreen = Screen.TimingTower;
+        state.CursorOffset = 0;
         return Task.CompletedTask;
     }
 }

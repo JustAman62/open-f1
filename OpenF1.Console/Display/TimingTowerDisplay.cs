@@ -103,7 +103,7 @@ public class TimingTowerDisplay(
                 ),
                 new Text($"{line.GapToLeader, 7}", lineStyle),
                 new Text(
-                    $"{line.IntervalToPositionAhead?.Value, 8}",
+                    $"{line.IntervalToPositionAhead?.Value, 8}{(line.IntervalToPositionAhead?.Catching ?? false ? "▲" : string.Empty)}",
                     GetStyle(line.IntervalToPositionAhead, isComparisonLine)
                 ),
                 new Text(line.BestLapTime?.Value ?? "NULL", _normal),
@@ -352,7 +352,7 @@ public class TimingTowerDisplay(
         table.NoBorder();
         table.Expand();
         table.HideHeaders();
-        table.AddColumns("Timestamp", "Message");
+        table.AddColumns("Message");
 
         var messages = raceControlMessages
             .RaceControlMessages.Messages.OrderByDescending(x => x.Value.Utc)
@@ -361,7 +361,7 @@ public class TimingTowerDisplay(
 
         foreach (var (key, value) in messages)
         {
-            table.AddRow($"{value.Utc:HH:mm:ss}", value.Message);
+            table.AddRow(value.Message);
         }
         return new Panel(table)
         {

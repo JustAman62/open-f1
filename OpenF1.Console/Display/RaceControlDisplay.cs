@@ -46,6 +46,17 @@ public class RaceControlDisplay(
         table.HideHeaders();
         table.AddColumns("Timestamp", "Message");
 
+        if (state.CursorOffset > 0)
+        {
+            table.AddRow(
+                new Text(string.Empty),
+                new Text(
+                    $"Skipping {state.CursorOffset} messages",
+                    new Style(foreground: Color.Red)
+                )
+            );
+        }
+
         var messages = raceControlMessages
             .RaceControlMessages.Messages.OrderByDescending(x => x.Value.Utc)
             .Skip(state.CursorOffset)
