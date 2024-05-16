@@ -8,19 +8,49 @@ public static class TimingDataPointExtensions
         this TimingDataPoint data
     ) => data.Lines.OrderBy(x => x.Value.Line).ToDictionary(x => x.Key, x => x.Value);
 
-    public static decimal? GapToLeaderSeconds(this TimingDataPoint.Driver driver) =>
-        decimal.TryParse(driver.GapToLeader, out var seconds) ? seconds : null;
+    [System.Diagnostics.CodeAnalysis.SuppressMessage(
+        "Style",
+        "IDE0046:Convert to conditional expression",
+        Justification = "Harder to read"
+    )]
+    public static decimal? GapToLeaderSeconds(this TimingDataPoint.Driver driver)
+    {
+        if (driver.GapToLeader?.Contains("LAP") ?? false)
+            return 0;
 
-    public static decimal? IntervalSeconds(this TimingDataPoint.Driver.Interval interval) =>
-        decimal.TryParse(interval?.Value, out var seconds) ? seconds : null;
+        return decimal.TryParse(driver.GapToLeader, out var seconds) ? seconds : null;
+    }
+
+    [System.Diagnostics.CodeAnalysis.SuppressMessage(
+        "Style",
+        "IDE0046:Convert to conditional expression",
+        Justification = "Harder to read"
+    )]
+    public static decimal? IntervalSeconds(this TimingDataPoint.Driver.Interval interval)
+    {
+        if (interval.Value?.Contains("LAP") ?? false)
+            return 0;
+
+        return decimal.TryParse(interval?.Value, out var seconds) ? seconds : null;
+    }
 
     public static TimeSpan? ToTimeSpan(this TimingDataPoint.Driver.BestLap lap) =>
-        TimeSpan.TryParseExact(lap.Value, ["m\\:ss\\.fff", "ss\\.fff"], CultureInfo.InvariantCulture, out var result)
+        TimeSpan.TryParseExact(
+            lap.Value,
+            ["m\\:ss\\.fff", "ss\\.fff"],
+            CultureInfo.InvariantCulture,
+            out var result
+        )
             ? result
             : null;
 
     public static TimeSpan? ToTimeSpan(this TimingDataPoint.Driver.LapSectorTime lap) =>
-        TimeSpan.TryParseExact(lap.Value, ["m\\:ss\\.fff", "ss\\.fff"], CultureInfo.InvariantCulture, out var result)
+        TimeSpan.TryParseExact(
+            lap.Value,
+            ["m\\:ss\\.fff", "ss\\.fff"],
+            CultureInfo.InvariantCulture,
+            out var result
+        )
             ? result
             : null;
 

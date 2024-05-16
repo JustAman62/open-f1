@@ -87,10 +87,10 @@ public class TimingHistoryDisplay(
 
     private string GetMarkedUp(decimal? time) => time switch
     {
-        < 0 => $"[green]({time})[/]",
-        < 0.5m => $"[grey62](+{time})[/]",
+        < 0 => $"[green dim italic]({time})[/]",
+        < 0.5m => $"[grey62 dim italic](+{time})[/]",
         null => "",
-        _ => $"[yellow](+{time})[/]",
+        _ => $"[yellow dim italic](+{time})[/]",
     };
 
     private string GetPositionChangeMarkup(int? change) => change switch

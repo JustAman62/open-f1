@@ -18,6 +18,8 @@ public class TimingTowerDisplay(
 {
     public Screen Screen => Screen.TimingTower;
 
+    private const int STATUS_PANEL_WIDTH = 15;
+
     private readonly Style _personalBest =
         new(foreground: Color.White, background: new Color(0, 118, 0));
     private readonly Style _overallBest =
@@ -28,7 +30,8 @@ public class TimingTowerDisplay(
     public Task<IRenderable> GetContentAsync()
     {
         var statusPanel = GetStatusPanel();
-        var raceControlPanel = GetRaceControlPanel();
+        var raceControlPanel =
+            state.CursorOffset > 0 ? GetComparisonPanel() : GetRaceControlPanel();
         var timingTower = sessionInfoProcessor.Latest.IsRace()
             ? GetRaceTimingTower()
             : GetNonRaceTimingTower();
@@ -44,7 +47,7 @@ public class TimingTowerDisplay(
         );
 
         layout["Info"].Size = 5;
-        layout["Info"]["Status"].Size = 19;
+        layout["Info"]["Status"].Size = STATUS_PANEL_WIDTH;
 
         return Task.FromResult<IRenderable>(layout);
     }
@@ -87,7 +90,9 @@ public class TimingTowerDisplay(
             var driver = driverList.Latest?.GetValueOrDefault(driverNumber) ?? new();
             var appData = timingAppData.Latest?.Lines.GetValueOrDefault(driverNumber) ?? new();
             var stint = appData.Stints.LastOrDefault().Value;
-            var previousLapDrivers = timingData.DriversByLap.GetValueOrDefault(line.NumberOfLaps - 1 ?? 0);
+            var previousLapDrivers = timingData.DriversByLap.GetValueOrDefault(
+                line.NumberOfLaps - 1 ?? 0
+            );
             var previousLapLine = previousLapDrivers?.GetValueOrDefault(driverNumber) ?? new();
             var teamColour = driver.TeamColour ?? "000000";
 
@@ -339,12 +344,13 @@ public class TimingTowerDisplay(
         return new Text("");
     }
 
-    private string GetPositionChangeMarkup(int? change) => change switch
-    {
-        < 0 => "[green]▲[/]",
-        > 0 => "[yellow]▼[/]",
-        _ => ""
-    };
+    private string GetPositionChangeMarkup(int? change) =>
+        change switch
+        {
+            < 0 => "[green]▲[/]",
+            > 0 => "[yellow]▼[/]",
+            _ => ""
+        };
 
     private IRenderable GetRaceControlPanel()
     {
@@ -361,7 +367,7 @@ public class TimingTowerDisplay(
 
         foreach (var (key, value) in messages)
         {
-            table.AddRow(value.Message);
+            table.AddRow($"► {value.Message}");
         }
         return new Panel(table)
         {
@@ -369,6 +375,119 @@ public class TimingTowerDisplay(
             Expand = true,
             Border = BoxBorder.Rounded
         };
+    }
+
+    private IRenderable GetComparisonPanel()
+    {
+        var lines = timingData.LatestLiveTimingDataPoint.Lines;
+
+        var previousLine = lines.FirstOrDefault(x => x.Value.Line == state.CursorOffset - 1);
+        var selectedLine = lines.FirstOrDefault(x => x.Value.Line == state.CursorOffset);
+        var nextLine = lines.FirstOrDefault(x => x.Value.Line == state.CursorOffset + 1);
+
+        var charts = new List<BarChart>();
+
+        if (previousLine.Key is not null)
+        {
+            var chart = GetComparisonChart(previousLine.Key, selectedLine.Key, selectedLine.Value);
+            if (chart is not null)
+                charts.Add(chart);
+        }
+
+        if (nextLine.Key is not null)
+        {
+            var chart = GetComparisonChart(selectedLine.Key, nextLine.Key, nextLine.Value);
+            if (chart is not null)
+                charts.Add(chart);
+        }
+
+        return new Columns(charts).PadLeft(1).Expand();
+    }
+
+    private BarChart? GetComparisonChart(
+        string prevDriverNumber,
+        string nextDriverNumber,
+        TimingDataPoint.Driver nextLine
+    )
+    {
+        var prevDriver = driverList.Latest?.GetValueOrDefault(prevDriverNumber) ?? new();
+        var nextDriver = driverList.Latest?.GetValueOrDefault(nextDriverNumber) ?? new();
+        var currentLap = nextLine.NumberOfLaps;
+        if (!currentLap.HasValue)
+            return null;
+
+        var chart = new BarChart()
+            .Width((System.Console.WindowWidth - STATUS_PANEL_WIDTH) / 2)
+            .Label(
+                $"[#{prevDriver.TeamColour}]{prevDriver.Tla}[/] [italic]vs[/] [#{nextDriver.TeamColour}]{nextDriver.Tla}[/]"
+            );
+
+        if (currentLap.Value > 0)
+        {
+            AddChartItem(chart, currentLap.Value, prevDriverNumber, nextDriverNumber);
+        }
+        else
+        {
+            return null;
+        }
+
+        if (currentLap.Value - 1 > 0)
+        {
+            AddChartItem(chart, currentLap.Value - 1, prevDriverNumber, nextDriverNumber);
+        }
+
+        if (currentLap.Value - 2 > 0)
+        {
+            AddChartItem(chart, currentLap.Value - 2, prevDriverNumber, nextDriverNumber);
+        }
+
+        if (currentLap.Value - 3 > 0)
+        {
+            AddChartItem(chart, currentLap.Value - 3, prevDriverNumber, nextDriverNumber);
+        }
+        return chart;
+    }
+
+    private void AddChartItem(
+        BarChart chart,
+        int lapNumber,
+        string prevDriverNumber,
+        string nextDriverNumber
+    )
+    {
+        var gap = GetGapBetweenDriversOnLap(lapNumber, prevDriverNumber, nextDriverNumber);
+        var gapOnPreviousLap = GetGapBetweenDriversOnLap(
+            lapNumber - 1,
+            prevDriverNumber,
+            nextDriverNumber
+        );
+        var color = gap switch {
+            _ when gap > gapOnPreviousLap => Color.Red,
+            _ when gap < gapOnPreviousLap => Color.Green,
+            _ => Color.Silver
+        };
+        chart.AddItem(
+            $"LAP {lapNumber}",
+            (double)gap,
+            color
+        );
+    }
+
+    private decimal GetGapBetweenDriversOnLap(
+        int lapNumber,
+        string prevDriverNumber,
+        string nextDriverNumber
+    )
+    {
+        var prevGapToLeader = timingData
+            .DriversByLap.GetValueOrDefault(lapNumber)
+            ?.GetValueOrDefault(prevDriverNumber)
+            ?.GapToLeaderSeconds();
+        var nextGapToLeader = timingData
+            .DriversByLap.GetValueOrDefault(lapNumber)
+            ?.GetValueOrDefault(nextDriverNumber)
+            ?.GapToLeaderSeconds();
+        return nextGapToLeader - prevGapToLeader ?? 0;
     }
 
     private IRenderable GetStatusPanel()
