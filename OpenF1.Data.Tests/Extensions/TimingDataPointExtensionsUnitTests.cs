@@ -5,7 +5,7 @@ public class TimingDataPointExtensionsUnitTests
     public static TheoryData<string, decimal?> IntervalTestData =>
         new()
         {
-            { "LAP 10", null },
+            { "LAP 10", 0 },
             { "+1", 1 },
             { "+1.123", (decimal?)1.123 },
             { "1L", null },
