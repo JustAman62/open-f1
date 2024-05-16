@@ -30,8 +30,11 @@ public class TimingTowerDisplay(
     public Task<IRenderable> GetContentAsync()
     {
         var statusPanel = GetStatusPanel();
+
         var raceControlPanel =
-            state.CursorOffset > 0 ? GetComparisonPanel() : GetRaceControlPanel();
+            state.CursorOffset > 0 && sessionInfoProcessor.Latest.IsRace()
+                ? GetComparisonPanel()
+                : GetRaceControlPanel();
         var timingTower = sessionInfoProcessor.Latest.IsRace()
             ? GetRaceTimingTower()
             : GetNonRaceTimingTower();
@@ -103,7 +106,7 @@ public class TimingTowerDisplay(
 
             table.AddRow(
                 new Markup(
-                    $"{line.Position, 2} [#{teamColour}]{driver.RacingNumber, 2} {driver.Tla ?? "UNK"}[/]",
+                    $"{line.Position, 2} [#{teamColour} bold]{driver.RacingNumber, 2} {driver.Tla ?? "UNK"}[/]",
                     lineStyle
                 ),
                 new Text($"{line.GapToLeader, 7}", lineStyle),
@@ -206,7 +209,7 @@ public class TimingTowerDisplay(
 
             table.AddRow(
                 new Markup(
-                    $"{line.Position, 2} [#{teamColour}]{driver.RacingNumber, 2} {driver.Tla ?? "UNK"}[/]",
+                    $"{line.Position, 2} [#{teamColour} bold]{driver.RacingNumber, 2} {driver.Tla ?? "UNK"}[/]",
                     _normal
                 ),
                 new Text($"{(gapToLeader > 0 ? "+" : "")}{gapToLeader:f3}".PadLeft(7), _normal),
@@ -320,7 +323,7 @@ public class TimingTowerDisplay(
             background = Color.White;
         }
 
-        if (interval.IntervalSeconds() < 1)
+        if (interval.IntervalSeconds() < 1 && interval.IntervalSeconds() > 0)
         {
             foreground = Color.Green3;
         }
@@ -410,6 +413,8 @@ public class TimingTowerDisplay(
         TimingDataPoint.Driver nextLine
     )
     {
+        if (string.IsNullOrWhiteSpace(prevDriverNumber) || string.IsNullOrWhiteSpace(nextDriverNumber))
+            return null;
         var prevDriver = driverList.Latest?.GetValueOrDefault(prevDriverNumber) ?? new();
         var nextDriver = driverList.Latest?.GetValueOrDefault(nextDriverNumber) ?? new();
         var currentLap = nextLine.NumberOfLaps;
@@ -419,7 +424,7 @@ public class TimingTowerDisplay(
         var chart = new BarChart()
             .Width((System.Console.WindowWidth - STATUS_PANEL_WIDTH) / 2)
             .Label(
-                $"[#{prevDriver.TeamColour}]{prevDriver.Tla}[/] [italic]vs[/] [#{nextDriver.TeamColour}]{nextDriver.Tla}[/]"
+                $"[#{prevDriver.TeamColour} bold]{prevDriver.Tla}[/] [italic]vs[/] [#{nextDriver.TeamColour} bold]{nextDriver.Tla}[/]"
             );
 
         if (currentLap.Value > 0)
@@ -461,16 +466,13 @@ public class TimingTowerDisplay(
             prevDriverNumber,
             nextDriverNumber
         );
-        var color = gap switch {
+        var color = gap switch
+        {
             _ when gap > gapOnPreviousLap => Color.Red,
             _ when gap < gapOnPreviousLap => Color.Green,
             _ => Color.Silver
         };
-        chart.AddItem(
-            $"LAP {lapNumber}",
-            (double)gap,
-            color
-        );
+        chart.AddItem($"LAP {lapNumber}", (double)gap, color);
     }
 
     private decimal GetGapBetweenDriversOnLap(
