@@ -174,8 +174,7 @@ public class TimingTowerDisplay(
                 "S2",
                 "S3",
                 "Pit",
-                "Tyre",
-                "Driver"
+                "Tyre"
             )
             .RemoveColumnPadding();
 
@@ -187,13 +186,16 @@ public class TimingTowerDisplay(
 
         var bestSector1 = timingData
             .BestLaps.DefaultIfEmpty()
-            .Min(x => x.Value?.Sectors.GetValueOrDefault("0")?.ToTimeSpan() ?? TimeSpan.MaxValue);
+            .MinBy(x => x.Value?.Sectors.GetValueOrDefault("0")?.ToTimeSpan())
+            .Value?.Sectors?["0"];
         var bestSector2 = timingData
             .BestLaps.DefaultIfEmpty()
-            .Min(x => x.Value?.Sectors.GetValueOrDefault("1")?.ToTimeSpan() ?? TimeSpan.MaxValue);
+            .MinBy(x => x.Value?.Sectors.GetValueOrDefault("1")?.ToTimeSpan())
+            .Value?.Sectors?["1"];
         var bestSector3 = timingData
             .BestLaps.DefaultIfEmpty()
-            .Min(x => x.Value?.Sectors.GetValueOrDefault("2")?.ToTimeSpan() ?? TimeSpan.MaxValue);
+            .MinBy(x => x.Value?.Sectors.GetValueOrDefault("2")?.ToTimeSpan())
+            .Value?.Sectors?["2"];
 
         foreach (var (driverNumber, line) in timingData.LatestLiveTimingDataPoint.GetOrderedLines())
         {
@@ -214,30 +216,27 @@ public class TimingTowerDisplay(
                 ),
                 new Text($"{(gapToLeader > 0 ? "+" : "")}{gapToLeader:f3}".PadLeft(7), _normal),
                 new Text(line.BestLapTime?.Value ?? "NULL", _normal),
-                new Text(
-                    bestLap?.Sectors.GetValueOrDefault("0")?.Value?.PadLeft(6) ?? "      ",
-                    GetStyle(bestLap?.Sectors.GetValueOrDefault("0"), bestSector1)
+                GetSectorMarkup(
+                    bestLap?.Sectors.GetValueOrDefault("0"),
+                    bestSector1,
+                    overrideStyle: true,
+                    showDifference: true
                 ),
-                new Text(
-                    bestLap?.Sectors.GetValueOrDefault("1")?.Value?.PadLeft(6) ?? "      ",
-                    GetStyle(bestLap?.Sectors.GetValueOrDefault("1"), bestSector2)
+                GetSectorMarkup(
+                    bestLap?.Sectors.GetValueOrDefault("1"),
+                    bestSector2,
+                    overrideStyle: true,
+                    showDifference: true
                 ),
-                new Text(
-                    bestLap?.Sectors.GetValueOrDefault("2")?.Value?.PadLeft(6) ?? "      ",
-                    GetStyle(bestLap?.Sectors.GetValueOrDefault("2"), bestSector3)
+                GetSectorMarkup(
+                    bestLap?.Sectors.GetValueOrDefault("2"),
+                    bestSector3,
+                    overrideStyle: true,
+                    showDifference: true
                 ),
-                new Text(
-                    line.Sectors.GetValueOrDefault("0")?.Value?.PadLeft(6) ?? "      ",
-                    GetStyle(line.Sectors.GetValueOrDefault("0"))
-                ),
-                new Text(
-                    line.Sectors.GetValueOrDefault("1")?.Value?.PadLeft(6) ?? "      ",
-                    GetStyle(line.Sectors.GetValueOrDefault("1"))
-                ),
-                new Text(
-                    line.Sectors.GetValueOrDefault("2")?.Value?.PadLeft(6) ?? "      ",
-                    GetStyle(line.Sectors.GetValueOrDefault("2"))
-                ),
+                GetSectorMarkup(line.Sectors.GetValueOrDefault("0"), bestSector1),
+                GetSectorMarkup(line.Sectors.GetValueOrDefault("1"), bestSector2),
+                GetSectorMarkup(line.Sectors.GetValueOrDefault("2"), bestSector3),
                 new Text(
                     line.InPit.GetValueOrDefault()
                         ? "IN "
@@ -250,11 +249,7 @@ public class TimingTowerDisplay(
                             ? _personalBest
                             : Style.Plain
                 ),
-                new Text($"{stint?.Compound?[0] ?? 'X'} {stint?.TotalLaps, 2}", GetStyle(stint)),
-                new Markup(
-                    $"[#{teamColour}]{driver.RacingNumber, 2} {driver.Tla ?? "UNK"}[/]",
-                    _normal
-                )
+                new Text($"{stint?.Compound?[0] ?? 'X'} {stint?.TotalLaps, 2}", GetStyle(stint))
             );
         }
 
@@ -264,21 +259,45 @@ public class TimingTowerDisplay(
         return table;
     }
 
+    private IRenderable GetSectorMarkup(
+        TimingDataPoint.Driver.LapSectorTime? time,
+        TimingDataPoint.Driver.LapSectorTime? bestSector = null,
+        bool overrideStyle = false,
+        bool showDifference = false
+    )
+    {
+        var sector =
+            $"[{GetStyle(time, bestSector, overrideStyle).ToMarkup()}]{time?.Value?.PadLeft(6)}[/]";
+
+        var differenceToBest = time?.ToTimeSpan() - bestSector?.ToTimeSpan();
+        var differenceColor = differenceToBest < TimeSpan.Zero ? "green" : "white";
+        var difference = differenceToBest.HasValue
+            ? $"[dim italic {differenceColor}]({(differenceToBest >= TimeSpan.Zero ? "+" : string.Empty)}{differenceToBest:s\\.fff})[/]"
+            : string.Empty;
+        return differenceToBest < TimeSpan.FromSeconds(10) && showDifference
+            ? new Markup($"{sector}{difference}")
+            : new Markup($"{sector}");
+    }
+
     [System.Diagnostics.CodeAnalysis.SuppressMessage(
         "Style",
         "IDE0046:Convert to conditional expression",
         Justification = "Harder to read"
     )]
-    private Style GetStyle(TimingDataPoint.Driver.LapSectorTime? time, TimeSpan? bestSector = null)
+    private Style GetStyle(
+        TimingDataPoint.Driver.LapSectorTime? time,
+        TimingDataPoint.Driver.LapSectorTime? bestSector = null,
+        bool overrideStyle = false
+    )
     {
         if (string.IsNullOrWhiteSpace(time?.Value))
             return _normal;
 
-        if (bestSector == time?.ToTimeSpan())
+        if (bestSector?.ToTimeSpan() == time?.ToTimeSpan())
             return _overallBest;
 
-        // If we are checking against a best sector, don't style it unless it is fasted
-        if (bestSector.HasValue)
+        // If we are checking against a best sector, don't style it unless it is fastest
+        if (overrideStyle)
             return _normal;
 
         if (time?.OverallFastest ?? false)
@@ -413,7 +432,10 @@ public class TimingTowerDisplay(
         TimingDataPoint.Driver nextLine
     )
     {
-        if (string.IsNullOrWhiteSpace(prevDriverNumber) || string.IsNullOrWhiteSpace(nextDriverNumber))
+        if (
+            string.IsNullOrWhiteSpace(prevDriverNumber)
+            || string.IsNullOrWhiteSpace(nextDriverNumber)
+        )
             return null;
         var prevDriver = driverList.Latest?.GetValueOrDefault(prevDriverNumber) ?? new();
         var nextDriver = driverList.Latest?.GetValueOrDefault(nextDriverNumber) ?? new();
