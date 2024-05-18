@@ -522,9 +522,10 @@ public class TimingTowerDisplay(
         {
             var style = trackStatusProcessor.Latest.Status switch
             {
-                "1" => _personalBest,
-                "2" => new Style(foreground: Color.White, background: Color.Yellow),
-                "4" => new Style(foreground: Color.White, background: Color.Yellow),
+                "1" => _personalBest, // All Clear
+                "2" => new Style(foreground: Color.White, background: Color.Yellow), // Yellow Flad
+                "4" => new Style(foreground: Color.White, background: Color.Yellow), // Safety Car
+                "5" => new Style(foreground: Color.White, background: Color.Red), // Red Flag
                 _ => Style.Plain
             };
             items.Add(
