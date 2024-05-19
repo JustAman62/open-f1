@@ -8,7 +8,7 @@ public static partial class ServiceCollectionExtensions
     {
         var processorTypes = typeof(IProcessor)
             .Assembly.GetTypes()
-            .Where(x => x.IsClass && x.IsAssignableTo(typeof(IProcessor)));
+            .Where(x => x.IsClass && x.IsAssignableTo(typeof(IProcessor)) && !x.IsGenericType);
 
         foreach (var processorType in processorTypes)
         {

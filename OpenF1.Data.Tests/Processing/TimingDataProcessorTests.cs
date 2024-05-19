@@ -50,9 +50,9 @@ public class TimingDataProcessorTests
         }
 
         // Assert
-        Assert.NotNull(processor.LatestLiveTimingDataPoint);
-        Assert.NotEmpty(processor.LatestLiveTimingDataPoint.Lines);
-        var line = processor.LatestLiveTimingDataPoint.Lines["1"];
+        Assert.NotNull(processor.Latest);
+        Assert.NotEmpty(processor.Latest.Lines);
+        var line = processor.Latest.Lines["1"];
         Assert.Equal(1, line.Line);
         Assert.False(line.InPit);
         Assert.Equal("+1.000", line.GapToLeader);
@@ -107,10 +107,10 @@ public class TimingDataProcessorTests
         }
 
         // Assert
-        Assert.NotNull(processor.LatestLiveTimingDataPoint);
-        Assert.NotEmpty(processor.LatestLiveTimingDataPoint.Lines);
+        Assert.NotNull(processor.Latest);
+        Assert.NotEmpty(processor.Latest.Lines);
 
-        var line = processor.LatestLiveTimingDataPoint.Lines["1"];
+        var line = processor.Latest.Lines["1"];
         Assert.Equal(1, line.Line);
         Assert.Equal(fasterBestLapTime, line.BestLapTime.Value);
 
@@ -165,10 +165,10 @@ public class TimingDataProcessorTests
         }
 
         // Assert
-        Assert.NotNull(processor.LatestLiveTimingDataPoint);
-        Assert.NotEmpty(processor.LatestLiveTimingDataPoint.Lines);
+        Assert.NotNull(processor.Latest);
+        Assert.NotEmpty(processor.Latest.Lines);
 
-        var line = processor.LatestLiveTimingDataPoint.Lines["1"];
+        var line = processor.Latest.Lines["1"];
         Assert.Equal(1, line.Line);
         Assert.Equal(slowerBestLapTime, line.BestLapTime.Value);
 

@@ -57,7 +57,7 @@ public class TimingTowerDisplay(
 
     private IRenderable GetRaceTimingTower()
     {
-        if (timingData.LatestLiveTimingDataPoint is null)
+        if (timingData.Latest is null)
             return new Text("No Timing");
 
         var table = new Table();
@@ -82,13 +82,13 @@ public class TimingTowerDisplay(
         // Increase padding between lap and sector times to clearly mark them
         table.Columns[5].Padding = new Padding(left: 1, 0, 0, 0);
 
-        var comparisonDataPoint = timingData.LatestLiveTimingDataPoint.Lines.FirstOrDefault(x =>
+        var comparisonDataPoint = timingData.Latest.Lines.FirstOrDefault(x =>
             x.Value.Line == state.CursorOffset
         );
 
         var lapNumber = lapCountProcessor.Latest?.CurrentLap ?? 0;
 
-        foreach (var (driverNumber, line) in timingData.LatestLiveTimingDataPoint.GetOrderedLines())
+        foreach (var (driverNumber, line) in timingData.Latest.GetOrderedLines())
         {
             var driver = driverList.Latest?.GetValueOrDefault(driverNumber) ?? new();
             var appData = timingAppData.Latest?.Lines.GetValueOrDefault(driverNumber) ?? new();
@@ -158,7 +158,7 @@ public class TimingTowerDisplay(
 
     private IRenderable GetNonRaceTimingTower()
     {
-        if (timingData.LatestLiveTimingDataPoint is null)
+        if (timingData.Latest is null)
             return new Text("No Timing Available");
 
         var table = new Table();
@@ -182,7 +182,7 @@ public class TimingTowerDisplay(
         table.Columns[3].Padding = new Padding(left: 1, 0, 0, 0);
         table.Columns[6].Padding = new Padding(left: 1, 0, 0, 0);
 
-        var bestDriver = timingData.LatestLiveTimingDataPoint.GetOrderedLines().First();
+        var bestDriver = timingData.Latest.GetOrderedLines().First();
 
         var bestSector1 = timingData
             .BestLaps.DefaultIfEmpty()
@@ -197,7 +197,7 @@ public class TimingTowerDisplay(
             .MinBy(x => x.Value?.Sectors.GetValueOrDefault("2")?.ToTimeSpan())
             .Value?.Sectors?["2"];
 
-        foreach (var (driverNumber, line) in timingData.LatestLiveTimingDataPoint.GetOrderedLines())
+        foreach (var (driverNumber, line) in timingData.Latest.GetOrderedLines())
         {
             var driver = driverList.Latest?.GetValueOrDefault(driverNumber) ?? new();
             var appData = timingAppData.Latest?.Lines.GetValueOrDefault(driverNumber) ?? new();
@@ -383,7 +383,7 @@ public class TimingTowerDisplay(
         table.AddColumns("Message");
 
         var messages = raceControlMessages
-            .RaceControlMessages.Messages.OrderByDescending(x => x.Value.Utc)
+            .Latest.Messages.OrderByDescending(x => x.Value.Utc)
             .Skip(state.CursorOffset)
             .Take(5);
 
@@ -401,7 +401,7 @@ public class TimingTowerDisplay(
 
     private IRenderable GetComparisonPanel()
     {
-        var lines = timingData.LatestLiveTimingDataPoint.Lines;
+        var lines = timingData.Latest.Lines;
 
         var previousLine = lines.FirstOrDefault(x => x.Value.Line == state.CursorOffset - 1);
         var selectedLine = lines.FirstOrDefault(x => x.Value.Line == state.CursorOffset);

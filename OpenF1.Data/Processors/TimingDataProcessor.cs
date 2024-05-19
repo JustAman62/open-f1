@@ -8,7 +8,7 @@ public class TimingDataProcessor(IMapper mapper) : IProcessor<TimingDataPoint>
     /// <summary>
     /// The latest timing data available
     /// </summary>
-    public TimingDataPoint LatestLiveTimingDataPoint { get; private set; } = new();
+    public TimingDataPoint Latest { get; private set; } = new();
 
     /// <summary>
     /// Dictionary of LapNumber-DriverList where DriverList is Dictionary DriverNumber-Lap.
@@ -26,13 +26,13 @@ public class TimingDataProcessor(IMapper mapper) : IProcessor<TimingDataPoint>
 
     public void Process(TimingDataPoint data)
     {
-        _ = mapper.Map(data, LatestLiveTimingDataPoint);
+        _ = mapper.Map(data, Latest);
 
         foreach (var (driverNumber, lap) in data.Lines)
         {
             // Super hacky way of doing a clean clone. Using AutoMapper seems to not clone the Sectors array properly.
             var cloned = JsonSerializer.Deserialize<TimingDataPoint.Driver>(
-                JsonSerializer.Serialize(LatestLiveTimingDataPoint.Lines[driverNumber])
+                JsonSerializer.Serialize(Latest.Lines[driverNumber])
             )!;
 
             // If this update changes the NumberOfLaps, then take a snapshot of that drivers data for that lap

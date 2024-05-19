@@ -58,7 +58,7 @@ public class RaceControlDisplay(
         }
 
         var messages = raceControlMessages
-            .RaceControlMessages.Messages.OrderByDescending(x => x.Value.Utc)
+            .Latest.Messages.OrderByDescending(x => x.Value.Utc)
             .Skip(state.CursorOffset)
             .Take(20);
 
