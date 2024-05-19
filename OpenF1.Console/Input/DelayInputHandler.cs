@@ -2,7 +2,7 @@ using OpenF1.Data;
 
 namespace OpenF1.Console;
 
-public class IncreaseDelayInputHandler(ITimingService timingService) : IInputHandler
+public class IncreaseDelayInputHandler(IDateTimeProvider dateTimeProvider) : IInputHandler
 {
     public bool IsEnabled => true;
 
@@ -17,12 +17,12 @@ public class IncreaseDelayInputHandler(ITimingService timingService) : IInputHan
     public Task ExecuteAsync(ConsoleKeyInfo consoleKeyInfo)
     {
         var increaseBy = consoleKeyInfo.Modifiers.HasFlag(ConsoleModifiers.Shift) ? 30 : 5;
-        timingService.Delay += TimeSpan.FromSeconds(increaseBy);
+        dateTimeProvider.Delay += TimeSpan.FromSeconds(increaseBy);
         return Task.CompletedTask;
     }
 }
 
-public class DecreaseDelayInputHandler(ITimingService timingService) : IInputHandler
+public class DecreaseDelayInputHandler(IDateTimeProvider dateTimeProvider) : IInputHandler
 {
     public bool IsEnabled => true;
 
@@ -37,9 +37,9 @@ public class DecreaseDelayInputHandler(ITimingService timingService) : IInputHan
     public Task ExecuteAsync(ConsoleKeyInfo consoleKeyInfo)
     {
         var decreaseBy = consoleKeyInfo.Modifiers.HasFlag(ConsoleModifiers.Shift) ? 30 : 5;
-        timingService.Delay -= TimeSpan.FromSeconds(decreaseBy);
-        if (timingService.Delay < TimeSpan.Zero)
-            timingService.Delay = TimeSpan.Zero;
+        dateTimeProvider.Delay -= TimeSpan.FromSeconds(decreaseBy);
+        if (dateTimeProvider.Delay < TimeSpan.Zero)
+            dateTimeProvider.Delay = TimeSpan.Zero;
 
         return Task.CompletedTask;
     }

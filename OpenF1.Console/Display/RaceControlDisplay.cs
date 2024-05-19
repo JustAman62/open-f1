@@ -6,11 +6,12 @@ namespace OpenF1.Console;
 
 public class RaceControlDisplay(
     State state,
+    ExtrapolatedClockProcessor extrapolatedClockProcessor,
     RaceControlMessageProcessor raceControlMessages,
     TrackStatusProcessor trackStatusProcessor,
     LapCountProcessor lapCountProcessor,
     WeatherProcessor weatherProcessor,
-    ITimingService timingService
+    IDateTimeProvider dateTimeProvider
 ) : IDisplay
 {
     public Screen Screen => Screen.RaceControl;
@@ -33,7 +34,7 @@ public class RaceControlDisplay(
 
         layout["Info"].Size = 23;
         layout["Info"]["Status"].Size = 4;
-        layout["Info"]["Clock"].Size = 6;
+        layout["Info"]["Clock"].Size = 8;
 
         return Task.FromResult<IRenderable>(layout);
     }
@@ -111,9 +112,11 @@ public class RaceControlDisplay(
         var items = new List<IRenderable>
         {
             new Text($"Simulation Time"),
-            new Text($"{DateTimeOffset.UtcNow - timingService.Delay:s}"),
+            new Text($"{dateTimeProvider.Utc:s}"),
             new Text($@"Delayed By"),
-            new Text($@"{timingService.Delay:d\.hh\:mm\:ss}")
+            new Text($@"{dateTimeProvider.Delay:d\.hh\:mm\:ss}"),
+            new Text($@"Session Clock"),
+            new Text($@"{extrapolatedClockProcessor.ExtrapolatedRemaining():hh\:mm\:ss}")
         };
 
         var rows = new Rows(items);

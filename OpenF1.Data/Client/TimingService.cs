@@ -5,8 +5,11 @@ using System.Threading.Channels;
 using Microsoft.Extensions.Logging;
 using OpenF1.Data;
 
-public class TimingService(IEnumerable<IProcessor> processors, ILogger<TimingService> logger)
-    : ITimingService
+public class TimingService(
+    IDateTimeProvider dateTimeProvider,
+    IEnumerable<IProcessor> processors,
+    ILogger<TimingService> logger
+) : ITimingService
 {
     private CancellationTokenSource _cts = new();
     private Task? _executeTask;
@@ -21,15 +24,16 @@ public class TimingService(IEnumerable<IProcessor> processors, ILogger<TimingSer
             AllowTrailingCommas = true,
         };
 
-    public TimeSpan Delay { get; set; } = TimeSpan.Zero;
-
     public ILogger Logger { get; } = logger;
 
     public Task StartAsync()
     {
         _cts.Cancel();
         _cts = new();
-        _executeTask = Task.Factory.StartNew(() => ExecuteAsync(_cts.Token), TaskCreationOptions.LongRunning);
+        _executeTask = Task.Factory.StartNew(
+            () => ExecuteAsync(_cts.Token),
+            TaskCreationOptions.LongRunning
+        );
         return Task.CompletedTask;
     }
 
@@ -58,7 +62,7 @@ public class TimingService(IEnumerable<IProcessor> processors, ILogger<TimingSer
                 {
                     // Add a delay to the message timestamp,
                     // then figure out how long we have to wait for it to be the wall clock time
-                    var timestampWithDelay = res.timestamp + Delay;
+                    var timestampWithDelay = res.timestamp + dateTimeProvider.Delay;
                     var timeToWait = timestampWithDelay - DateTimeOffset.UtcNow;
                     if (timeToWait > TimeSpan.Zero)
                     {
@@ -67,10 +71,11 @@ public class TimingService(IEnumerable<IProcessor> processors, ILogger<TimingSer
                             // If we have to wait for more than a second, then wait for just a second and repeat the loop.
                             // This way if the Delay is reduced by the user, we can react to it after at most a second.
                             Logger.LogDebug($"Delaying for 1 second");
-                            await Task.Delay(TimeSpan.FromSeconds(1), cancellationToken).ConfigureAwait(false);
+                            await Task.Delay(TimeSpan.FromSeconds(1), cancellationToken)
+                                .ConfigureAwait(false);
                             continue;
                         }
-                        
+
                         Logger.LogDebug($"Delaying for {timeToWait}");
                         await Task.Delay(timeToWait, cancellationToken).ConfigureAwait(false);
                     }
@@ -102,6 +107,11 @@ public class TimingService(IEnumerable<IProcessor> processors, ILogger<TimingSer
         ProcessData("LapCount", obj["LapCount"]?.ToString(), DateTimeOffset.UtcNow);
         ProcessData("WeatherData", obj["WeatherData"]?.ToString(), DateTimeOffset.UtcNow);
         ProcessData("SessionInfo", obj["SessionInfo"]?.ToString(), DateTimeOffset.UtcNow);
+        ProcessData(
+            "ExtrapolatedClock",
+            obj["ExtrapolatedClock"]?.ToString(),
+            DateTimeOffset.UtcNow
+        );
 
         var linesToProcess = obj["TimingData"]?["Lines"]?.AsObject() ?? [];
         foreach (var (_, line) in linesToProcess)
@@ -167,6 +177,9 @@ public class TimingService(IEnumerable<IProcessor> processors, ILogger<TimingSer
                 break;
             case LiveTimingDataType.SessionInfo:
                 SendToProcessor<SessionInfoDataPoint>(data);
+                break;
+            case LiveTimingDataType.ExtrapolatedClock:
+                SendToProcessor<ExtrapolatedClockDataPoint>(data);
                 break;
         }
     }

@@ -13,7 +13,8 @@ public class TimingTowerDisplay(
     TrackStatusProcessor trackStatusProcessor,
     LapCountProcessor lapCountProcessor,
     SessionInfoProcessor sessionInfoProcessor,
-    ITimingService timingService
+    ExtrapolatedClockProcessor extrapolatedClockProcessor,
+    IDateTimeProvider dateTimeProvider
 ) : IDisplay
 {
     public Screen Screen => Screen.TimingTower;
@@ -536,8 +537,8 @@ public class TimingTowerDisplay(
             );
         }
 
-        items.Add(new Text($@"Delayed By"));
-        items.Add(new Text($@"{timingService.Delay:d\.hh\:mm\:ss}"));
+        items.Add(new Text($@"{dateTimeProvider.Utc:HH\:mm\:ss}"));
+        items.Add(new Text($@"{extrapolatedClockProcessor.ExtrapolatedRemaining():hh\:mm\:ss}"));
 
         var rows = new Rows(items);
         return new Panel(rows)

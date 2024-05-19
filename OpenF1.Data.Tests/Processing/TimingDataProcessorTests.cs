@@ -1,7 +1,5 @@
 using AutoMapper;
 using AutoMapper.EquivalencyExpression;
-using Microsoft.Extensions.Logging;
-using NSubstitute;
 using OpenF1.Data.AutoMapper;
 
 namespace OpenF1.Data.Tests;

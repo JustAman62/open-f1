@@ -5,6 +5,7 @@ using Spectre.Console.Rendering;
 
 public class ManageSessionDisplay(
     ITimingService timingService,
+    IDateTimeProvider dateTimeProvider,
     IJsonTimingClient jsonTimingClient,
     ILiveTimingClient liveTimingClient
 ) : IDisplay
@@ -37,7 +38,7 @@ public class ManageSessionDisplay(
                 $"Real Client Status: {liveTimingClient.Connection?.State.ToString() ?? "No Connection"}"
             ),
             new Text(
-                $"Delay: {timingService.Delay} / Simulation Time: {DateTimeOffset.UtcNow - timingService.Delay:s}"
+                $"Delay: {dateTimeProvider.Delay} / Simulation Time: {dateTimeProvider.Utc:s}"
             ),
             new Text($"Items in Queue: {timingService.GetRemainingWorkItems()}"),
             new Text($"Queue State:"),

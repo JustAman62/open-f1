@@ -11,6 +11,7 @@ public record LiveTimingOptions
     /// <summary>
     /// The directory to read and store live timing data for simulations.
     /// When live sessions are being listened to, all data received will be recorded in this directory.
+    /// Defaults to <c>~/open-f1/data</c>
     /// </summary>
     public string DataDirectory { get; set; } =
         Path.Join(BaseDirectory, "data");

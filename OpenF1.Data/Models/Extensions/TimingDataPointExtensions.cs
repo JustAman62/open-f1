@@ -1,4 +1,5 @@
 using System.Globalization;
+using System.Net.NetworkInformation;
 
 namespace OpenF1.Data;
 
@@ -34,25 +35,19 @@ public static class TimingDataPointExtensions
         return decimal.TryParse(interval?.Value, out var seconds) ? seconds : null;
     }
 
-    public static TimeSpan? ToTimeSpan(this TimingDataPoint.Driver.BestLap lap) =>
+    public static bool TryParseTimeSpan(this string? str, out TimeSpan result) =>
         TimeSpan.TryParseExact(
-            lap.Value,
-            ["m\\:ss\\.fff", "ss\\.fff"],
+            str,
+            ["hh\\:mm\\:ss", "m\\:ss\\.fff", "ss\\.fff"],
             CultureInfo.InvariantCulture,
-            out var result
-        )
-            ? result
-            : null;
+            out result
+        );
+
+    public static TimeSpan? ToTimeSpan(this TimingDataPoint.Driver.BestLap lap) =>
+        lap.Value.TryParseTimeSpan(out var result) ? result : null;
 
     public static TimeSpan? ToTimeSpan(this TimingDataPoint.Driver.LapSectorTime lap) =>
-        TimeSpan.TryParseExact(
-            lap.Value,
-            ["m\\:ss\\.fff", "ss\\.fff"],
-            CultureInfo.InvariantCulture,
-            out var result
-        )
-            ? result
-            : null;
+        lap.Value.TryParseTimeSpan(out var result) ? result : null;
 
     public static bool IsRace(this SessionInfoDataPoint? sessionInfo) =>
         (sessionInfo?.Name?.EndsWith("Race") ?? true)

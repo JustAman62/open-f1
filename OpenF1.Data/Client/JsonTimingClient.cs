@@ -7,6 +7,7 @@ namespace OpenF1.Data;
 
 public class JsonTimingClient(
     ITimingService timingService,
+    IDateTimeProvider dateTimeProvider,
     IOptions<LiveTimingOptions> options,
     ILogger<JsonTimingClient> logger
 ) : IJsonTimingClient
@@ -66,9 +67,9 @@ public class JsonTimingClient(
                 ?["Heartbeat"]?.Deserialize<HeartbeatDataPoint>();
             if (subscriptionHeartbeat is not null)
             {
-                timingService.Delay = DateTimeOffset.UtcNow - subscriptionHeartbeat.Utc;
+                dateTimeProvider.Delay = DateTimeOffset.UtcNow - subscriptionHeartbeat.Utc;
                 logger.LogInformation(
-                    $"Calculated a delay of {timingService.Delay} between now and {subscriptionHeartbeat.Utc:s}"
+                    $"Calculated a delay of {dateTimeProvider.Delay} between now and {subscriptionHeartbeat.Utc:s}"
                 );
             }
             else

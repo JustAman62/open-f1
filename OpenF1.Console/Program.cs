@@ -1,6 +1,4 @@
-﻿using System.Runtime.InteropServices;
-using System.Runtime.Loader;
-using InMemLogger;
+﻿using InMemLogger;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;

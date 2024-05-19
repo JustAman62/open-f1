@@ -1,9 +1,7 @@
 namespace OpenF1.Data;
 
 public interface ITimingService
-{
-    public TimeSpan Delay { get; set; }
-    
+{    
     public Task StartAsync();
     public Task StopAsync();
 
