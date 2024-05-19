@@ -9,7 +9,7 @@ public class RaceControlMessageProcessor(INotifyService notifyService) : IProces
         foreach (var message in data.Messages)
         {
             var added = RaceControlMessages.Messages.TryAdd(message.Key, message.Value);
-            if (added)
+            if (added && (message.Value.Message?.StartsWith("WAVED BLUE FLAG", StringComparison.OrdinalIgnoreCase) ?? true))
             {
                 // New race control messages are important, so alert the user
                 notifyService.SendNotification();
