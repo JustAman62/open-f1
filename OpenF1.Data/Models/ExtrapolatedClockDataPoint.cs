@@ -7,7 +7,7 @@ public sealed record ExtrapolatedClockDataPoint: ILiveTimingDataPoint
 
     public DateTimeOffset Utc { get; init; }
 
-    public string Remaining { get; init; }
+    public string Remaining { get; init; } = "99:00:00";
 
     public bool Extrapolating { get; init; }
 }
