@@ -97,31 +97,36 @@ dotnet run --project OpenF1.Console/OpenF1.Console.csproj
 ### Start Timing for a Live Session
 
 1. Start `openf1-console` as described above
-2. Navigate to the `[S] Session` Screen
-3. Start a Live Session with the `[L] Start Live Session` action.
-4. Press `[Esc]` to return to the main screen
-5. Switch to the Timing Tower screen with the `[O] Timing Tower` action
+2. Navigate to the <kbd>S</kbd> `Session` Screen
+3. Start a Live Session with the <kbd>L</kbd> `Start Live Session` action.
+4. Press <kbd>Esc</kbd> to return to the main screen
+5. Switch to the Timing Tower screen with the <kbd>O</kbd> `Timing Tower` action
+
+During the session, streamed timing data will be written to `~/open-f1/data/<session-name>`. This will allow for [future replays](#start-timing-for-a-pre-recorded-session) of this recorded data.
 
 ### Start Timing for a Pre-recorded Session
 
+Data for pre-recorded sessions should be stored in the `~/open-f1/data/<session-name>` directory. Sample data can be found in this repos [Sample Data](/Sample%20Data/) folder. To use this sample data, copy one of the folders to `~/open-f1/data` and then it will be visible in step 4 below.
+
 1. Start `openf1-console` as described above
-2. Navigate to the `[S] Session` Screen
-3. Start a Simulated Session with the `[F] Start Simulation` action.
-4. Select the session to start using the Up/Down arrows, then pressing `[Enter]`
-5. Press `[Esc]` to return to the main screen
-6. Switch to the Timing Tower screen with the `[O] Timing Tower` action
+2. Navigate to the <kbd>S</kbd> `Session` Screen
+3. Start a Simulated Session with the <kbd>F</kbd> `Start Simulation` action.
+4. Select the session to start using the Up/Down arrows, then pressing <kbd>Enter</kbd> `
+5. Press <kbd>Esc</kbd> ` to return to the main screen
+6. Switch to the Timing Tower screen with the <kbd>O</kbd> `Timing Tower` action
+7. Optionally skip forward in time a bit by decreasing the delay with <kbd>←</kbd> (or <kbd>⇧ Shift</kbd> + <kbd>←</kbd> to decrease by 30 seconds).
 
 ### During the Session
 
 #### Managing Delay
 
-All session data, whether live or pre-recorded, is sent to a `Channel` that acts as a delayed-queue. After a short delay, data points are pulled from the queue and processed, leading to updates on the timing screens. The amount of this delay can be changed with the `[►] Delay+` and `[◄] Delay-` actions whilst on the timing screens. When using `openf1-console` during a live session, you may wish to increase this delay to around ~50 seconds (actual number may vary) to match with the broadcast delay and avoid being spoiled about upcoming action.
+All session data, whether live or pre-recorded, is sent to a `Channel` that acts as a delayed-queue. After a short delay, data points are pulled from the queue and processed, leading to updates on the timing screens. The amount of this delay can be changed with the <kbd>►</kbd> `Delay+` and <kbd>◄</kbd> `Delay-` actions whilst on the timing screens. When using `openf1-console` during a live session, you may wish to increase this delay to around ~50 seconds (actual number may vary) to match with the broadcast delay and avoid being spoiled about upcoming action.
 
-Simulated session start with a calculated delay equal to the amount of time between the start of the actual session and now. This means you can decrease the delay with the `[◄] Delay-` action to fast-forward through the session.
+Simulated session start with a calculated delay equal to the amount of time between the start of the actual session and now. This means you can decrease the delay with the <kbd>◄</kbd> `Delay-` action to fast-forward through the session.
 
 #### Using the Cursor
 
-There is a global cursor that is controlled with the `[▼] Down (1)` and `[▲] Up` actions. What this cursor does depends on the screen, for example is can be used in the Timing Tower screen to scroll through Race Control Messages, or to select a driver on the Tower to see comparative intervals.
+There is a global cursor that is controlled with the <kbd>▼</kbd> `Down (1)` and <kbd>▲</kbd> `Up` actions. What this cursor does depends on the screen, for example is can be used in the Timing Tower screen to scroll through Race Control Messages, or to select a driver on the Tower to see comparative intervals.
 
 ## Configuration
 
@@ -200,7 +205,7 @@ LAP 12/56 Gap     Interval Best Lap Last Lap S1     S2     S3     Pits    Tyre C
 
 ### Using a Cursor to Display Relative Gap for a Specific Driver
 
-Use the cursor controlled by the `[▼] Down (1)` and `[▲] Up` actions in the `[O] Timing Tower` screen to select a specific driver (in this case Norris) to see the relative interval between that driver and all other. This is useful for determining where a driver will fall to after a pit stop, or looking at pit windows during under cuts.
+Use the cursor controlled by the <kbd>▼</kbd> `Down (1)` and <kbd>▲</kbd> `Up` actions in the <kbd>O</kbd> `Timing Tower` screen to select a specific driver (in this case Norris) to see the relative interval between that driver and all other. This is useful for determining where a driver will fall to after a pit stop, or looking at pit windows during under cuts.
 
 ```
 LAP  7/56 Gap     Interval Best Lap Last Lap S1     S2     S3     Pits Tyre Compare
@@ -234,7 +239,7 @@ LAP  7/56 Gap     Interval Best Lap Last Lap S1     S2     S3     Pits Tyre Comp
 
 ### Race Control Screen
 
-The `[R] Race Control` screen shows all Race Control Messages for the session, along with other session data such as the Weather.
+The <kbd>R</kbd> `Race Control` screen shows all Race Control Messages for the session, along with other session data such as the Weather.
 
 ```
 ┌─Race Control Messages────────────────────────────────────────────────────┐┌─Status──────────────┐
@@ -259,7 +264,7 @@ The `[R] Race Control` screen shows all Race Control Messages for the session, a
 
 ### Using a Cursor to View Timing History by Lap
 
-In the `[H] Timing by Lap` screen, you can use the cursor controlled by the `[▼] Down (1)` and `[▲] Up` actions to view historical snapshots of the timing tower at the end of every lap.
+In the <kbd>H</kbd> `Timing by Lap` screen, you can use the cursor controlled by the <kbd>▼</kbd> `Down (1)` and <kbd>▲</kbd> `Up` actions to view historical snapshots of the timing tower at the end of every lap.
 
 ```
 LAP  6/56 Gap     Interval Last Lap S1     S2     S3
