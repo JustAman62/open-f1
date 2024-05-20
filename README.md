@@ -1,3 +1,4 @@
+<!-- omit in toc -->
 # open-f1
 
 open-f1 is a open source F1 Live Timing client.
@@ -19,30 +20,29 @@ Feature Highlights:
 - [Race Control](#race-control-screen) messages including investigations, penalties, lap deletions, and weather
 - Lap-by-lap [Timing History](#using-a-cursor-to-view-timing-history-by-lap) to observe gaps over time
 
+<!-- omit in toc -->
 ## Table of Contents
 
-- [open-f1](#open-f1)
-  - [Table of Contents](#table-of-contents)
-  - [Inspiration](#inspiration)
-  - [Getting Started with `openf1-console`](#getting-started-with-openf1-console)
-    - [Installation](#installation)
-      - [Install and run as a dotnet tool](#install-and-run-as-a-dotnet-tool)
-    - [Install and run the standalone executable](#install-and-run-the-standalone-executable)
-      - [Run directly from Source](#run-directly-from-source)
-    - [Start Timing for a Live Session](#start-timing-for-a-live-session)
-    - [Start Timing for a Pre-recorded Session](#start-timing-for-a-pre-recorded-session)
-    - [During the Session](#during-the-session)
-      - [Managing Delay](#managing-delay)
-      - [Using the Cursor](#using-the-cursor)
-  - [Configuration](#configuration)
-  - [Live Timing Data Source](#live-timing-data-source)
-  - [Data Recording and Replay](#data-recording-and-replay)
-  - [OpenF1 Console in Action](#openf1-console-in-action)
-    - [Timing Tower during a Race](#timing-tower-during-a-race)
-    - [Using a Cursor to Display Relative Gap for a Specific Driver](#using-a-cursor-to-display-relative-gap-for-a-specific-driver)
-    - [Race Control Screen](#race-control-screen)
-    - [Using a Cursor to View Timing History by Lap](#using-a-cursor-to-view-timing-history-by-lap)
-  - [Notice](#notice)
+- [Inspiration](#inspiration)
+- [Getting Started with `openf1-console`](#getting-started-with-openf1-console)
+  - [Installation](#installation)
+    - [Install and run as a dotnet tool](#install-and-run-as-a-dotnet-tool)
+  - [Install and run the standalone executable](#install-and-run-the-standalone-executable)
+    - [Run directly from Source](#run-directly-from-source)
+  - [Start Timing for a Live Session](#start-timing-for-a-live-session)
+  - [Start Timing for a Pre-recorded Session](#start-timing-for-a-pre-recorded-session)
+  - [During the Session](#during-the-session)
+    - [Managing Delay](#managing-delay)
+    - [Using the Cursor](#using-the-cursor)
+- [Configuration](#configuration)
+- [Live Timing Data Source](#live-timing-data-source)
+- [Data Recording and Replay](#data-recording-and-replay)
+- [OpenF1 Console in Action](#openf1-console-in-action)
+  - [Timing Tower during a Race](#timing-tower-during-a-race)
+  - [Using a Cursor to Display Relative Gap for a Specific Driver](#using-a-cursor-to-display-relative-gap-for-a-specific-driver)
+  - [Race Control Screen](#race-control-screen)
+  - [Using a Cursor to View Timing History by Lap](#using-a-cursor-to-view-timing-history-by-lap)
+- [Notice](#notice)
 
 
 ## Inspiration
