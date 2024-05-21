@@ -1,6 +1,7 @@
 using System.Collections.Concurrent;
 using System.Text.Json;
 using System.Text.Json.Nodes;
+using System.Text.Json.Serialization;
 using System.Threading.Channels;
 using Microsoft.Extensions.Logging;
 using OpenF1.Data;
@@ -20,7 +21,7 @@ public class TimingService(
     private static readonly JsonSerializerOptions _jsonSerializerOptions =
         new(JsonSerializerDefaults.Web)
         {
-            UnmappedMemberHandling = System.Text.Json.Serialization.JsonUnmappedMemberHandling.Skip,
+            UnmappedMemberHandling = JsonUnmappedMemberHandling.Skip,
             AllowTrailingCommas = true,
         };
 
@@ -30,10 +31,7 @@ public class TimingService(
     {
         _cts.Cancel();
         _cts = new();
-        _executeTask = Task.Factory.StartNew(
-            () => ExecuteAsync(_cts.Token),
-            TaskCreationOptions.LongRunning
-        );
+        _executeTask = ExecuteAsync(_cts.Token);
         return Task.CompletedTask;
     }
 

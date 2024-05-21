@@ -1,16 +1,3 @@
 {
-    "dotnet.defaultSolution": "OpenF1.sln",
-    "sqltools.useNodeRuntime": true,
-    "sqltools.connections": [
-        {
-            "previewLimit": 50,
-            "server": "localhost",
-            "port": 51000,
-            "driver": "PostgreSQL",
-            "name": "Open F1",
-            "database": "OPEN_F1",
-            "username": "postgres",
-            "password": "changeit"
-        }
-    ]
+    "dotnet.defaultSolution": "OpenF1.sln"
 }
