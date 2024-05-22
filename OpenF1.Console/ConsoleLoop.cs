@@ -70,7 +70,6 @@ public class ConsoleLoop(
     public override async Task StopAsync(CancellationToken cancellationToken)
     {
         await base.StopAsync(cancellationToken);
-        System.Console.Clear();
         System.Console.WriteLine("Exiting openf1-console...");
         AnsiConsole.Cursor.Show();
         hostApplicationLifetime.StopApplication();

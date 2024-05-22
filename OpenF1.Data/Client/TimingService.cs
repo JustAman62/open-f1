@@ -1,4 +1,7 @@
+using System.Buffers.Text;
 using System.Collections.Concurrent;
+using System.IO.Compression;
+using System.Text;
 using System.Text.Json;
 using System.Text.Json.Nodes;
 using System.Text.Json.Serialization;
@@ -82,101 +85,139 @@ public class TimingService(
 
     public void ProcessSubscriptionData(string res)
     {
-        var obj = JsonNode.Parse(res)?.AsObject();
-        if (obj is null)
-            return;
-
-        ProcessData("Heartbeat", obj["Heartbeat"]?.ToString(), DateTimeOffset.UtcNow);
-        ProcessData("DriverList", obj["DriverList"]?.ToString(), DateTimeOffset.UtcNow);
-        ProcessData("TrackStatus", obj["TrackStatus"]?.ToString(), DateTimeOffset.UtcNow);
-        ProcessData("LapCount", obj["LapCount"]?.ToString(), DateTimeOffset.UtcNow);
-        ProcessData("WeatherData", obj["WeatherData"]?.ToString(), DateTimeOffset.UtcNow);
-        ProcessData("SessionInfo", obj["SessionInfo"]?.ToString(), DateTimeOffset.UtcNow);
-        ProcessData(
-            "ExtrapolatedClock",
-            obj["ExtrapolatedClock"]?.ToString(),
-            DateTimeOffset.UtcNow
-        );
-
-        var linesToProcess = obj["TimingData"]?["Lines"]?.AsObject() ?? [];
-        foreach (var (_, line) in linesToProcess)
+        try
         {
-            if (line?["Sectors"] is null)
-                continue;
-            line["Sectors"] = ArrayToIndexedDictionary(line["Sectors"]!);
-        }
-        ProcessData("TimingData", obj["TimingData"]?.ToString(), DateTimeOffset.UtcNow);
+            Logger.LogInformation("Handling subscription data");
 
-        var stintLinesToProcess = obj["TimingAppData"]?["Lines"]?.AsObject() ?? [];
-        foreach (var (_, line) in stintLinesToProcess)
-        {
-            if (line?["Stints"] is null)
-                continue;
-            line["Stints"] = ArrayToIndexedDictionary(line["Stints"]!);
-        }
-        ProcessData("TimingAppData", obj["TimingAppData"]?.ToString(), DateTimeOffset.UtcNow);
+            var obj = JsonNode.Parse(res)?.AsObject();
+            if (obj is null)
+                return;
 
-        var raceControlMessages = obj["RaceControlMessages"]?["Messages"];
-        if (raceControlMessages is not null)
-        {
-            obj["RaceControlMessages"]!["Messages"] = ArrayToIndexedDictionary(raceControlMessages);
+            ProcessData("Heartbeat", obj["Heartbeat"]?.ToString(), DateTimeOffset.UtcNow);
+            ProcessData("DriverList", obj["DriverList"]?.ToString(), DateTimeOffset.UtcNow);
+            ProcessData("TrackStatus", obj["TrackStatus"]?.ToString(), DateTimeOffset.UtcNow);
+            ProcessData("LapCount", obj["LapCount"]?.ToString(), DateTimeOffset.UtcNow);
+            ProcessData("WeatherData", obj["WeatherData"]?.ToString(), DateTimeOffset.UtcNow);
+            ProcessData("SessionInfo", obj["SessionInfo"]?.ToString(), DateTimeOffset.UtcNow);
+            ProcessData("CarData.z", obj["CarData.z"]?.ToString(), DateTimeOffset.UtcNow);
+            ProcessData("PositionData.z", obj["PositionData.z"]?.ToString(), DateTimeOffset.UtcNow);
+            ProcessData(
+                "ExtrapolatedClock",
+                obj["ExtrapolatedClock"]?.ToString(),
+                DateTimeOffset.UtcNow
+            );
+
+            var linesToProcess = obj["TimingData"]?["Lines"]?.AsObject() ?? [];
+            foreach (var (_, line) in linesToProcess)
+            {
+                if (line?["Sectors"] is null)
+                    continue;
+                line["Sectors"] = ArrayToIndexedDictionary(line["Sectors"]!);
+            }
+            ProcessData("TimingData", obj["TimingData"]?.ToString(), DateTimeOffset.UtcNow);
+
+            var stintLinesToProcess = obj["TimingAppData"]?["Lines"]?.AsObject() ?? [];
+            foreach (var (_, line) in stintLinesToProcess)
+            {
+                if (line?["Stints"] is null)
+                    continue;
+                line["Stints"] = ArrayToIndexedDictionary(line["Stints"]!);
+            }
+            ProcessData("TimingAppData", obj["TimingAppData"]?.ToString(), DateTimeOffset.UtcNow);
+
+            var raceControlMessages = obj["RaceControlMessages"]?["Messages"];
+            if (raceControlMessages is not null)
+            {
+                obj["RaceControlMessages"]!["Messages"] = ArrayToIndexedDictionary(
+                    raceControlMessages
+                );
+            }
+            ProcessData(
+                "RaceControlMessages",
+                obj["RaceControlMessages"]?.ToString(),
+                DateTimeOffset.UtcNow
+            );
         }
-        ProcessData(
-            "RaceControlMessages",
-            obj["RaceControlMessages"]?.ToString(),
-            DateTimeOffset.UtcNow
-        );
+        catch (Exception ex)
+        {
+            Logger.LogError(ex, "Failed to parse subscription data");
+        }
     }
 
     private void ProcessData(string type, string? data, DateTimeOffset timestamp)
     {
+        if (data is null)
+            return;
+        if (type.EndsWith(".z"))
+        {
+            type = type.Replace(".z", string.Empty);
+            data = DecompressUtilities.DeflateDecompress(data);
+        }
+
         Logger.LogDebug($"Processing {type} data point for timestamp {timestamp:s} :: {data}");
         if (data is null || !Enum.TryParse<LiveTimingDataType>(type, out var liveTimingDataType))
             return;
 
+        var json = JsonNode.Parse(data);
+        if (json is null)
+                return;
+
         switch (liveTimingDataType)
         {
             case LiveTimingDataType.Heartbeat:
-                SendToProcessor<HeartbeatDataPoint>(data);
+                SendToProcessor<HeartbeatDataPoint>(json);
                 break;
             case LiveTimingDataType.RaceControlMessages:
-                SendToProcessor<RaceControlMessageDataPoint>(data);
+                SendToProcessor<RaceControlMessageDataPoint>(json);
                 break;
             case LiveTimingDataType.TimingData:
-                SendToProcessor<TimingDataPoint>(data);
+                SendToProcessor<TimingDataPoint>(json);
                 break;
             case LiveTimingDataType.TimingAppData:
-                SendToProcessor<TimingAppDataPoint>(data);
+                // Sometimes TimingAppData doesn't start with any Stints. 
+                // In this case, the first time Stints are sent are as a list instead of a dictionary, so we have to clean that up before processing
+                var stintLinesToProcess = json["Lines"]?.AsObject() ?? [];
+                foreach (var (_, line) in stintLinesToProcess)
+                {
+                    // If stints are missing, or they're already a dictionary, do nothing
+                    if (line?["Stints"] is null || line?["Stints"]?.GetValueKind() == JsonValueKind.Object)
+                        continue;
+                    line!["Stints"] = ArrayToIndexedDictionary(line["Stints"]!);
+                }
+                SendToProcessor<TimingAppDataPoint>(json);
                 break;
             case LiveTimingDataType.DriverList:
-                SendToProcessor<DriverListDataPoint>(data);
+                SendToProcessor<DriverListDataPoint>(json);
                 break;
             case LiveTimingDataType.TrackStatus:
-                SendToProcessor<TrackStatusDataPoint>(data);
+                SendToProcessor<TrackStatusDataPoint>(json);
                 break;
             case LiveTimingDataType.LapCount:
-                SendToProcessor<LapCountDataPoint>(data);
+                SendToProcessor<LapCountDataPoint>(json);
                 break;
             case LiveTimingDataType.WeatherData:
-                SendToProcessor<WeatherDataPoint>(data);
+                SendToProcessor<WeatherDataPoint>(json);
                 break;
             case LiveTimingDataType.SessionInfo:
-                SendToProcessor<SessionInfoDataPoint>(data);
+                SendToProcessor<SessionInfoDataPoint>(json);
                 break;
             case LiveTimingDataType.ExtrapolatedClock:
-                SendToProcessor<ExtrapolatedClockDataPoint>(data);
+                SendToProcessor<ExtrapolatedClockDataPoint>(json);
+                break;
+            case LiveTimingDataType.CarData:
+                SendToProcessor<CarDataPoint>(json);
+                break;
+            case LiveTimingDataType.Position:
+                SendToProcessor<PositionDataPoint>(json);
                 break;
         }
     }
 
-    private void SendToProcessor<T>(string data) where T : ILiveTimingDataPoint
+    private void SendToProcessor<T>(JsonNode json)
+        where T : ILiveTimingDataPoint
     {
         try
         {
-            var json = JsonNode.Parse(data);
-            if (json is null)
-                return;
-
             // Remove the _kf property, it's not needed and breaks deserialization
             json["_kf"] = null;
 
@@ -198,7 +239,7 @@ public class TimingService(
         }
         catch (Exception ex)
         {
-            Logger.LogError(ex, "Failed to send data to processor: {}", data);
+            Logger.LogError(ex, "Failed to send {}, data to processor: {}", typeof(T).Name, json.ToString());
         }
     }
 

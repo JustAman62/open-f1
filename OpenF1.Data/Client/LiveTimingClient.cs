@@ -15,8 +15,8 @@ public sealed class LiveTimingClient(
     private readonly string[] _topics =
     [
         "Heartbeat",
-        // "CarData.z",
-        // "Position.z",
+        "CarData.z",
+        "Position.z",
         "ExtrapolatedClock",
         "TopThree",
         "TimingStats",
