@@ -169,7 +169,7 @@ public class TimingService(
         }
     }
 
-    private void SendToProcessor<T>(string data)
+    private void SendToProcessor<T>(string data) where T : ILiveTimingDataPoint
     {
         try
         {
