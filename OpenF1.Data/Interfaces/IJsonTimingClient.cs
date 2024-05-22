@@ -2,6 +2,9 @@ namespace OpenF1.Data;
 
 public interface IJsonTimingClient
 {
+    /// <summary>
+    /// The <see cref="Task"/> representing the current state of the simulation data loading process.
+    /// </summary>
     public Task? ExecuteTask { get; }
 
     /// <summary>
@@ -17,8 +20,7 @@ public interface IJsonTimingClient
     /// file named <c>live.txt</c> and <c>subscribe.txt</c>
     /// </summary>
     /// <param name="directory">The directory to load the simulation files from.</param>
-    /// <returns>A Task indicating when the simulation has been started.</returns>
-    public Task StartAsync(string directory);
-
-    public Task StopAsync();
+    /// <param name="cancellationToken">A <see cref="CancellationToken"/> indicating that execution should be stopped.</param>
+    /// <returns>A Task indicating when all simulation data has been sent to the <see cref="ITimingClient"/>.</returns>
+    public Task StartAsync(string directory, CancellationToken cancellationToken = default);
 }

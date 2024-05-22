@@ -12,9 +12,6 @@ public class JsonTimingClient(
     ILogger<JsonTimingClient> logger
 ) : IJsonTimingClient
 {
-    private string _directory = "";
-    private CancellationTokenSource _cts = new();
-
     public Task? ExecuteTask { get; private set; }
 
     /// <inheritdoc />
@@ -33,29 +30,20 @@ public class JsonTimingClient(
             );
     }
 
-    public async Task StartAsync(string directory)
+    /// <inheritdoc />
+    public Task StartAsync(string directory, CancellationToken cancellationToken)
     {
-        _directory = directory;
-        _cts.Cancel();
-        _cts = new CancellationTokenSource();
-        ExecuteTask = ExecuteAsync(_cts.Token);
-        await timingService.StartAsync().ConfigureAwait(false);
+        ExecuteTask = LoadSimulationDataAsync(directory, cancellationToken);
+        return ExecuteTask;
     }
 
-    public async Task StopAsync()
-    {
-        _cts.Cancel();
-        ExecuteTask = null;
-        await timingService.StopAsync();
-    }
-
-    public async Task ExecuteAsync(CancellationToken cancellationToken)
+    private async Task LoadSimulationDataAsync(string directory, CancellationToken cancellationToken)
     {
         try
         {
             // Handle the dump of data we receive at subscription time
             var subscriptionData = await File.ReadAllTextAsync(
-                    Path.Join(_directory, "/subscribe.txt"),
+                    Path.Join(directory, "/subscribe.txt"),
                     cancellationToken
                 )
                 .ConfigureAwait(false);
@@ -78,7 +66,7 @@ public class JsonTimingClient(
             }
 
             // Handle the real-time data
-            var lines = File.ReadLinesAsync(Path.Join(_directory, "/live.txt"), cancellationToken);
+            var lines = File.ReadLinesAsync(Path.Join(directory, "/live.txt"), cancellationToken);
 
             await foreach (var line in lines)
             {

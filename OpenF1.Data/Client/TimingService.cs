@@ -3,6 +3,7 @@ using System.Text.Json;
 using System.Text.Json.Nodes;
 using System.Text.Json.Serialization;
 using System.Threading.Channels;
+using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using OpenF1.Data;
 
@@ -10,10 +11,8 @@ public class TimingService(
     IDateTimeProvider dateTimeProvider,
     IEnumerable<IProcessor> processors,
     ILogger<TimingService> logger
-) : ITimingService
+) : BackgroundService, ITimingService
 {
-    private CancellationTokenSource _cts = new();
-    private Task? _executeTask;
     private ConcurrentQueue<(string type, string? data, DateTimeOffset timestamp)> _recent = new();
     private Channel<(string type, string? data, DateTimeOffset timestamp)> _workItems =
         Channel.CreateUnbounded<(string type, string? data, DateTimeOffset timestamp)>();
@@ -27,21 +26,6 @@ public class TimingService(
 
     public ILogger Logger { get; } = logger;
 
-    public Task StartAsync()
-    {
-        _cts.Cancel();
-        _cts = new();
-        _executeTask = ExecuteAsync(_cts.Token);
-        return Task.CompletedTask;
-    }
-
-    public virtual Task StopAsync()
-    {
-        _cts.Cancel();
-        _executeTask = null;
-        return Task.CompletedTask;
-    }
-
     public async Task EnqueueAsync(string type, string? data, DateTimeOffset timestamp) =>
         await _workItems.Writer.WriteAsync((type, data, timestamp));
 
@@ -50,8 +34,11 @@ public class TimingService(
 
     public int GetRemainingWorkItems() => _workItems.Reader.Count;
 
-    private async Task ExecuteAsync(CancellationToken cancellationToken)
+    protected override async Task ExecuteAsync(CancellationToken cancellationToken)
     {
+        // Immediately yield to ensure all the other hosted services start as expected
+        await Task.Yield();
+
         while (!cancellationToken.IsCancellationRequested)
         {
             if (_workItems.Reader.TryPeek(out var res))

@@ -15,6 +15,9 @@ public class ConsoleLoop(
 
     protected override async Task ExecuteAsync(CancellationToken cancellationToken)
     {
+        // Immediately yield to ensure all the other hosted services start as expected
+        await Task.Yield();
+
         var contentPanel = new Panel("Open F1").Expand().RoundedBorder() as IRenderable;
         var layout = new Layout("Root").SplitRows(
             new Layout("Content", contentPanel),

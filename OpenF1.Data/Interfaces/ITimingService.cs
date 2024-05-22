@@ -1,10 +1,9 @@
+using Microsoft.Extensions.Hosting;
+
 namespace OpenF1.Data;
 
-public interface ITimingService
-{    
-    public Task StartAsync();
-    public Task StopAsync();
-
+public interface ITimingService : IHostedService
+{
     public List<(string type, string? data, DateTimeOffset timestamp)> GetQueueSnapshot();
 
     public Task EnqueueAsync(string type, string? data, DateTimeOffset timestamp);

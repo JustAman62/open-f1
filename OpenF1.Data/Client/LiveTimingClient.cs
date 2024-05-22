@@ -75,7 +75,6 @@ public sealed class LiveTimingClient(
 
         var res = await proxy.Invoke<JObject>("Subscribe", new[] { _topics });
         HandleSubscriptionResponse(res.ToString());
-        await timingService.StartAsync();
         logger.LogInformation("Started Live Timing client");
     }
 
@@ -154,7 +153,6 @@ public sealed class LiveTimingClient(
         {
             DisposeConnection();
             _disposedValue = true;
-            timingService.StopAsync();
         }
         GC.SuppressFinalize(this);
     }
