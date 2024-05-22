@@ -1,13 +1,15 @@
-
 namespace OpenF1.Data;
 
-public class NotifyService : INotifyService
+public class NotifyService(IEnumerable<INotifyHandler> handlers) : INotifyService
 {
-    private Action? _action;
-
     /// <inheritdoc />
-    public void RegisterNotificationHandler(Action action) => _action = action;
-    
-    /// <inheritdoc />
-    public void SendNotification() => _action?.Invoke();
+    public void SendNotification()
+    {
+        foreach (var handler in handlers)
+        {
+            // Fire-and-forget each task
+            // In the future, we might push these to a queue and handle them inside a IHostedService
+            _ = handler.OnNotificationAsync();
+        }
+    }
 }

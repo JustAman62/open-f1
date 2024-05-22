@@ -7,16 +7,14 @@ namespace OpenF1.Console;
 public class ConsoleLoop(
     State state,
     IEnumerable<IDisplay> displays,
-    IEnumerable<IInputHandler> inputHandlers
-)
+    IEnumerable<IInputHandler> inputHandlers,
+    IHostApplicationLifetime hostApplicationLifetime
+) : BackgroundService
 {
-    private CancellationTokenSource _cts = new CancellationTokenSource();
     private const long TargetFrameTimeMs = 100;
 
-    public async Task ExecuteAsync()
+    protected override async Task ExecuteAsync(CancellationToken cancellationToken)
     {
-        _cts = new CancellationTokenSource();
-
         var contentPanel = new Panel("Open F1").Expand().RoundedBorder() as IRenderable;
         var layout = new Layout("Root").SplitRows(
             new Layout("Content", contentPanel),
@@ -27,14 +25,14 @@ public class ConsoleLoop(
         AnsiConsole.Cursor.Hide();
         
         var stopwatch = Stopwatch.StartNew();
-        while (!_cts.IsCancellationRequested)
+        while (!cancellationToken.IsCancellationRequested)
         {
             stopwatch.Restart();
             await ShowAndHandleInputs(layout).ConfigureAwait(false);
 
             if (state.CurrentScreen == Screen.Shutdown)
             {
-                AnsiConsole.Clear();
+                await StopAsync(cancellationToken).ConfigureAwait(false);
                 return;
             }
 
@@ -61,15 +59,18 @@ public class ConsoleLoop(
             var timeToDelay = TargetFrameTimeMs - stopwatch.ElapsedMilliseconds;
             if (timeToDelay > 0)
             {
-                await Task.Delay(TimeSpan.FromMilliseconds(timeToDelay)).ConfigureAwait(false);
+                await Task.Delay(TimeSpan.FromMilliseconds(timeToDelay), cancellationToken).ConfigureAwait(false);
             }
         }
     }
 
-    public void Stop()
+    public override async Task StopAsync(CancellationToken cancellationToken)
     {
-        _cts.Cancel();
-        _cts = new CancellationTokenSource();
+        await base.StopAsync(cancellationToken);
+        System.Console.Clear();
+        System.Console.WriteLine("Exiting openf1-console...");
+        AnsiConsole.Cursor.Show();
+        hostApplicationLifetime.StopApplication();
     }
 
     private async Task ShowAndHandleInputs(Layout layout)
