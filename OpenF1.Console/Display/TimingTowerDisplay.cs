@@ -14,6 +14,7 @@ public class TimingTowerDisplay(
     LapCountProcessor lapCountProcessor,
     SessionInfoProcessor sessionInfoProcessor,
     ExtrapolatedClockProcessor extrapolatedClockProcessor,
+    PositionDataProcessor positionDataProcessor,
     IDateTimeProvider dateTimeProvider
 ) : IDisplay
 {
@@ -92,6 +93,10 @@ public class TimingTowerDisplay(
         foreach (var (driverNumber, line) in timingData.Latest.GetOrderedLines())
         {
             var driver = driverList.Latest?.GetValueOrDefault(driverNumber) ?? new();
+            var position =
+                positionDataProcessor
+                    .Latest.Position.LastOrDefault()
+                    ?.Entries.GetValueOrDefault(driverNumber) ?? new();
             var appData = timingAppData.Latest?.Lines.GetValueOrDefault(driverNumber) ?? new();
             var stint = appData.Stints.LastOrDefault().Value;
             var previousLapDrivers = timingData.DriversByLap.GetValueOrDefault(
@@ -111,10 +116,12 @@ public class TimingTowerDisplay(
                     lineStyle
                 ),
                 new Text($"{line.GapToLeader, 7}", lineStyle),
-                new Text(
-                    $"{line.IntervalToPositionAhead?.Value, 8}{(line.IntervalToPositionAhead?.Catching ?? false ? "▲" : string.Empty)}",
-                    GetStyle(line.IntervalToPositionAhead, isComparisonLine)
-                ),
+                position.Status == PositionDataPoint.PositionData.Entry.DriverStatus.OffTrack
+                    ? new Text("OFF TRK", new Style(background: Color.Red, foreground: Color.White))
+                    : new Text(
+                        $"{line.IntervalToPositionAhead?.Value, 8}{(line.IntervalToPositionAhead?.Catching ?? false ? "▲" : string.Empty)}",
+                        GetStyle(line.IntervalToPositionAhead, isComparisonLine)
+                    ),
                 new Text(line.BestLapTime?.Value ?? "NULL", _normal),
                 new Text(line.LastLapTime?.Value ?? "NULL", GetStyle(line.LastLapTime)),
                 new Text(
