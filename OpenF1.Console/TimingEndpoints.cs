@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Mvc;
 using OpenF1.Data;
 
 namespace OpenF1.Console;
@@ -6,8 +7,7 @@ public static class TimingEndpoints
 {
     public static WebApplication MapTimingEndpoints(this WebApplication app)
     {
-        app
-            .MapLatestDataEndpoint<DriverListProcessor, DriverListDataPoint>()
+        app.MapLatestDataEndpoint<DriverListProcessor, DriverListDataPoint>()
             .MapLatestDataEndpoint<ExtrapolatedClockProcessor, ExtrapolatedClockDataPoint>()
             .MapLatestDataEndpoint<HeartbeatProcessor, HeartbeatDataPoint>()
             .MapLatestDataEndpoint<LapCountProcessor, LapCountDataPoint>()
@@ -18,20 +18,39 @@ public static class TimingEndpoints
             .MapLatestDataEndpoint<TrackStatusProcessor, TrackStatusDataPoint>()
             .MapLatestDataEndpoint<WeatherProcessor, WeatherDataPoint>();
 
+        app.MapGet(
+            "/timingdata/TimingData/laps/:lapNumber",
+            ([FromRoute] int lapNumber, TimingDataProcessor processor) =>
+            {
+                return processor.DriversByLap.TryGetValue(lapNumber, out var data)
+                    ? TypedResults.Ok(data)
+                    : Results.NotFound();
+            }
+        );
+
+        app.MapGet(
+            "/timingdata/TimingData/laps/best",
+            ([FromRoute] int lapNumber, TimingDataProcessor processor) =>
+            {
+                return TypedResults.Ok(processor.BestLaps);
+            }
+        );
+
         return app;
     }
 
-    private static WebApplication MapLatestDataEndpoint<TProcessor, T>(this WebApplication app) 
-        where TProcessor : IProcessor<T> 
+    private static WebApplication MapLatestDataEndpoint<TProcessor, T>(this WebApplication app)
+        where TProcessor : IProcessor<T>
         where T : ILiveTimingDataPoint, new()
     {
         var dataPoint = new T();
         app.MapGet(
-            $"/timingdata/{dataPoint.LiveTimingDataType}/latest", 
-            (TProcessor processor, HttpContext context) => 
+            $"/timingdata/{dataPoint.LiveTimingDataType}/latest",
+            (TProcessor processor) =>
             {
                 return TypedResults.Ok(processor.Latest);
-            });
+            }
+        );
         return app;
     }
 }
