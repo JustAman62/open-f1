@@ -208,6 +208,10 @@ public class TimingTowerDisplay(
         foreach (var (driverNumber, line) in timingData.Latest.GetOrderedLines())
         {
             var driver = driverList.Latest?.GetValueOrDefault(driverNumber) ?? new();
+            var position =
+                positionDataProcessor
+                    .Latest.Position.LastOrDefault()
+                    ?.Entries.GetValueOrDefault(driverNumber) ?? new();
             var appData = timingAppData.Latest?.Lines.GetValueOrDefault(driverNumber) ?? new();
             var stint = appData.Stints.LastOrDefault().Value;
             var bestLap = timingData.BestLaps.GetValueOrDefault(driverNumber);
@@ -222,7 +226,12 @@ public class TimingTowerDisplay(
                     $"{line.Position, 2} [#{teamColour} bold]{driver.RacingNumber, 2} {driver.Tla ?? "UNK"}[/]",
                     _normal
                 ),
-                new Text($"{(gapToLeader > 0 ? "+" : "")}{gapToLeader:f3}".PadLeft(7), _normal),
+                position.Status == PositionDataPoint.PositionData.Entry.DriverStatus.OffTrack
+                    ? new Text("OFF TRK", new Style(background: Color.Red, foreground: Color.White))
+                    : new Text(
+                        $"{(gapToLeader > 0 ? "+" : "")}{gapToLeader:f3}".PadLeft(7),
+                        _normal
+                    ),
                 new Text(line.BestLapTime?.Value ?? "NULL", _normal),
                 GetSectorMarkup(
                     bestLap?.Sectors.GetValueOrDefault("0"),

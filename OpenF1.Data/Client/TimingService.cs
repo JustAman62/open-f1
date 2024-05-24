@@ -1,7 +1,4 @@
-using System.Buffers.Text;
 using System.Collections.Concurrent;
-using System.IO.Compression;
-using System.Text;
 using System.Text.Json;
 using System.Text.Json.Nodes;
 using System.Text.Json.Serialization;
@@ -25,6 +22,8 @@ public class TimingService(
         {
             UnmappedMemberHandling = JsonUnmappedMemberHandling.Skip,
             AllowTrailingCommas = true,
+            WriteIndented = false,
+            Converters = { new JsonStringEnumConverter() },
         };
 
     public ILogger Logger { get; } = logger;
@@ -160,7 +159,7 @@ public class TimingService(
 
         var json = JsonNode.Parse(data);
         if (json is null)
-                return;
+            return;
 
         switch (liveTimingDataType)
         {
@@ -174,13 +173,16 @@ public class TimingService(
                 SendToProcessor<TimingDataPoint>(json);
                 break;
             case LiveTimingDataType.TimingAppData:
-                // Sometimes TimingAppData doesn't start with any Stints. 
+                // Sometimes TimingAppData doesn't start with any Stints.
                 // In this case, the first time Stints are sent are as a list instead of a dictionary, so we have to clean that up before processing
                 var stintLinesToProcess = json["Lines"]?.AsObject() ?? [];
                 foreach (var (_, line) in stintLinesToProcess)
                 {
                     // If stints are missing, or they're already a dictionary, do nothing
-                    if (line?["Stints"] is null || line?["Stints"]?.GetValueKind() == JsonValueKind.Object)
+                    if (
+                        line?["Stints"] is null
+                        || line?["Stints"]?.GetValueKind() == JsonValueKind.Object
+                    )
                         continue;
                     line!["Stints"] = ArrayToIndexedDictionary(line["Stints"]!);
                 }
@@ -239,7 +241,12 @@ public class TimingService(
         }
         catch (Exception ex)
         {
-            Logger.LogError(ex, "Failed to send {}, data to processor: {}", typeof(T).Name, json.ToString());
+            Logger.LogError(
+                ex,
+                "Failed to send {}, data to processor: {}",
+                typeof(T).Name,
+                json.ToJsonString(_jsonSerializerOptions)
+            );
         }
     }
 
