@@ -8,5 +8,6 @@ public enum Screen {
     TimingTower,
     TimingHistory,
     RaceControl,
-    DriverTracker
+    DriverTracker,
+    SessionStats
 }

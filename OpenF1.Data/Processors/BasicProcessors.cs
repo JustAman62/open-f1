@@ -15,3 +15,5 @@ public class TimingAppDataProcessor(IMapper mapper) : ProcessorBase<TimingAppDat
 public class TrackStatusProcessor(IMapper mapper) : ProcessorBase<TrackStatusDataPoint>(mapper);
 
 public class WeatherProcessor(IMapper mapper) : ProcessorBase<WeatherDataPoint>(mapper);
+
+public class ChampionshipPredictionProcessor(IMapper mapper) : ProcessorBase<ChampionshipPredictionDataPoint>(mapper);

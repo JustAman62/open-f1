@@ -21,10 +21,9 @@ public static class DisplayUtils
     )
     {
         var lineStyle = selected ? STYLE_INVERT : STYLE_NORMAL;
-        var teamColour = driver.TeamColour ?? "000000";
-        return new Markup(
-            $"{line.Line, 2} [#{teamColour} bold]{driver.RacingNumber, 2} {driver.Tla ?? "UNK"}[/]",
-            lineStyle
-        );
+        return new Markup($"{line.Line, 2} {MarkedUpDriverNumber(driver)}", lineStyle);
     }
+
+    public static string MarkedUpDriverNumber(DriverListDataPoint.Driver driver) =>
+        $"[#{driver.TeamColour ?? "000000"} bold]{driver.RacingNumber, 2} {driver.Tla ?? "UNK"}[/]";
 }

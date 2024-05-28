@@ -1,3 +1,4 @@
+using Microsoft.Extensions.Options;
 using OpenF1.Data;
 using Spectre.Console;
 using Spectre.Console.Rendering;
@@ -42,10 +43,8 @@ public class DriverTrackerDisplay(
         foreach (var (driverNumber, line) in timingData.Latest.GetOrderedLines())
         {
             var driver = driverList.Latest?.GetValueOrDefault(driverNumber) ?? new();
-            var isSelected =
-                state.CursorOffset == line.Line || state.SelectedDrivers.Contains(driverNumber);
             table.AddRow(
-                DisplayUtils.DriverTag(driver, line, isSelected),
+                DisplayUtils.DriverTag(driver, line, state.SelectedDrivers.Contains(driverNumber)),
                 new Text(
                     " ",
                     state.CursorOffset == line.Line
@@ -60,8 +59,16 @@ public class DriverTrackerDisplay(
 
     private IRenderable GetDetails()
     {
-        var canvas = new Canvas(200, 200);
-        foreach (var driver in driverList.Latest)
+        var height = System.Console.WindowHeight - 8;
+        var maxCoordVal = 10000;
+        var scaleFactor = maxCoordVal / height;
+        var canvas = new Canvas(height + 1, height + 1);
+        for (var i = 0; i < height; i++)
+        {
+            canvas.SetPixel(i, 0, Color.White);
+            canvas.SetPixel(0, i, Color.White);
+        }
+        foreach (var driver in driverList.Latest.Where(x => state.SelectedDrivers.Contains(x.Key)))
         {
             var position = positionData
                 .Latest.Position.LastOrDefault()
@@ -71,12 +78,17 @@ public class DriverTrackerDisplay(
                 var color = System.Drawing.Color.FromArgb(
                     Convert.ToInt32(driver.Value.TeamColour, 16)
                 );
+                try
+                {
 
                 canvas.SetPixel(
-                    (position.X.Value / 100) + 100,
-                    (position.Y.Value / 100) + 100,
+                    (position.X.Value + maxCoordVal) / scaleFactor,
+                    (position.Y.Value + maxCoordVal) / scaleFactor,
                     new Color(color.R, color.G, color.B)
                 );
+                } catch {
+                    logger.LogError($"Failed to write {position.X.Value} {position.Y.Value} {scaleFactor}");
+                }
             }
         }
         canvas.Scale = true;

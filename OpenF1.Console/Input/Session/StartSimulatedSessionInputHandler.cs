@@ -19,7 +19,7 @@ public class StartSimulatedSessionInputHandler(
 
     public int Sort => 41;
 
-    public async Task ExecuteAsync(ConsoleKeyInfo consoleKeyInfo)
+    public Task ExecuteAsync(ConsoleKeyInfo consoleKeyInfo)
     {
         var directories = jsonTimingClient.GetDirectoryNames();
         var title = $"""
@@ -31,17 +31,18 @@ public class StartSimulatedSessionInputHandler(
 
         var prompt = new SelectionPrompt<string>()
             .Title(title)
-            .AddChoices(directories)
-            .AddChoices("Cancel");
+            .AddChoices("Cancel")
+            .AddChoices(directories);
 
         AnsiConsole.Clear();
 
         var result = AnsiConsole.Prompt(prompt);
         if (result == "Cancel")
         {
-            return;
+            return Task.CompletedTask;
         }
 
-        await jsonTimingClient.StartAsync(result);
+        _ = jsonTimingClient.StartAsync(result);
+        return Task.CompletedTask;
     }
 }

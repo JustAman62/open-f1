@@ -8,7 +8,7 @@ public sealed class CursorInputHandler(State state) : IInputHandler
 
     public ConsoleKey[] Keys => [ConsoleKey.UpArrow, ConsoleKey.DownArrow];
 
-    public string Description => "Cursor";
+    public string Description => $"Cursor {state.CursorOffset}";
 
     public int Sort => 21;
 

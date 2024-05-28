@@ -154,11 +154,10 @@ F1 live timing is streamed using `SignalR` (the old ASP.NET version, not the new
 * `SessionData`
 * `LapCount`
 * `TimingData`
-
-The following topics are also available but currently not subscribed to:
-
 * `CarData.z`
 * `Position.z`
+* `ChampionshipPrediction`
+* `TeamRadio`
 
 ## Data Recording and Replay
 

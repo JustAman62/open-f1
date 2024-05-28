@@ -27,7 +27,8 @@ public class JsonTimingClient(
                 && Directory
                     .GetFiles(x)
                     .Any(x => x.EndsWith("subscribe.txt", StringComparison.OrdinalIgnoreCase))
-            );
+            )
+            .OrderByDescending(x => Directory.GetCreationTime(x));
     }
 
     /// <inheritdoc />

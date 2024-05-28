@@ -28,7 +28,9 @@ public sealed class LiveTimingClient(
         "SessionInfo",
         "SessionData",
         "LapCount",
-        "TimingData"
+        "TimingData",
+        "ChampionshipPrediction",
+        "TeamRadio"
     ];
 
     private bool _disposedValue;

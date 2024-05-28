@@ -155,11 +155,11 @@ public class TimingTowerDisplay(
         table
             .AddColumns(
                 sessionInfoProcessor.Latest.Name?.ToFixedWidth(9) ?? "Unknown ",
-                "Gap    ",
+                "Gap",
                 "Best Lap",
-                "BS1",
-                "BS2",
-                "BS3",
+                "BL S1",
+                "BL S2",
+                "BL S3",
                 "S1",
                 "S2",
                 "S3",
@@ -250,7 +250,6 @@ public class TimingTowerDisplay(
 
         table.SimpleBorder();
         table.Expand();
-
         return table;
     }
 

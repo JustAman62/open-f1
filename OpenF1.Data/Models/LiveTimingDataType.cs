@@ -17,5 +17,7 @@ public enum LiveTimingDataType
     SessionInfo,
     SessionData,
     LapCount,
-    TimingData
+    TimingData,
+    ChampionshipPrediction,
+    TeamRadio,
 }
