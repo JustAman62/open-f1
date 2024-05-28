@@ -53,16 +53,14 @@ public class TimingHistoryDisplay(
 
         foreach (var (driverNumber, line) in selectedLapDrivers.OrderBy(x => x.Value.Line))
         {
-            var lap = driverList.Latest?.GetValueOrDefault(driverNumber) ?? new();
+            var driver = driverList.Latest?.GetValueOrDefault(driverNumber) ?? new();
             var previousLap = previousLapDrivers?.GetValueOrDefault(driverNumber) ?? new();
-            var teamColour = lap.TeamColour ?? "000000";
+            var teamColour = driver.TeamColour ?? "000000";
 
             var positionChange = line.Line - previousLap.Line;
 
             table.AddRow(
-                new Markup(
-                    $"{line.Position, 2} [#{teamColour}]{lap.RacingNumber, 2} {lap.Tla ?? "UNK"}[/]"
-                ),
+                DisplayUtils.DriverTag(driver, line, selected: false),
                 new Markup($"{line.GapToLeader} {GetMarkedUp(line.GapToLeaderSeconds() - previousLap.GapToLeaderSeconds())}" ?? "", _normal),
                 new Markup($"{line.IntervalToPositionAhead?.Value} {GetMarkedUp(line.IntervalToPositionAhead?.IntervalSeconds() - previousLap.IntervalToPositionAhead?.IntervalSeconds())}" ?? "", _normal),
                 new Text(line.LastLapTime?.Value ?? "NULL", GetStyle(line.LastLapTime)),

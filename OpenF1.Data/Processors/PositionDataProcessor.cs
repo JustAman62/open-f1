@@ -1,16 +1,16 @@
+using AutoMapper;
+
 namespace OpenF1.Data;
 
-public class PositionDataProcessor : IProcessor<PositionDataPoint>
+public class PositionDataProcessor(IMapper mapper) : IProcessor<PositionDataPoint>
 {
     public PositionDataPoint Latest { get; private set; } = new();
 
     public void Process(PositionDataPoint data)
     {
-        Latest.Position.AddRange(data.Position);
-        // Remove all but the latest entry
-        if (Latest.Position.Count > 1)
+        foreach (var item in data.Position)
         {
-            Latest.Position.RemoveRange(0, Latest.Position.Count - 1);
+            mapper.Map(item.Entries, Latest.Position.Last().Entries);
         }
     }
 }

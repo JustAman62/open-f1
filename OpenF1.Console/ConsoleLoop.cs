@@ -41,22 +41,20 @@ public class ConsoleLoop(
 
             var display = displays.SingleOrDefault(x => x.Screen == state.CurrentScreen);
 
+            AnsiConsole.Cursor.SetPosition(0, 0);
+            AnsiConsole.Cursor.Hide();
             try
             {
                 contentPanel = display is not null
                     ? await display.GetContentAsync().ConfigureAwait(false)
                     : new Panel($"Unknown Display Selected: {state.CurrentScreen}").Expand();
+                layout["Content"].Update(contentPanel);
+                AnsiConsole.Write(layout);
             }
             catch (Exception ex)
             {
-                contentPanel = new Panel($"Exception: {ex.ToString().EscapeMarkup()}").Expand();
+                AnsiConsole.Write(new Panel($"Exception: {ex.ToString().EscapeMarkup()}").Expand());
             }
-
-            layout["Content"].Update(contentPanel);
-
-            AnsiConsole.Cursor.SetPosition(0, 0);
-            AnsiConsole.Cursor.Hide();
-            AnsiConsole.Write(layout);
 
             stopwatch.Stop();
             var timeToDelay = TargetFrameTimeMs - stopwatch.ElapsedMilliseconds;

@@ -7,5 +7,6 @@ public enum Screen {
     Logs,
     TimingTower,
     TimingHistory,
-    RaceControl
+    RaceControl,
+    DriverTracker
 }

@@ -1,5 +1,3 @@
-using System.Text.Json.Serialization;
-
 namespace OpenF1.Data;
 
 /// <summary>
@@ -10,7 +8,7 @@ public sealed class PositionDataPoint : ILiveTimingDataPoint
 {
     public LiveTimingDataType LiveTimingDataType => LiveTimingDataType.Position;
 
-    public List<PositionData> Position { get; set; } = new();
+    public List<PositionData> Position { get; set; } = [new()];
 
     public sealed class PositionData
     {

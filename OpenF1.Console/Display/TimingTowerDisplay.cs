@@ -22,13 +22,6 @@ public class TimingTowerDisplay(
 
     private const int STATUS_PANEL_WIDTH = 15;
 
-    private readonly Style _personalBest =
-        new(foreground: Color.White, background: new Color(0, 118, 0));
-    private readonly Style _overallBest =
-        new(foreground: Color.White, background: new Color(118, 0, 118));
-    private readonly Style _normal = new(foreground: Color.White);
-    private readonly Style _invert = new(foreground: Color.Black, background: Color.White);
-
     public Task<IRenderable> GetContentAsync()
     {
         var statusPanel = GetStatusPanel();
@@ -59,9 +52,6 @@ public class TimingTowerDisplay(
 
     private IRenderable GetRaceTimingTower()
     {
-        if (timingData.Latest is null)
-            return new Text("No Timing");
-
         var table = new Table();
         table
             .AddColumns(
@@ -99,30 +89,25 @@ public class TimingTowerDisplay(
                     ?.Entries.GetValueOrDefault(driverNumber) ?? new();
             var appData = timingAppData.Latest?.Lines.GetValueOrDefault(driverNumber) ?? new();
             var stint = appData.Stints.LastOrDefault().Value;
-            var previousLapDrivers = timingData.DriversByLap.GetValueOrDefault(
-                line.NumberOfLaps - 1 ?? 0
-            );
-            var previousLapLine = previousLapDrivers?.GetValueOrDefault(driverNumber) ?? new();
-            var teamColour = driver.TeamColour ?? "000000";
 
-            var positionChange = line.Line - previousLapLine.Line;
+            // Driver.Line is only updated at the end of the lap, so if they are different a position change has just happened
+            var positionChange = line.Line - driver.Line;
 
             var isComparisonLine = line == comparisonDataPoint.Value;
-            var lineStyle = isComparisonLine ? _invert : _normal;
 
             table.AddRow(
-                new Markup(
-                    $"{line.Position, 2} [#{teamColour} bold]{driver.RacingNumber, 2} {driver.Tla ?? "UNK"}[/]",
-                    lineStyle
+                DisplayUtils.DriverTag(driver, line, isComparisonLine),
+                new Text(
+                    $"{line.GapToLeader, 7}",
+                    isComparisonLine ? DisplayUtils.STYLE_INVERT : DisplayUtils.STYLE_NORMAL
                 ),
-                new Text($"{line.GapToLeader, 7}", lineStyle),
                 position.Status == PositionDataPoint.PositionData.Entry.DriverStatus.OffTrack
                     ? new Text("OFF TRK", new Style(background: Color.Red, foreground: Color.White))
                     : new Text(
                         $"{line.IntervalToPositionAhead?.Value, 8}{(line.IntervalToPositionAhead?.Catching ?? false ? "▲" : string.Empty)}",
                         GetStyle(line.IntervalToPositionAhead, isComparisonLine)
                     ),
-                new Text(line.BestLapTime?.Value ?? "NULL", _normal),
+                new Text(line.BestLapTime?.Value ?? "NULL", DisplayUtils.STYLE_NORMAL),
                 new Text(line.LastLapTime?.Value ?? "NULL", GetStyle(line.LastLapTime)),
                 new Text(
                     line.Sectors.GetValueOrDefault("0")?.Value?.PadLeft(6) ?? "      ",
@@ -150,10 +135,7 @@ public class TimingTowerDisplay(
                 ),
                 new Text($"{stint?.Compound?[0]} {stint?.TotalLaps, 2}", GetStyle(stint)),
                 GetGapBetweenLines(comparisonDataPoint.Value, line),
-                new Markup(
-                    $"[#{teamColour}]{driver.RacingNumber, 2} {driver.Tla ?? "UNK"}[/]",
-                    lineStyle
-                ),
+                DisplayUtils.DriverTag(driver, line, isComparisonLine),
                 new Markup(GetPositionChangeMarkup(positionChange))
             );
         }
@@ -215,24 +197,20 @@ public class TimingTowerDisplay(
             var appData = timingAppData.Latest?.Lines.GetValueOrDefault(driverNumber) ?? new();
             var stint = appData.Stints.LastOrDefault().Value;
             var bestLap = timingData.BestLaps.GetValueOrDefault(driverNumber);
-            var teamColour = driver.TeamColour ?? "000000";
 
             var gapToLeader = (
                 line.BestLapTime.ToTimeSpan() - bestDriver.Value.BestLapTime.ToTimeSpan()
             )?.TotalSeconds;
 
             table.AddRow(
-                new Markup(
-                    $"{line.Position, 2} [#{teamColour} bold]{driver.RacingNumber, 2} {driver.Tla ?? "UNK"}[/]",
-                    _normal
-                ),
+                DisplayUtils.DriverTag(driver, line, selected: false),
                 position.Status == PositionDataPoint.PositionData.Entry.DriverStatus.OffTrack
                     ? new Text("OFF TRK", new Style(background: Color.Red, foreground: Color.White))
                     : new Text(
                         $"{(gapToLeader > 0 ? "+" : "")}{gapToLeader:f3}".PadLeft(7),
-                        _normal
+                        DisplayUtils.STYLE_NORMAL
                     ),
-                new Text(line.BestLapTime?.Value ?? "NULL", _normal),
+                new Text(line.BestLapTime?.Value ?? "NULL", DisplayUtils.STYLE_NORMAL),
                 GetSectorMarkup(
                     bestLap?.Sectors.GetValueOrDefault("0"),
                     bestSector1,
@@ -263,7 +241,7 @@ public class TimingTowerDisplay(
                     line.InPit.GetValueOrDefault()
                         ? new Style(foreground: Color.Black, background: Color.Yellow)
                         : line.PitOut.GetValueOrDefault()
-                            ? _personalBest
+                            ? DisplayUtils.STYLE_PB
                             : Style.Plain
                 ),
                 new Text($"{stint?.Compound?[0] ?? 'X'} {stint?.TotalLaps, 2}", GetStyle(stint))
@@ -308,20 +286,20 @@ public class TimingTowerDisplay(
     )
     {
         if (string.IsNullOrWhiteSpace(time?.Value))
-            return _normal;
+            return DisplayUtils.STYLE_NORMAL;
 
         if (bestSector?.ToTimeSpan() == time?.ToTimeSpan())
-            return _overallBest;
+            return DisplayUtils.STYLE_BEST;
 
         // If we are checking against a best sector, don't style it unless it is fastest
         if (overrideStyle)
-            return _normal;
+            return DisplayUtils.STYLE_NORMAL;
 
         if (time?.OverallFastest ?? false)
-            return _overallBest;
+            return DisplayUtils.STYLE_BEST;
         if (time?.PersonalFastest ?? false)
-            return _personalBest;
-        return _normal;
+            return DisplayUtils.STYLE_PB;
+        return DisplayUtils.STYLE_NORMAL;
     }
 
     [System.Diagnostics.CodeAnalysis.SuppressMessage(
@@ -332,7 +310,7 @@ public class TimingTowerDisplay(
     private Style GetStyle(TimingAppDataPoint.Driver.Stint? stint)
     {
         if (stint is null)
-            return _normal;
+            return DisplayUtils.STYLE_NORMAL;
 
         return stint.Compound switch
         {
@@ -341,14 +319,14 @@ public class TimingTowerDisplay(
             "SOFT" => new Style(foreground: Color.White, background: Color.Red),
             "INTER" => new Style(foreground: Color.Black, background: Color.Green),
             "WET" => new Style(foreground: Color.Black, background: Color.Blue),
-            _ => _normal
+            _ => DisplayUtils.STYLE_NORMAL
         };
     }
 
     private Style GetStyle(TimingDataPoint.Driver.Interval? interval, bool isComparisonLine)
     {
         if (interval is null)
-            return _normal;
+            return DisplayUtils.STYLE_NORMAL;
 
         var foreground = Color.White;
         var background = Color.Black;
@@ -371,7 +349,7 @@ public class TimingTowerDisplay(
     {
         if (from == to)
         {
-            return new Text("-------", _invert);
+            return new Text("-------", DisplayUtils.STYLE_INVERT);
         }
 
         if (from?.GapToLeaderSeconds() is not null && to.GapToLeaderSeconds() is not null)
@@ -544,7 +522,7 @@ public class TimingTowerDisplay(
         {
             var style = trackStatusProcessor.Latest.Status switch
             {
-                "1" => _personalBest, // All Clear
+                "1" => DisplayUtils.STYLE_PB, // All Clear
                 "2" => new Style(foreground: Color.Black, background: Color.Yellow), // Yellow Flad
                 "4" => new Style(foreground: Color.Black, background: Color.Yellow), // Safety Car
                 "5" => new Style(foreground: Color.White, background: Color.Red), // Red Flag

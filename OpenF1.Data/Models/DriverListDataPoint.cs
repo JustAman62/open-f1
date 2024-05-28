@@ -19,17 +19,26 @@ namespace OpenF1.Data;
 /// }
 /// </c>
 /// </summary>
-public sealed class DriverListDataPoint : Dictionary<string, DriverListDataPoint.Driver>, ILiveTimingDataPoint
+public sealed class DriverListDataPoint
+    : Dictionary<string, DriverListDataPoint.Driver>,
+        ILiveTimingDataPoint
 {
     /// <inheritdoc />
     public LiveTimingDataType LiveTimingDataType => LiveTimingDataType.DriverList;
 
-    public sealed record Driver {
+    public sealed record Driver
+    {
         public string? RacingNumber { get; set; }
         public string? BroadcastName { get; set; }
         public string? FullName { get; set; }
         public string? Tla { get; set; }
+
+        /// <summary>
+        /// The same as the driver position in <see cref="TimingDataPoint.Driver.Line" />, 
+        /// however unlike that property this only gets updated at the end of every lap.
+        /// </summary>
         public int? Line { get; set; }
+
         public string? TeamName { get; set; }
         public string? TeamColour { get; set; }
     }

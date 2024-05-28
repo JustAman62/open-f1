@@ -8,7 +8,7 @@ public class SwitchPageInputHandler(LapCountProcessor lapCountProcessor, State s
     public bool IsEnabled => true;
 
     public Screen[] ApplicableScreens =>
-        [Screen.RaceControl, Screen.TimingTower, Screen.TimingHistory];
+        [Screen.RaceControl, Screen.DriverTracker, Screen.TimingTower, Screen.TimingHistory];
 
     public ConsoleKey[] Keys => [ConsoleKey.LeftArrow, ConsoleKey.RightArrow];
 
@@ -33,6 +33,7 @@ public class SwitchPageInputHandler(LapCountProcessor lapCountProcessor, State s
                 break;
             case Screen.TimingTower:
             case Screen.RaceControl:
+            case Screen.DriverTracker:
                 state.CursorOffset = 0;
                 break;
         }
