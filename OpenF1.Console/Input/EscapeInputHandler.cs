@@ -9,7 +9,7 @@ public class EscapeInputHandler(State state) : IInputHandler
     public ConsoleKey[] Keys =>
         [state.CurrentScreen == Screen.Main ? ConsoleKey.X : ConsoleKey.Escape];
 
-    public int Sort => 99;
+    public int Sort => 1;
 
     public string Description =>
         state.CurrentScreen switch

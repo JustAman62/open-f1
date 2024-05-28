@@ -81,6 +81,7 @@ public class ConsoleLoop(
             .Select(x => $"[{string.Join('/', x.Keys.Select(k => k.GetConsoleKeyCharacter()))}] {x.Description}");
 
         var columns = new Columns(commandDescriptions.Select(x => new Text(x)));
+        columns.Collapse();
         layout["Footer"].Update(columns);
 
         if (System.Console.KeyAvailable)

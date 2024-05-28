@@ -2,7 +2,7 @@ namespace OpenF1.Console;
 
 public sealed class CursorInputHandler(State state) : IInputHandler
 {
-    public bool IsEnabled => state.CursorOffset != 0;
+    public bool IsEnabled => true;
 
     public Screen[] ApplicableScreens => Enum.GetValues<Screen>();
 
@@ -10,7 +10,7 @@ public sealed class CursorInputHandler(State state) : IInputHandler
 
     public string Description => "Cursor";
 
-    public int Sort => 10;
+    public int Sort => 21;
 
     public Task ExecuteAsync(ConsoleKeyInfo consoleKeyInfo)
     {

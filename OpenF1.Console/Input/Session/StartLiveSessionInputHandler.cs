@@ -12,7 +12,7 @@ public class StartLiveSessionInputHandler(ILiveTimingClient liveTimingClient) : 
 
     public string Description => "Start Live Session";
 
-    public int Sort => 1;
+    public int Sort => 40;
 
     public async Task ExecuteAsync(ConsoleKeyInfo consoleKeyInfo) =>
         await liveTimingClient.StartAsync();

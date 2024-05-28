@@ -12,6 +12,7 @@ public static class ConsoleKeyExtensions
             ConsoleKey.RightArrow => "►",
             ConsoleKey.OemComma => ",",
             ConsoleKey.OemPeriod => ".",
+            ConsoleKey.Enter => "⏎",
             _ => key.ToString()
         };
 }

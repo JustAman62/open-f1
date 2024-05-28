@@ -12,7 +12,7 @@ public sealed class SelectDriverInputHandler(State state, TimingDataProcessor ti
 
     public string Description => "Toggle Select";
 
-    public int Sort => 56;
+    public int Sort => 40;
 
     public Task ExecuteAsync(ConsoleKeyInfo consoleKeyInfo)
     {

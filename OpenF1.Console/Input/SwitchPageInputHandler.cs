@@ -12,14 +12,14 @@ public class SwitchPageInputHandler(LapCountProcessor lapCountProcessor, State s
 
     public ConsoleKey[] Keys => [ConsoleKey.LeftArrow, ConsoleKey.RightArrow];
 
-    public string Description => "Page";
+    public string Description => $"Page {GetScreenIndex() + 1}";
 
-    public int Sort => 54;
+    public int Sort => 20;
 
     public Task ExecuteAsync(ConsoleKeyInfo consoleKeyInfo)
     {
         // Find the index of the current screen, and move to the next one
-        var index = ApplicableScreens.ToList().IndexOf(state.CurrentScreen);
+        var index = GetScreenIndex();
         var newIndex = consoleKeyInfo.Key == ConsoleKey.LeftArrow ? index - 1 : index + 1;
         var newScreen = newIndex % ApplicableScreens.Length;
         state.CurrentScreen =
@@ -29,7 +29,7 @@ public class SwitchPageInputHandler(LapCountProcessor lapCountProcessor, State s
         switch (state.CurrentScreen)
         {
             case Screen.TimingHistory:
-                state.CursorOffset = lapCountProcessor.Latest?.CurrentLap - 2 ?? state.CursorOffset;
+                state.CursorOffset = Math.Max(lapCountProcessor.Latest.CurrentLap - 2 ?? 1, 1);
                 break;
             case Screen.TimingTower:
             case Screen.RaceControl:
@@ -40,4 +40,6 @@ public class SwitchPageInputHandler(LapCountProcessor lapCountProcessor, State s
 
         return Task.CompletedTask;
     }
+
+    private int GetScreenIndex() => ApplicableScreens.ToList().IndexOf(state.CurrentScreen);
 }

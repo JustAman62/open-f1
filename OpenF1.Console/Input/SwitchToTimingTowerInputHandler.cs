@@ -10,7 +10,7 @@ public class SwitchToTimingTowerInputHandler(State state) : IInputHandler
 
     public string Description => "Timing Tower";
 
-    public int Sort => 52;
+    public int Sort => 61;
 
     public Task ExecuteAsync(ConsoleKeyInfo consoleKeyInfo)
     {

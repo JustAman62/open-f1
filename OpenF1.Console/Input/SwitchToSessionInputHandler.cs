@@ -10,7 +10,7 @@ public class SwitchToSessionInputHandler(State state) : IInputHandler
 
     public string Description => "Session";
 
-    public int Sort => 50;
+    public int Sort => 60;
 
     public Task ExecuteAsync(ConsoleKeyInfo consoleKeyInfo)
     {

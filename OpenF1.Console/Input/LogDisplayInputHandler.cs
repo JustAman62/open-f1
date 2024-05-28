@@ -10,7 +10,7 @@ public class LogDisplayInputHandler(LogDisplayOptions options) : IInputHandler
 
     public string Description => "Minimum Log Level";
 
-    public int Sort => 1;
+    public int Sort => 20;
 
     public Task ExecuteAsync(ConsoleKeyInfo consoleKeyInfo)
     {

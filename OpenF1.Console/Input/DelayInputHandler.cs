@@ -6,14 +6,13 @@ public class IncreaseDelayInputHandler(IDateTimeProvider dateTimeProvider) : IIn
 {
     public bool IsEnabled => true;
 
-    public Screen[] ApplicableScreens =>
-        [Screen.ManageSession, Screen.TimingTower, Screen.RaceControl];
+    public Screen[] ApplicableScreens => [Screen.ManageSession, Screen.RaceControl];
 
     public ConsoleKey[] Keys => [ConsoleKey.N, ConsoleKey.M];
 
     public string Description => "Delay";
 
-    public int Sort => 20;
+    public int Sort => 22;
 
     public Task ExecuteAsync(ConsoleKeyInfo consoleKeyInfo)
     {

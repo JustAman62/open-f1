@@ -10,7 +10,7 @@ public class SwitchToLogsInputHandler(State state) : IInputHandler
 
     public string Description => "Logs";
 
-    public int Sort => 54;
+    public int Sort => 62;
 
     public Task ExecuteAsync(ConsoleKeyInfo consoleKeyInfo)
     {

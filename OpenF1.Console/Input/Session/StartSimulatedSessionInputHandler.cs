@@ -17,7 +17,7 @@ public class StartSimulatedSessionInputHandler(
 
     public string Description => "Start Simulation";
 
-    public int Sort => 2;
+    public int Sort => 41;
 
     public async Task ExecuteAsync(ConsoleKeyInfo consoleKeyInfo)
     {
