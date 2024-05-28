@@ -6,38 +6,25 @@ public class IncreaseDelayInputHandler(IDateTimeProvider dateTimeProvider) : IIn
 {
     public bool IsEnabled => true;
 
-    public Screen[] ApplicableScreens => [Screen.ManageSession, Screen.TimingTower, Screen.RaceControl];
+    public Screen[] ApplicableScreens =>
+        [Screen.ManageSession, Screen.TimingTower, Screen.RaceControl];
 
-    public ConsoleKey ConsoleKey => ConsoleKey.RightArrow;
+    public ConsoleKey[] Keys => [ConsoleKey.N, ConsoleKey.M];
 
-    public string Description => "Delay+";
+    public string Description => "Delay";
 
     public int Sort => 20;
 
     public Task ExecuteAsync(ConsoleKeyInfo consoleKeyInfo)
     {
-        var increaseBy = consoleKeyInfo.Modifiers.HasFlag(ConsoleModifiers.Shift) ? 30 : 5;
-        dateTimeProvider.Delay += TimeSpan.FromSeconds(increaseBy);
-        return Task.CompletedTask;
-    }
-}
+        var changeBy = consoleKeyInfo.Key == ConsoleKey.M ? 5 : -5;
+        if (consoleKeyInfo.Modifiers.HasFlag(ConsoleModifiers.Shift))
+        {
+            changeBy *= 6;
+        }
 
-public class DecreaseDelayInputHandler(IDateTimeProvider dateTimeProvider) : IInputHandler
-{
-    public bool IsEnabled => true;
+        dateTimeProvider.Delay += TimeSpan.FromSeconds(changeBy);
 
-    public Screen[] ApplicableScreens => [Screen.ManageSession, Screen.TimingTower, Screen.RaceControl];
-
-    public ConsoleKey ConsoleKey => ConsoleKey.LeftArrow;
-
-    public string Description => "Delay-";
-
-    public int Sort => 21;
-
-    public Task ExecuteAsync(ConsoleKeyInfo consoleKeyInfo)
-    {
-        var decreaseBy = consoleKeyInfo.Modifiers.HasFlag(ConsoleModifiers.Shift) ? 30 : 5;
-        dateTimeProvider.Delay -= TimeSpan.FromSeconds(decreaseBy);
         if (dateTimeProvider.Delay < TimeSpan.Zero)
             dateTimeProvider.Delay = TimeSpan.Zero;
 

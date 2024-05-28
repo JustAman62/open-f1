@@ -51,7 +51,7 @@ public class TimingTowerDisplay(
             )
         );
 
-        layout["Info"].Size = 5;
+        layout["Info"].Size = 6;
         layout["Info"]["Status"].Size = STATUS_PANEL_WIDTH;
 
         return Task.FromResult<IRenderable>(layout);
@@ -488,6 +488,11 @@ public class TimingTowerDisplay(
         if (currentLap.Value - 3 > 0)
         {
             AddChartItem(chart, currentLap.Value - 3, prevDriverNumber, nextDriverNumber);
+        }
+
+        if (currentLap.Value - 4 > 0)
+        {
+            AddChartItem(chart, currentLap.Value - 4, prevDriverNumber, nextDriverNumber);
         }
         return chart;
     }

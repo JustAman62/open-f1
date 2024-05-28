@@ -13,7 +13,7 @@ public class StartSimulatedSessionInputHandler(
 
     public Screen[] ApplicableScreens => [Screen.ManageSession];
 
-    public ConsoleKey ConsoleKey => ConsoleKey.F;
+    public ConsoleKey[] Keys => [ConsoleKey.F];
 
     public string Description => "Start Simulation";
 

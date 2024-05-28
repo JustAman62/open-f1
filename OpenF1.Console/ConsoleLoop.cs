@@ -23,7 +23,7 @@ public class ConsoleLoop(
             new Layout("Content", contentPanel),
             new Layout("Footer")
         );
-        layout["Footer"].Size = 2;
+        layout["Footer"].Size = 1;
 
         AnsiConsole.Cursor.Hide();
         
@@ -80,7 +80,7 @@ public class ConsoleLoop(
         var commandDescriptions = inputHandlers
             .Where(x => x.IsEnabled && x.ApplicableScreens.Contains(state.CurrentScreen))
             .OrderBy(x => x.Sort)
-            .Select(x => $"[{GetConsoleKeyCharacter(x.ConsoleKey)}] {x.Description}");
+            .Select(x => $"[{string.Join('/', x.Keys.Select(k => k.GetConsoleKeyCharacter()))}] {x.Description}");
 
         var columns = new Columns(commandDescriptions.Select(x => new Text(x)));
         layout["Footer"].Update(columns);
@@ -90,7 +90,7 @@ public class ConsoleLoop(
             var key = System.Console.ReadKey();
             var tasks = inputHandlers
                 .Where(x =>
-                    x.ConsoleKey == key.Key
+                    x.Keys.Contains(key.Key)
                     && (
                         x.ApplicableScreens is null
                         || x.ApplicableScreens.Contains(state.CurrentScreen)
@@ -100,15 +100,4 @@ public class ConsoleLoop(
             await Task.WhenAll(tasks);
         }
     }
-
-    private string GetConsoleKeyCharacter(ConsoleKey consoleKey) =>
-        consoleKey switch
-        {
-            ConsoleKey.Escape => "Esc",
-            ConsoleKey.UpArrow => "▲",
-            ConsoleKey.DownArrow => "▼",
-            ConsoleKey.LeftArrow => "◄",
-            ConsoleKey.RightArrow => "►",
-            _ => consoleKey.ToString()
-        };
 }

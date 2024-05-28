@@ -6,7 +6,7 @@ public class SwitchToLogsInputHandler(State state) : IInputHandler
 
     public Screen[] ApplicableScreens => [Screen.Main];
 
-    public ConsoleKey ConsoleKey => ConsoleKey.L;
+    public ConsoleKey[] Keys => [ConsoleKey.L];
 
     public string Description => "Logs";
 

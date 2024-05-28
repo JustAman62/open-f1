@@ -1,60 +1,32 @@
 namespace OpenF1.Console;
 
-public sealed class CursorUpInputHandler(State state) : IInputHandler
+public sealed class CursorInputHandler(State state) : IInputHandler
 {
     public bool IsEnabled => state.CursorOffset != 0;
 
     public Screen[] ApplicableScreens => Enum.GetValues<Screen>();
 
-    public ConsoleKey ConsoleKey => ConsoleKey.UpArrow;
+    public ConsoleKey[] Keys => [ConsoleKey.UpArrow, ConsoleKey.DownArrow];
 
-    public string Description => "Up";
+    public string Description => "Cursor";
 
-    public int Sort => 11;
+    public int Sort => 10;
 
     public Task ExecuteAsync(ConsoleKeyInfo consoleKeyInfo)
     {
+        var changeBy = consoleKeyInfo.Key == ConsoleKey.DownArrow ? 1 : -1;
         if (consoleKeyInfo.Modifiers.HasFlag(ConsoleModifiers.Shift))
         {
-            state.CursorOffset -= 5;
+            changeBy *= 5;
         }
-        else
-        {
-            state.CursorOffset--;
-        }
+
+        state.CursorOffset += changeBy;
 
         if (state.CursorOffset < 0)
         {
             state.CursorOffset = 0;
         }
 
-        return Task.CompletedTask;
-    }
-}
-
-public sealed class CursorDownInputHandler(State state) : IInputHandler
-{
-    public bool IsEnabled => true;
-
-    public Screen[] ApplicableScreens =>
-        Enum.GetValues<Screen>().Where(x => x != Screen.Main).ToArray();
-
-    public ConsoleKey ConsoleKey => ConsoleKey.DownArrow;
-
-    public string Description => $"Down ({state.CursorOffset})";
-
-    public int Sort => 10;
-
-    public Task ExecuteAsync(ConsoleKeyInfo consoleKeyInfo)
-    {
-        if (consoleKeyInfo.Modifiers.HasFlag(ConsoleModifiers.Shift))
-        {
-            state.CursorOffset += 5;
-        }
-        else
-        {
-            state.CursorOffset++;
-        }
         return Task.CompletedTask;
     }
 }

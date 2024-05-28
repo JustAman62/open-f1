@@ -6,7 +6,7 @@ public class SwitchToSessionInputHandler(State state) : IInputHandler
 
     public Screen[] ApplicableScreens => [Screen.Main];
 
-    public ConsoleKey ConsoleKey => ConsoleKey.S;
+    public ConsoleKey[] Keys => [ConsoleKey.S];
 
     public string Description => "Session";
 

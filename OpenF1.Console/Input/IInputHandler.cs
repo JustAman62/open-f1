@@ -6,7 +6,7 @@ public interface IInputHandler
 
     public Screen[] ApplicableScreens { get; }
 
-    public ConsoleKey ConsoleKey { get; }
+    public ConsoleKey[] Keys { get; }
 
     public string Description { get; }
 

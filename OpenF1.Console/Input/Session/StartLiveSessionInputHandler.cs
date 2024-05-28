@@ -8,7 +8,7 @@ public class StartLiveSessionInputHandler(ILiveTimingClient liveTimingClient) : 
 
     public Screen[] ApplicableScreens => [Screen.ManageSession];
 
-    public ConsoleKey ConsoleKey => ConsoleKey.L;
+    public ConsoleKey[] Keys => [ConsoleKey.L];
 
     public string Description => "Start Live Session";
 

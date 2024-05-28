@@ -6,8 +6,8 @@ public class EscapeInputHandler(State state) : IInputHandler
 
     public Screen[] ApplicableScreens => Enum.GetValues<Screen>();
 
-    public ConsoleKey ConsoleKey =>
-        state.CurrentScreen == Screen.Main ? ConsoleKey.X : ConsoleKey.Escape;
+    public ConsoleKey[] Keys =>
+        [state.CurrentScreen == Screen.Main ? ConsoleKey.X : ConsoleKey.Escape];
 
     public int Sort => 99;
 

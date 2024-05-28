@@ -4,9 +4,9 @@ public class SwitchToTimingTowerInputHandler(State state) : IInputHandler
 {
     public bool IsEnabled => true;
     
-    public Screen[] ApplicableScreens => [Screen.Main, Screen.RaceControl, Screen.TimingHistory];
+    public Screen[] ApplicableScreens => [Screen.Main, Screen.ManageSession];
 
-    public ConsoleKey ConsoleKey => ConsoleKey.O;
+    public ConsoleKey[] Keys => [ConsoleKey.T];
 
     public string Description => "Timing Tower";
 

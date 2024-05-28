@@ -1,5 +1,3 @@
-using Microsoft.Extensions.Logging;
-
 namespace OpenF1.Console;
 
 public class LogDisplayInputHandler(LogDisplayOptions options) : IInputHandler
@@ -8,7 +6,7 @@ public class LogDisplayInputHandler(LogDisplayOptions options) : IInputHandler
 
     public Screen[] ApplicableScreens => [Screen.Logs];
 
-    public ConsoleKey ConsoleKey => ConsoleKey.M;
+    public ConsoleKey[] Keys => [ConsoleKey.M];
 
     public string Description => "Minimum Log Level";
 
