@@ -17,6 +17,7 @@
     <PackageReference Include="Microsoft.Extensions.DependencyInjection" />
     <PackageReference Include="Microsoft.Extensions.Hosting" />
     <PackageReference Include="Microsoft.Extensions.Options" />
+    <PackageReference Include="NetCoreAudio" />
     <PackageReference Include="Spectre.Console" />
     <PackageReference Include="Swashbuckle.AspNetCore" />
   </ItemGroup>
