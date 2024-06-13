@@ -1,0 +1,782 @@
+{
+  "1": {
+    "gapToLeader": "LAP 3",
+    "intervalToPositionAhead": {
+      "value": "LAP 3",
+      "catching": null
+    },
+    "line": 1,
+    "position": "1",
+    "inPit": false,
+    "pitOut": false,
+    "numberOfPitStops": null,
+    "numberOfLaps": 2,
+    "lastLapTime": {
+      "value": "1:20.596",
+      "overallFastest": true,
+      "personalFastest": true
+    },
+    "sectors": {
+      "0": {
+        "value": "25.604",
+        "overallFastest": true,
+        "personalFastest": true
+      },
+      "1": {
+        "value": "27.925",
+        "overallFastest": true,
+        "personalFastest": true
+      },
+      "2": {
+        "value": "27.067",
+        "overallFastest": false,
+        "personalFastest": false
+      }
+    },
+    "bestLapTime": {
+      "value": "1:20.596",
+      "lap": 2
+    }
+  },
+  "2": {
+    "gapToLeader": "+20.040",
+    "intervalToPositionAhead": {
+      "value": "+0.745",
+      "catching": null
+    },
+    "line": 19,
+    "position": "19",
+    "inPit": false,
+    "pitOut": false,
+    "numberOfPitStops": null,
+    "numberOfLaps": 5,
+    "lastLapTime": {
+      "value": "1:22.702",
+      "overallFastest": false,
+      "personalFastest": true
+    },
+    "sectors": {
+      "0": {
+        "value": "25.954",
+        "overallFastest": false,
+        "personalFastest": false
+      },
+      "1": {
+        "value": "29.002",
+        "overallFastest": false,
+        "personalFastest": false
+      },
+      "2": {
+        "value": "27.746",
+        "overallFastest": false,
+        "personalFastest": false
+      }
+    },
+    "bestLapTime": {
+      "value": "1:22.702",
+      "lap": 5
+    }
+  },
+  "3": {
+    "gapToLeader": "+9.880",
+    "intervalToPositionAhead": {
+      "value": "+0.942",
+      "catching": null
+    },
+    "line": 11,
+    "position": "11",
+    "inPit": false,
+    "pitOut": false,
+    "numberOfPitStops": null,
+    "numberOfLaps": 3,
+    "lastLapTime": {
+      "value": "1:22.083",
+      "overallFastest": false,
+      "personalFastest": true
+    },
+    "sectors": {
+      "0": {
+        "value": "25.745",
+        "overallFastest": false,
+        "personalFastest": true
+      },
+      "1": {
+        "value": "28.729",
+        "overallFastest": false,
+        "personalFastest": true
+      },
+      "2": {
+        "value": "27.609",
+        "overallFastest": false,
+        "personalFastest": true
+      }
+    },
+    "bestLapTime": {
+      "value": "1:22.083",
+      "lap": 3
+    }
+  },
+  "4": {
+    "gapToLeader": "+0.960",
+    "intervalToPositionAhead": {
+      "value": "+0.960",
+      "catching": null
+    },
+    "line": 2,
+    "position": "2",
+    "inPit": false,
+    "pitOut": false,
+    "numberOfPitStops": null,
+    "numberOfLaps": 2,
+    "lastLapTime": {
+      "value": "1:20.673",
+      "overallFastest": false,
+      "personalFastest": true
+    },
+    "sectors": {
+      "0": {
+        "value": "25.691",
+        "overallFastest": false,
+        "personalFastest": true
+      },
+      "1": {
+        "value": "28.003",
+        "overallFastest": false,
+        "personalFastest": true
+      },
+      "2": {
+        "value": "26.979",
+        "overallFastest": false,
+        "personalFastest": false
+      }
+    },
+    "bestLapTime": {
+      "value": "1:20.673",
+      "lap": 2
+    }
+  },
+  "10": {
+    "gapToLeader": "+18.301",
+    "intervalToPositionAhead": {
+      "value": "+0.737",
+      "catching": null
+    },
+    "line": 15,
+    "position": "15",
+    "inPit": false,
+    "pitOut": false,
+    "numberOfPitStops": null,
+    "numberOfLaps": 6,
+    "lastLapTime": {
+      "value": "1:22.399",
+      "overallFastest": false,
+      "personalFastest": true
+    },
+    "sectors": {
+      "0": {
+        "value": "26.052",
+        "overallFastest": false,
+        "personalFastest": false
+      },
+      "1": {
+        "value": "28.815",
+        "overallFastest": false,
+        "personalFastest": false
+      },
+      "2": {
+        "value": "27.532",
+        "overallFastest": false,
+        "personalFastest": true
+      }
+    },
+    "bestLapTime": {
+      "value": "1:22.399",
+      "lap": 6
+    }
+  },
+  "11": {
+    "gapToLeader": "+8.938",
+    "intervalToPositionAhead": {
+      "value": "+0.907",
+      "catching": null
+    },
+    "line": 10,
+    "position": "10",
+    "inPit": false,
+    "pitOut": false,
+    "numberOfPitStops": null,
+    "numberOfLaps": 3,
+    "lastLapTime": {
+      "value": "1:21.913",
+      "overallFastest": false,
+      "personalFastest": true
+    },
+    "sectors": {
+      "0": {
+        "value": "25.783",
+        "overallFastest": false,
+        "personalFastest": true
+      },
+      "1": {
+        "value": "28.569",
+        "overallFastest": false,
+        "personalFastest": true
+      },
+      "2": {
+        "value": "27.561",
+        "overallFastest": false,
+        "personalFastest": true
+      }
+    },
+    "bestLapTime": {
+      "value": "1:21.913",
+      "lap": 3
+    }
+  },
+  "14": {
+    "gapToLeader": "+20.858",
+    "intervalToPositionAhead": {
+      "value": "+0.818",
+      "catching": null
+    },
+    "line": 20,
+    "position": "20",
+    "inPit": false,
+    "pitOut": false,
+    "numberOfPitStops": null,
+    "numberOfLaps": 5,
+    "lastLapTime": {
+      "value": "1:22.698",
+      "overallFastest": false,
+      "personalFastest": true
+    },
+    "sectors": {
+      "0": {
+        "value": "25.688",
+        "overallFastest": false,
+        "personalFastest": true
+      },
+      "1": {
+        "value": "29.097",
+        "overallFastest": false,
+        "personalFastest": false
+      },
+      "2": {
+        "value": "27.913",
+        "overallFastest": false,
+        "personalFastest": false
+      }
+    },
+    "bestLapTime": {
+      "value": "1:22.698",
+      "lap": 5
+    }
+  },
+  "16": {
+    "gapToLeader": "+2.029",
+    "intervalToPositionAhead": {
+      "value": "+1.069",
+      "catching": null
+    },
+    "line": 3,
+    "position": "3",
+    "inPit": false,
+    "pitOut": false,
+    "numberOfPitStops": null,
+    "numberOfLaps": 2,
+    "lastLapTime": {
+      "value": "1:20.926",
+      "overallFastest": false,
+      "personalFastest": true
+    },
+    "sectors": {
+      "0": {
+        "value": "25.685",
+        "overallFastest": false,
+        "personalFastest": true
+      },
+      "1": {
+        "value": "28.145",
+        "overallFastest": false,
+        "personalFastest": true
+      },
+      "2": {
+        "value": "27.096",
+        "overallFastest": false,
+        "personalFastest": false
+      }
+    },
+    "bestLapTime": {
+      "value": "1:20.926",
+      "lap": 2
+    }
+  },
+  "18": {
+    "gapToLeader": "+14.793",
+    "intervalToPositionAhead": {
+      "value": "+0.889",
+      "catching": null
+    },
+    "line": 13,
+    "position": "13",
+    "inPit": false,
+    "pitOut": false,
+    "numberOfPitStops": null,
+    "numberOfLaps": 5,
+    "lastLapTime": {
+      "value": "1:22.252",
+      "overallFastest": false,
+      "personalFastest": true
+    },
+    "sectors": {
+      "0": {
+        "value": "25.887",
+        "overallFastest": false,
+        "personalFastest": false
+      },
+      "1": {
+        "value": "28.627",
+        "overallFastest": false,
+        "personalFastest": true
+      },
+      "2": {
+        "value": "27.738",
+        "overallFastest": false,
+        "personalFastest": true
+      }
+    },
+    "bestLapTime": {
+      "value": "1:22.252",
+      "lap": 5
+    }
+  },
+  "20": {
+    "gapToLeader": "+18.755",
+    "intervalToPositionAhead": {
+      "value": "+0.454",
+      "catching": null
+    },
+    "line": 16,
+    "position": "16",
+    "inPit": false,
+    "pitOut": false,
+    "numberOfPitStops": null,
+    "numberOfLaps": 6,
+    "lastLapTime": {
+      "value": "1:22.237",
+      "overallFastest": false,
+      "personalFastest": true
+    },
+    "sectors": {
+      "0": {
+        "value": "25.833",
+        "overallFastest": false,
+        "personalFastest": true
+      },
+      "1": {
+        "value": "28.861",
+        "overallFastest": false,
+        "personalFastest": true
+      },
+      "2": {
+        "value": "27.543",
+        "overallFastest": false,
+        "personalFastest": true
+      }
+    },
+    "bestLapTime": {
+      "value": "1:22.237",
+      "lap": 6
+    }
+  },
+  "22": {
+    "gapToLeader": "+8.031",
+    "intervalToPositionAhead": {
+      "value": "+0.821",
+      "catching": null
+    },
+    "line": 9,
+    "position": "9",
+    "inPit": false,
+    "pitOut": false,
+    "numberOfPitStops": null,
+    "numberOfLaps": 3,
+    "lastLapTime": {
+      "value": "1:21.758",
+      "overallFastest": false,
+      "personalFastest": true
+    },
+    "sectors": {
+      "0": {
+        "value": "25.648",
+        "overallFastest": false,
+        "personalFastest": true
+      },
+      "1": {
+        "value": "28.567",
+        "overallFastest": false,
+        "personalFastest": true
+      },
+      "2": {
+        "value": "27.543",
+        "overallFastest": false,
+        "personalFastest": false
+      }
+    },
+    "bestLapTime": {
+      "value": "1:21.758",
+      "lap": 3
+    }
+  },
+  "23": {
+    "gapToLeader": "+15.960",
+    "intervalToPositionAhead": {
+      "value": "+1.167",
+      "catching": null
+    },
+    "line": 14,
+    "position": "14",
+    "inPit": false,
+    "pitOut": false,
+    "numberOfPitStops": null,
+    "numberOfLaps": 5,
+    "lastLapTime": {
+      "value": "1:22.357",
+      "overallFastest": false,
+      "personalFastest": true
+    },
+    "sectors": {
+      "0": {
+        "value": "25.971",
+        "overallFastest": false,
+        "personalFastest": false
+      },
+      "1": {
+        "value": "28.762",
+        "overallFastest": false,
+        "personalFastest": true
+      },
+      "2": {
+        "value": "27.624",
+        "overallFastest": false,
+        "personalFastest": true
+      }
+    },
+    "bestLapTime": {
+      "value": "1:22.357",
+      "lap": 5
+    }
+  },
+  "24": {
+    "gapToLeader": "+19.295",
+    "intervalToPositionAhead": {
+      "value": "+0.810",
+      "catching": null
+    },
+    "line": 18,
+    "position": "18",
+    "inPit": false,
+    "pitOut": false,
+    "numberOfPitStops": null,
+    "numberOfLaps": 5,
+    "lastLapTime": {
+      "value": "1:22.565",
+      "overallFastest": false,
+      "personalFastest": true
+    },
+    "sectors": {
+      "0": {
+        "value": "25.962",
+        "overallFastest": false,
+        "personalFastest": false
+      },
+      "1": {
+        "value": "28.866",
+        "overallFastest": false,
+        "personalFastest": true
+      },
+      "2": {
+        "value": "27.737",
+        "overallFastest": false,
+        "personalFastest": true
+      }
+    },
+    "bestLapTime": {
+      "value": "1:22.565",
+      "lap": 5
+    }
+  },
+  "27": {
+    "gapToLeader": "+7.210",
+    "intervalToPositionAhead": {
+      "value": "+1.385",
+      "catching": null
+    },
+    "line": 8,
+    "position": "8",
+    "inPit": false,
+    "pitOut": false,
+    "numberOfPitStops": null,
+    "numberOfLaps": 3,
+    "lastLapTime": {
+      "value": "1:21.700",
+      "overallFastest": false,
+      "personalFastest": true
+    },
+    "sectors": {
+      "0": {
+        "value": "25.624",
+        "overallFastest": false,
+        "personalFastest": true
+      },
+      "1": {
+        "value": "28.466",
+        "overallFastest": false,
+        "personalFastest": true
+      },
+      "2": {
+        "value": "27.610",
+        "overallFastest": false,
+        "personalFastest": false
+      }
+    },
+    "bestLapTime": {
+      "value": "1:21.700",
+      "lap": 3
+    }
+  },
+  "31": {
+    "gapToLeader": "+12.371",
+    "intervalToPositionAhead": {
+      "value": "+0.935",
+      "catching": null
+    },
+    "line": 12,
+    "position": "12",
+    "inPit": false,
+    "pitOut": false,
+    "numberOfPitStops": null,
+    "numberOfLaps": 4,
+    "lastLapTime": {
+      "value": "1:22.229",
+      "overallFastest": false,
+      "personalFastest": true
+    },
+    "sectors": {
+      "0": {
+        "value": "25.762",
+        "overallFastest": false,
+        "personalFastest": true
+      },
+      "1": {
+        "value": "28.744",
+        "overallFastest": false,
+        "personalFastest": true
+      },
+      "2": {
+        "value": "27.723",
+        "overallFastest": false,
+        "personalFastest": false
+      }
+    },
+    "bestLapTime": {
+      "value": "1:22.229",
+      "lap": 4
+    }
+  },
+  "44": {
+    "gapToLeader": "+5.825",
+    "intervalToPositionAhead": {
+      "value": "+0.979",
+      "catching": null
+    },
+    "line": 7,
+    "position": "7",
+    "inPit": false,
+    "pitOut": false,
+    "numberOfPitStops": null,
+    "numberOfLaps": 3,
+    "lastLapTime": {
+      "value": "1:21.222",
+      "overallFastest": false,
+      "personalFastest": true
+    },
+    "sectors": {
+      "0": {
+        "value": "25.398",
+        "overallFastest": false,
+        "personalFastest": true
+      },
+      "1": {
+        "value": "28.589",
+        "overallFastest": false,
+        "personalFastest": false
+      },
+      "2": {
+        "value": "27.235",
+        "overallFastest": false,
+        "personalFastest": true
+      }
+    },
+    "bestLapTime": {
+      "value": "1:21.222",
+      "lap": 3
+    }
+  },
+  "55": {
+    "gapToLeader": "+2.868",
+    "intervalToPositionAhead": {
+      "value": "+0.780",
+      "catching": null
+    },
+    "line": 4,
+    "position": "4",
+    "inPit": false,
+    "pitOut": false,
+    "numberOfPitStops": null,
+    "numberOfLaps": 3,
+    "lastLapTime": {
+      "value": "1:20.966",
+      "overallFastest": false,
+      "personalFastest": true
+    },
+    "sectors": {
+      "0": {
+        "value": "25.426",
+        "overallFastest": false,
+        "personalFastest": true
+      },
+      "1": {
+        "value": "28.351",
+        "overallFastest": false,
+        "personalFastest": false
+      },
+      "2": {
+        "value": "27.189",
+        "overallFastest": false,
+        "personalFastest": false
+      }
+    },
+    "bestLapTime": {
+      "value": "1:20.966",
+      "lap": 3
+    }
+  },
+  "63": {
+    "gapToLeader": "+4.846",
+    "intervalToPositionAhead": {
+      "value": "+1.350",
+      "catching": null
+    },
+    "line": 6,
+    "position": "6",
+    "inPit": false,
+    "pitOut": false,
+    "numberOfPitStops": null,
+    "numberOfLaps": 3,
+    "lastLapTime": {
+      "value": "1:21.135",
+      "overallFastest": false,
+      "personalFastest": true
+    },
+    "sectors": {
+      "0": {
+        "value": "25.452",
+        "overallFastest": false,
+        "personalFastest": true
+      },
+      "1": {
+        "value": "28.312",
+        "overallFastest": false,
+        "personalFastest": true
+      },
+      "2": {
+        "value": "27.371",
+        "overallFastest": false,
+        "personalFastest": false
+      }
+    },
+    "bestLapTime": {
+      "value": "1:21.135",
+      "lap": 3
+    }
+  },
+  "77": {
+    "gapToLeader": "+20.032",
+    "intervalToPositionAhead": {
+      "value": "+1.277",
+      "catching": null
+    },
+    "line": 17,
+    "position": "17",
+    "inPit": false,
+    "pitOut": false,
+    "numberOfPitStops": null,
+    "numberOfLaps": 6,
+    "lastLapTime": {
+      "value": "1:22.415",
+      "overallFastest": false,
+      "personalFastest": true
+    },
+    "sectors": {
+      "0": {
+        "value": "26.033",
+        "overallFastest": false,
+        "personalFastest": false
+      },
+      "1": {
+        "value": "28.796",
+        "overallFastest": false,
+        "personalFastest": true
+      },
+      "2": {
+        "value": "27.586",
+        "overallFastest": false,
+        "personalFastest": true
+      }
+    },
+    "bestLapTime": {
+      "value": "1:22.415",
+      "lap": 6
+    }
+  },
+  "81": {
+    "gapToLeader": "+3.496",
+    "intervalToPositionAhead": {
+      "value": "+0.628",
+      "catching": null
+    },
+    "line": 5,
+    "position": "5",
+    "inPit": false,
+    "pitOut": false,
+    "numberOfPitStops": null,
+    "numberOfLaps": 3,
+    "lastLapTime": {
+      "value": "1:20.808",
+      "overallFastest": false,
+      "personalFastest": true
+    },
+    "sectors": {
+      "0": {
+        "value": "25.315",
+        "overallFastest": true,
+        "personalFastest": true
+      },
+      "1": {
+        "value": "28.254",
+        "overallFastest": false,
+        "personalFastest": true
+      },
+      "2": {
+        "value": "27.239",
+        "overallFastest": false,
+        "personalFastest": false
+      }
+    },
+    "bestLapTime": {
+      "value": "1:20.808",
+      "lap": 3
+    }
+  }
+}

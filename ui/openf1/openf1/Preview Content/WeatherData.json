@@ -1,0 +1,10 @@
+{
+  "liveTimingDataType": "WeatherData",
+  "airTemp": "25.0",
+  "humidity": "51.0",
+  "pressure": "1006.8",
+  "rainfall": "0",
+  "trackTemp": "40.5",
+  "windDirection": "137",
+  "windSpeed": "1.9"
+}

@@ -1,0 +1,295 @@
+{
+  "liveTimingDataType": "TimingAppData",
+  "lines": {
+    "1": {
+      "stints": {
+        "0": {
+          "lapFlags": 3,
+          "compound": "MEDIUM",
+          "new": "true",
+          "tyresNotChanged": "0",
+          "totalLaps": 8,
+          "startLaps": 0,
+          "lapTime": "1:20.596",
+          "lapNumber": 2
+        }
+      }
+    },
+    "2": {
+      "stints": {
+        "0": {
+          "lapFlags": 1,
+          "compound": "HARD",
+          "new": "true",
+          "tyresNotChanged": "0",
+          "totalLaps": 7,
+          "startLaps": 0,
+          "lapTime": "1:22.702",
+          "lapNumber": 5
+        }
+      }
+    },
+    "3": {
+      "stints": {
+        "0": {
+          "lapFlags": 1,
+          "compound": "MEDIUM",
+          "new": "true",
+          "tyresNotChanged": "0",
+          "totalLaps": 7,
+          "startLaps": 0,
+          "lapTime": "1:22.083",
+          "lapNumber": 3
+        }
+      }
+    },
+    "4": {
+      "stints": {
+        "0": {
+          "lapFlags": 1,
+          "compound": "MEDIUM",
+          "new": "true",
+          "tyresNotChanged": "0",
+          "totalLaps": 8,
+          "startLaps": 0,
+          "lapTime": "1:20.673",
+          "lapNumber": 2
+        }
+      }
+    },
+    "10": {
+      "stints": {
+        "0": {
+          "lapFlags": 1,
+          "compound": "SOFT",
+          "new": "true",
+          "tyresNotChanged": "0",
+          "totalLaps": 7,
+          "startLaps": 0,
+          "lapTime": "1:22.399",
+          "lapNumber": 6
+        }
+      }
+    },
+    "11": {
+      "stints": {
+        "0": {
+          "lapFlags": 1,
+          "compound": "HARD",
+          "new": "true",
+          "tyresNotChanged": "0",
+          "totalLaps": 7,
+          "startLaps": 0,
+          "lapTime": "1:21.913",
+          "lapNumber": 3
+        }
+      }
+    },
+    "14": {
+      "stints": {
+        "0": {
+          "lapFlags": 1,
+          "compound": "SOFT",
+          "new": "true",
+          "tyresNotChanged": "0",
+          "totalLaps": 7,
+          "startLaps": 0,
+          "lapTime": "1:22.698",
+          "lapNumber": 5
+        },
+        "1": {
+          "lapFlags": 0,
+          "compound": "HARD",
+          "new": "false",
+          "tyresNotChanged": "0",
+          "totalLaps": 1,
+          "startLaps": 1,
+          "lapTime": null,
+          "lapNumber": null
+        }
+      }
+    },
+    "16": {
+      "stints": {
+        "0": {
+          "lapFlags": 1,
+          "compound": "MEDIUM",
+          "new": "true",
+          "tyresNotChanged": "0",
+          "totalLaps": 8,
+          "startLaps": 0,
+          "lapTime": "1:20.926",
+          "lapNumber": 2
+        }
+      }
+    },
+    "18": {
+      "stints": {
+        "0": {
+          "lapFlags": 1,
+          "compound": "MEDIUM",
+          "new": "false",
+          "tyresNotChanged": "0",
+          "totalLaps": 8,
+          "startLaps": 1,
+          "lapTime": "1:22.252",
+          "lapNumber": 5
+        }
+      }
+    },
+    "20": {
+      "stints": {
+        "0": {
+          "lapFlags": 1,
+          "compound": "MEDIUM",
+          "new": "true",
+          "tyresNotChanged": "0",
+          "totalLaps": 7,
+          "startLaps": 0,
+          "lapTime": "1:22.237",
+          "lapNumber": 6
+        }
+      }
+    },
+    "22": {
+      "stints": {
+        "0": {
+          "lapFlags": 1,
+          "compound": "MEDIUM",
+          "new": "true",
+          "tyresNotChanged": "0",
+          "totalLaps": 7,
+          "startLaps": 0,
+          "lapTime": "1:21.758",
+          "lapNumber": 3
+        }
+      }
+    },
+    "23": {
+      "stints": {
+        "0": {
+          "lapFlags": 1,
+          "compound": "MEDIUM",
+          "new": "true",
+          "tyresNotChanged": "0",
+          "totalLaps": 7,
+          "startLaps": 0,
+          "lapTime": "1:22.357",
+          "lapNumber": 5
+        }
+      }
+    },
+    "24": {
+      "stints": {
+        "0": {
+          "lapFlags": 1,
+          "compound": "HARD",
+          "new": "true",
+          "tyresNotChanged": "0",
+          "totalLaps": 7,
+          "startLaps": 0,
+          "lapTime": "1:22.565",
+          "lapNumber": 5
+        }
+      }
+    },
+    "27": {
+      "stints": {
+        "0": {
+          "lapFlags": 1,
+          "compound": "MEDIUM",
+          "new": "true",
+          "tyresNotChanged": "0",
+          "totalLaps": 7,
+          "startLaps": 0,
+          "lapTime": "1:21.700",
+          "lapNumber": 3
+        }
+      }
+    },
+    "31": {
+      "stints": {
+        "0": {
+          "lapFlags": 1,
+          "compound": "MEDIUM",
+          "new": "true",
+          "tyresNotChanged": "0",
+          "totalLaps": 7,
+          "startLaps": 0,
+          "lapTime": "1:22.229",
+          "lapNumber": 4
+        }
+      }
+    },
+    "44": {
+      "stints": {
+        "0": {
+          "lapFlags": 1,
+          "compound": "MEDIUM",
+          "new": "true",
+          "tyresNotChanged": "0",
+          "totalLaps": 8,
+          "startLaps": 0,
+          "lapTime": "1:21.222",
+          "lapNumber": 3
+        }
+      }
+    },
+    "55": {
+      "stints": {
+        "0": {
+          "lapFlags": 1,
+          "compound": "MEDIUM",
+          "new": "true",
+          "tyresNotChanged": "0",
+          "totalLaps": 8,
+          "startLaps": 0,
+          "lapTime": "1:20.966",
+          "lapNumber": 3
+        }
+      }
+    },
+    "63": {
+      "stints": {
+        "0": {
+          "lapFlags": 1,
+          "compound": "MEDIUM",
+          "new": "true",
+          "tyresNotChanged": "0",
+          "totalLaps": 8,
+          "startLaps": 0,
+          "lapTime": "1:21.135",
+          "lapNumber": 3
+        }
+      }
+    },
+    "77": {
+      "stints": {
+        "0": {
+          "lapFlags": 1,
+          "compound": "MEDIUM",
+          "new": "true",
+          "tyresNotChanged": "0",
+          "totalLaps": 7,
+          "startLaps": 0,
+          "lapTime": "1:22.415",
+          "lapNumber": 6
+        }
+      }
+    },
+    "81": {
+      "stints": {
+        "0": {
+          "lapFlags": 1,
+          "compound": "MEDIUM",
+          "new": "true",
+          "tyresNotChanged": "0",
+          "totalLaps": 8,
+          "startLaps": 0,
+          "lapTime": "1:20.808",
+          "lapNumber": 3
+        }
+      }
+    }
+  }
+}

@@ -7,7 +7,8 @@ public static class TimingEndpoints
 {
     public static WebApplication MapTimingEndpoints(this WebApplication app)
     {
-        app.MapLatestDataEndpoint<DriverListProcessor, DriverListDataPoint>()
+        app
+            .MapLatestDataEndpoint<DriverListProcessor, DriverListDataPoint>()
             .MapLatestDataEndpoint<ExtrapolatedClockProcessor, ExtrapolatedClockDataPoint>()
             .MapLatestDataEndpoint<HeartbeatProcessor, HeartbeatDataPoint>()
             .MapLatestDataEndpoint<LapCountProcessor, LapCountDataPoint>()
@@ -19,7 +20,7 @@ public static class TimingEndpoints
             .MapLatestDataEndpoint<WeatherProcessor, WeatherDataPoint>();
 
         app.MapGet(
-            "/data/TimingData/laps/:lapNumber",
+            "/data/TimingData/laps/{lapNumber}",
             ([FromRoute] int lapNumber, TimingDataProcessor processor) =>
             {
                 return processor.DriversByLap.TryGetValue(lapNumber, out var data)
@@ -30,7 +31,7 @@ public static class TimingEndpoints
 
         app.MapGet(
             "/data/TimingData/laps/best",
-            ([FromRoute] int lapNumber, TimingDataProcessor processor) =>
+            (TimingDataProcessor processor) =>
             {
                 return TypedResults.Ok(processor.BestLaps);
             }
