@@ -415,3 +415,5 @@ obj
 data
 config.json
 *output/
+
+xcuserdata/
