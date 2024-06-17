@@ -14,4 +14,11 @@ extension JSONEncoder {
         encoder.dateEncodingStrategy = .iso8601
         return encoder
     }()
+    
+    static let pretty: JSONEncoder = {
+        let encoder = JSONEncoder()
+        encoder.dateEncodingStrategy = .iso8601
+        encoder.outputFormatting = [.prettyPrinted, .withoutEscapingSlashes, .sortedKeys]
+        return encoder
+    }()
 }

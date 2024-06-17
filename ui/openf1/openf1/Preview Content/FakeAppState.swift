@@ -1,11 +1,12 @@
 import Foundation
+import SwiftUI
 
 class FakeAppState: AppStateProtocol {
     lazy var timingData: TimingData = { return load("TimingData") }()
-    lazy var driverList: Dictionary<DriverNumber, DriverData> = { return load("DriverList") }()
+    lazy var driverList: Dictionary<DriverNumber, DriverListData> = { return load("DriverList") }()
     
     private func load<T>(_ name: String) -> T where T: Decodable {
-        guard let path = Bundle.path(forResource: name, ofType: "json", inDirectory: "Preview Content") 
+        guard let path = Bundle.main.path(forResource: name, ofType: "json")
         else { fatalError("Cannot load \(name) data as file could not be found")}
         
         do {
@@ -14,5 +15,12 @@ class FakeAppState: AppStateProtocol {
         } catch {
             fatalError("Failed to load JSON data \(error)")
         }
+    }
+}
+
+extension View {
+    func previewEnvironment() -> some View {
+        return self
+            .environment(\.appState, FakeAppState())
     }
 }
