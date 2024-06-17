@@ -33,6 +33,7 @@
 		07667D102C1B644B008950CC /* RaceTimingScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 07667D0F2C1B644B008950CC /* RaceTimingScreen.swift */; };
 		078119922C20B41E0093816F /* RawDataScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 078119912C20B41E0093816F /* RawDataScreen.swift */; };
 		078119952C20C3C00093816F /* Color+Convenience.swift in Sources */ = {isa = PBXBuildFile; fileRef = 078119942C20C3C00093816F /* Color+Convenience.swift */; };
+		078119972C20C7FC0093816F /* TimingData+Helpers.swift in Sources */ = {isa = PBXBuildFile; fileRef = 078119962C20C7FC0093816F /* TimingData+Helpers.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -64,6 +65,7 @@
 		07667D0F2C1B644B008950CC /* RaceTimingScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RaceTimingScreen.swift; sourceTree = "<group>"; };
 		078119912C20B41E0093816F /* RawDataScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RawDataScreen.swift; sourceTree = "<group>"; };
 		078119942C20C3C00093816F /* Color+Convenience.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Color+Convenience.swift"; sourceTree = "<group>"; };
+		078119962C20C7FC0093816F /* TimingData+Helpers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TimingData+Helpers.swift"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -145,6 +147,7 @@
 			children = (
 				0743070C2C1B5717008B0BEC /* DriverListData.swift */,
 				074307082C1B552C008B0BEC /* TimingData.swift */,
+				078119962C20C7FC0093816F /* TimingData+Helpers.swift */,
 				0743070A2C1B558E008B0BEC /* Misc.swift */,
 			);
 			path = Models;
@@ -253,6 +256,7 @@
 				078119922C20B41E0093816F /* RawDataScreen.swift in Sources */,
 				074307062C1B54CD008B0BEC /* AppState.swift in Sources */,
 				074307292C1B5E1B008B0BEC /* JsonUtils.swift in Sources */,
+				078119972C20C7FC0093816F /* TimingData+Helpers.swift in Sources */,
 				0743070D2C1B5717008B0BEC /* DriverListData.swift in Sources */,
 				074307092C1B552C008B0BEC /* TimingData.swift in Sources */,
 				074306F82C1B5479008B0BEC /* ContentView.swift in Sources */,

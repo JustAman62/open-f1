@@ -11,7 +11,7 @@ class TimingData : Codable {
     @Observable
     class DriverData : Identifiable, Codable {
         var gapToLeader: String?
-        var interval: Interval?
+        var intervalToPositionAhead: Interval?
         var line: Int?
         var position: String?
         var inPit: Bool?
@@ -24,7 +24,7 @@ class TimingData : Codable {
         
         enum CodingKeys: String, CodingKey {
             case _gapToLeader = "gapToLeader"
-            case _interval = "interval"
+            case _intervalToPositionAhead = "intervalToPositionAhead"
             case _line = "line"
             case _position = "position"
             case _inPit = "inPit"
