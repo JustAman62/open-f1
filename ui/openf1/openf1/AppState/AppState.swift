@@ -3,12 +3,14 @@ import SwiftUI
 
 protocol AppStateProtocol {
     var timingData: TimingData { get }
+    var timingDataHistory: Dictionary<LapNumber, Dictionary<DriverNumber, TimingData.DriverData>> { get }
     var driverList: Dictionary<DriverNumber, DriverListData> { get }
 }
 
 @Observable
 class AppState : AppStateProtocol {
     var timingData: TimingData { .init() }
+    var timingDataHistory: Dictionary<LapNumber, Dictionary<DriverNumber, TimingData.DriverData>> { .init() }
     var driverList: Dictionary<DriverNumber, DriverListData> { .init() }
 }
 

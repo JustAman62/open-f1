@@ -1,4 +1,5 @@
 import Foundation
+import SwiftUI
 
 @Observable
 class DriverListData : Identifiable, Codable {
@@ -18,5 +19,11 @@ class DriverListData : Identifiable, Codable {
         case _line = "line"
         case _teamName = "teamName"
         case _teamColour = "teamColour"
+    }
+}
+
+extension DriverListData {
+    var color: Color {
+        Color.init(hex: self.teamColour ?? "FFFFFF")
     }
 }

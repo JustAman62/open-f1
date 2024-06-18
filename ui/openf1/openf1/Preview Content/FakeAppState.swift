@@ -2,8 +2,13 @@ import Foundation
 import SwiftUI
 
 class FakeAppState: AppStateProtocol {
-    lazy var timingData: TimingData = { return load("TimingData") }()
-    lazy var driverList: Dictionary<DriverNumber, DriverListData> = { return load("DriverList") }()
+    lazy var timingData: TimingData = load("TimingData")
+    lazy var timingDataHistory: Dictionary<LapNumber, Dictionary<DriverNumber, TimingData.DriverData>> = [
+        1: load("TimingDataHistory_1"),
+        2: load("TimingDataHistory_2")
+    ]
+    
+    lazy var driverList: Dictionary<DriverNumber, DriverListData> = load("DriverList")
     
     private func load<T>(_ name: String) -> T where T: Decodable {
         guard let path = Bundle.main.path(forResource: name, ofType: "json")

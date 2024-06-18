@@ -3,42 +3,36 @@ import SwiftUI
 struct RaceTimingScreen: View {
     @Environment(\.appState) private var appState
     
-    var sortedTiming: [(DriverNumber, TimingData.DriverData)] {
-        appState.timingData.lines.sorted(using: KeyPathComparator(\.value.line))
-    }
-    
     var body: some View {
-        GeometryReader { geometry in
-            ScrollView {
-                Grid {
-                    GridRow {
-                        Text("")
-                        Text("Gap")
-                        Text("Interval")
-                        Text("")
-                        Text("Best")
-                        Text("Last")
-                        Text("")
-                        Text("Sector 1")
-                        Text("Sector 2")
-                        Text("Sector 3")
-                    }
-                    ForEach(sortedTiming, id: \.0) { driverNumber, timing in
-                        GridRow {
-                            gridRow(driverNumber: driverNumber, timing: timing)
-                        }
-                        .font(.body.monospaced())
-                    }
+        ScrollView([.horizontal, .vertical]) {
+            Grid {
+                GridRow {
+                    Text("")
+                    Text("Gap")
+                    Text("Interval")
+                    Text("")
+                    Text("Best")
+                    Text("Last")
+                    Text("")
+                    Text("Sector 1")
+                    Text("Sector 2")
+                    Text("Sector 3")
                 }
-                .frame(width: geometry.size.width, alignment: .leading)
+                .font(.headline)
+                
+                ForEach(appState.timingData.sorted, id: \.0) { driverNumber, timing in
+                    GridRow {
+                        gridRow(driverNumber: driverNumber, timing: timing)
+                    }
+                    .font(.body.monospaced())
+                }
             }
         }
     }
     
     @ViewBuilder private func gridRow(driverNumber: String, timing: TimingData.DriverData) -> some View {
         if let driver = appState.driverList[driverNumber] {
-            Text(driver.tla ?? "UNK")
-                .background(Color.init(hex: driver.teamColour ?? "FFFFFF"))
+            DriverTag(driver: driver)
 
             Text(timing.gapToLeader ?? "UNK")
             Text(timing.intervalToPositionAhead?.value ?? "UNK")
