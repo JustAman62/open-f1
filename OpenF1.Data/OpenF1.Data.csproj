@@ -1,6 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
+    <IsPackable>true</IsPackable>
     <PackageId>OpenF1.Data</PackageId>
     <PackageReadmeFile>README.md</PackageReadmeFile>
     <PackageTags>formula1;f1;livetiming;timing</PackageTags>

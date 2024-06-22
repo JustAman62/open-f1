@@ -7,6 +7,7 @@
     <AssemblyName>openf1-console</AssemblyName>
     <ToolCommandName>openf1-console</ToolCommandName>
     <PackAsTool>true</PackAsTool>
+    <IsPackable>true</IsPackable>
     <PackageTags>formula1;f1;livetiming;timing;tui;terminal-ui</PackageTags>
     <GenerateRuntimeConfigurationFiles>true</GenerateRuntimeConfigurationFiles>
   </PropertyGroup>
