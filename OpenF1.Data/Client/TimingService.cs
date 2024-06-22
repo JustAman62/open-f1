@@ -111,32 +111,8 @@ public class TimingService(
                 obj["ExtrapolatedClock"]?.ToString(),
                 DateTimeOffset.UtcNow
             );
-
-            var linesToProcess = obj["TimingData"]?["Lines"]?.AsObject() ?? [];
-            foreach (var (_, line) in linesToProcess)
-            {
-                if (line?["Sectors"] is null)
-                    continue;
-                line["Sectors"] = ArrayToIndexedDictionary(line["Sectors"]!);
-            }
             ProcessData("TimingData", obj["TimingData"]?.ToString(), DateTimeOffset.UtcNow);
-
-            var stintLinesToProcess = obj["TimingAppData"]?["Lines"]?.AsObject() ?? [];
-            foreach (var (_, line) in stintLinesToProcess)
-            {
-                if (line?["Stints"] is null)
-                    continue;
-                line["Stints"] = ArrayToIndexedDictionary(line["Stints"]!);
-            }
             ProcessData("TimingAppData", obj["TimingAppData"]?.ToString(), DateTimeOffset.UtcNow);
-
-            var raceControlMessages = obj["RaceControlMessages"]?["Messages"];
-            if (raceControlMessages is not null)
-            {
-                obj["RaceControlMessages"]!["Messages"] = ArrayToIndexedDictionary(
-                    raceControlMessages
-                );
-            }
             ProcessData(
                 "RaceControlMessages",
                 obj["RaceControlMessages"]?.ToString(),
@@ -173,9 +149,17 @@ public class TimingService(
                 SendToProcessor<HeartbeatDataPoint>(json);
                 break;
             case LiveTimingDataType.RaceControlMessages:
+                json["Messages"] = ArrayToIndexedDictionary(json["Messages"]);
                 SendToProcessor<RaceControlMessageDataPoint>(json);
                 break;
             case LiveTimingDataType.TimingData:
+                var linesToProcess = json["Lines"]?.AsObject() ?? [];
+                foreach (var (_, line) in linesToProcess)
+                {
+                    if (line?["Sectors"] is null)
+                        continue;
+                    line["Sectors"] = ArrayToIndexedDictionary(line["Sectors"]!);
+                }
                 SendToProcessor<TimingDataPoint>(json);
                 break;
             case LiveTimingDataType.TimingAppData:
@@ -220,10 +204,7 @@ public class TimingService(
                 break;
             case LiveTimingDataType.TeamRadio:
                 // if Captures is an array, make it an indexed dictionary instead
-                if (json["Captures"]?.GetValueKind() == JsonValueKind.Array)
-                {
-                    json["Captures"] = ArrayToIndexedDictionary(json["Captures"]!);
-                }
+                json["Captures"] = ArrayToIndexedDictionary(json["Captures"]);
                 SendToProcessor<TeamRadioDataPoint>(json);
                 break;
             case LiveTimingDataType.ChampionshipPrediction:
@@ -267,11 +248,18 @@ public class TimingService(
         }
     }
 
-    private JsonNode ArrayToIndexedDictionary(JsonNode node)
+    private JsonNode? ArrayToIndexedDictionary(JsonNode? node)
     {
-        var dict = node.AsArray()
-            .Select((val, idx) => (idx, val))
-            .ToDictionary(x => x.idx.ToString(), x => x.val);
-        return JsonSerializer.SerializeToNode(dict)!;
+        if (node?.GetValueKind() == JsonValueKind.Array)
+        {
+            var dict = node.AsArray()
+                .Select((val, idx) => (idx, val))
+                .ToDictionary(x => x.idx.ToString(), x => x.val);
+            return JsonSerializer.SerializeToNode(dict)!;
+        }
+        else
+        {
+            return node;
+        }
     }
 }
