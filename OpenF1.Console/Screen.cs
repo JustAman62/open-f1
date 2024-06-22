@@ -9,6 +9,6 @@ public enum Screen {
     TimingHistory,
     RaceControl,
     DriverTracker,
-    SessionStats,
+    ChampionshipStats,
     TeamRadio
 }
