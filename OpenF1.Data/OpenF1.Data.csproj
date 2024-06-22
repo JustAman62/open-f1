@@ -11,6 +11,7 @@
     <PackageReference Include="AutoMapper" />
     <PackageReference Include="AutoMapper.Collection" />
     <PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection" />
+    <PackageReference Include="FFMpegCore" />
     <PackageReference Include="Microsoft.AspNet.SignalR.Client" />
     <PackageReference Include="Microsoft.Extensions.Configuration" />
     <PackageReference Include="Microsoft.Extensions.Logging" />

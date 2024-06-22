@@ -15,7 +15,7 @@ public sealed class TeamRadioDisplay(
     public Task<IRenderable> GetContentAsync()
     {
         var layout = new Layout("Root").SplitColumns(
-            new Layout("Left", GetTeamRadioTable()),
+            new Layout("Left", GetTeamRadioTable()) { Size = 28 },
             new Layout("Right", GetSelectedTranscription())
         );
 
@@ -32,8 +32,7 @@ public sealed class TeamRadioDisplay(
             new TableColumn("Action")
         );
         table.Expand();
-        table.RoundedBorder();
-        table.Title = new TableTitle("Team Radio");
+        table.NoBorder().RemoveColumnPadding();
 
         var selectedIdx = teamRadio.Ordered.ElementAtOrDefault(state.CursorOffset).Key;
 
@@ -49,7 +48,7 @@ public sealed class TeamRadioDisplay(
                     : new Text(string.Empty)
             );
         }
-        return table;
+        return new Panel(table) { Header = new PanelHeader("Select Team Radio"), Expand = true, Padding = new Padding(0) };
     }
 
     private IRenderable GetSelectedTranscription()

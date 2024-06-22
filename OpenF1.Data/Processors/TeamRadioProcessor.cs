@@ -6,7 +6,7 @@ public class TeamRadioProcessor(SessionInfoProcessor sessionInfoProcessor, ITran
     : ProcessorBase<TeamRadioDataPoint>(mapper)
 {
     public Dictionary<string, TeamRadioDataPoint.Capture> Ordered =>
-        Latest.Captures.Reverse().Take(8).ToDictionary(x => x.Key, x => x.Value);
+        Latest.Captures.Reverse().ToDictionary(x => x.Key, x => x.Value);
 
     /// <summary>
     /// If the selected team radio hasn't already been downloaded, 
@@ -22,7 +22,7 @@ public class TeamRadioProcessor(SessionInfoProcessor sessionInfoProcessor, ITran
         }
 
         var downloadUri = $"https://livetiming.formula1.com/static/{sessionInfoProcessor.Latest.Path}{radio.Path}";
-        var destFilePath = Path.GetTempFileName();
+        var destFilePath = $"{Path.GetTempFileName()}.mp3";
     
         // TODO: Use DI based HttpClients
         using var httpClient = new HttpClient();

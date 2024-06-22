@@ -1,3 +1,4 @@
+using Instances.Exceptions;
 using OpenF1.Data;
 
 namespace OpenF1.Console;
@@ -41,14 +42,29 @@ public sealed class TranscribeTeamRadioInputHandler(
 
     private async Task TranscribeAsync(int offset)
     {
+        var radio = teamRadio.Ordered.ElementAtOrDefault(offset);
         try
         {
-            var radio = teamRadio.Ordered.ElementAtOrDefault(offset);
             await teamRadio.TranscribeAsync(radio.Key);
+        }
+        catch (InstanceFileNotFoundException ex)
+        {
+            var text = """
+            Failed to transcribe, likely because ffmpeg could not be found installed on your computer. 
+            We use FFMpegCore to convert audio files from mp3 to wav, and it requires ffmpeg. 
+            Visit https://github.com/rosenbjerg/FFMpegCore?tab=readme-ov-file#binaries to learn how to install.
+            """;
+
+            logger.LogError(ex, text);
+            radio.Value.Transcription = text;
         }
         catch (Exception ex)
         {
-            logger.LogError(ex, "Failed to transcribe");
+            var text = $"""
+            Failed to transcribe, due to an unknown error.
+            Team Radio File Path: {radio.Value.DownloadedFilePath}
+            """;
+            logger.LogError(ex, text);
         }
     }
 }
