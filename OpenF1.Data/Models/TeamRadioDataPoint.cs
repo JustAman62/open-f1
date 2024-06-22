@@ -31,5 +31,12 @@ public sealed class TeamRadioDataPoint: ILiveTimingDataPoint
         public DateTimeOffset? Utc { get; set; }
         public string? RacingNumber { get; set; }
         public string? Path { get; set; }
+
+        public string? DownloadedFilePath { get; set; }
+
+        /// <summary>
+        /// This field is populated by us on-demand and not the Live Timing feed
+        /// </summary>
+        public string? Transcription { get; set; }
     }
 }

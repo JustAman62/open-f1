@@ -23,7 +23,8 @@ public static partial class ServiceCollectionExtensions
             .AddAutoMapper(cfg => cfg.AddCollectionMappers(), typeof(TimingDataPointConfiguration).Assembly)
             .AddLiveTimingClient()
             .AddLiveTimingProcessors()
-            .AddSingleton<INotifyService, NotifyService>();
+            .AddSingleton<INotifyService, NotifyService>()
+            .AddSingleton<ITranscriptionProvider, TranscriptionProvider>();
 
         return collection;
     }

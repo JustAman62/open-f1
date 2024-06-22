@@ -4,9 +4,7 @@ using Spectre.Console.Rendering;
 
 namespace OpenF1.Console;
 
-public sealed class TeamRadioDisplay(
-    State state,
-    TeamRadioProcessor teamRadio,
+public sealed class SessionStatsDisplay(
     ChampionshipPredictionProcessor championshipPrediction,
     DriverListProcessor driverList
 ) : IDisplay
@@ -16,44 +14,11 @@ public sealed class TeamRadioDisplay(
     public Task<IRenderable> GetContentAsync()
     {
         var layout = new Layout("Root").SplitColumns(
-            new Layout("Left").SplitRows(
-                new Layout("Top Left", GetTeamsChampionshipTable()) { Size = 15 },
-                new Layout("Bottom Left", GetTeamRadioTable())
-            ),
+            new Layout("Left", GetTeamsChampionshipTable()),
             new Layout("Right", GetDriversChampionshipTable())
         );
 
         return Task.FromResult<IRenderable>(layout);
-    }
-
-    private IRenderable GetTeamRadioTable()
-    {
-        var table = new Table();
-        table.AddColumns(
-            new TableColumn("Idx") { Width = 2, Alignment = Justify.Right },
-            new TableColumn("Time") { Width = 8, Alignment = Justify.Center },
-            new TableColumn("Driver") { Width = 6, Alignment = Justify.Center },
-            new TableColumn("Action")
-        );
-        table.Expand();
-        table.RoundedBorder();
-        table.Title = new TableTitle("Team Radio");
-
-        var selectedIdx = teamRadio.Ordered.ElementAtOrDefault(state.CursorOffset).Key;
-
-        foreach (var (idx, entry) in teamRadio.Ordered)
-        {
-            var driver = driverList.Latest!.GetValueOrDefault(entry.RacingNumber) ?? new();
-            table.AddRow(
-                new Text($"{idx, 2}"),
-                new Text($"{entry.Utc:HH\\:mm\\:ss}"),
-                new Markup(DisplayUtils.MarkedUpDriverNumber(driver)),
-                idx == selectedIdx
-                    ? new Text("► Play", DisplayUtils.STYLE_INVERT)
-                    : new Text(string.Empty)
-            );
-        }
-        return table;
     }
 
     private IRenderable GetDriversChampionshipTable()

@@ -21,6 +21,8 @@
     <PackageVersion Include="NSubstitute" Version="5.0.0" />
     <PackageVersion Include="Spectre.Console" Version="0.48.0" />
     <PackageVersion Include="Swashbuckle.AspNetCore" Version="6.5.0" />
+    <PackageVersion Include="Whisper.net" Version="1.5.0" />
+    <PackageVersion Include="Whisper.net.Runtime" Version="1.5.0" />
     <PackageVersion Include="xunit" Version="2.5.0" />
     <PackageVersion Include="xunit.runner.visualstudio" Version="2.5.0" />
   </ItemGroup>
