@@ -1,10 +1,10 @@
-using Microsoft.AspNet.SignalR.Client;
+using Microsoft.AspNetCore.SignalR.Client;
 using OpenF1.Console;
 using OpenF1.Data;
 
 public class StartLiveSessionInputHandler(ILiveTimingClient liveTimingClient) : IInputHandler
 {
-    public bool IsEnabled => liveTimingClient.Connection?.State != ConnectionState.Connected;
+    public bool IsEnabled => liveTimingClient.Connection?.State != HubConnectionState.Connected;
 
     public Screen[] ApplicableScreens => [Screen.ManageSession];
 

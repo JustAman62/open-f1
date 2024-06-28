@@ -19,6 +19,9 @@
     <PackageReference Include="Microsoft.Extensions.Hosting" />
     <PackageReference Include="Microsoft.Extensions.Options" />
     <PackageReference Include="NetCoreAudio" />
+    <PackageReference Include="Serilog" />
+    <PackageReference Include="Serilog.AspNetCore" />
+    <PackageReference Include="Serilog.Sinks.File" />
     <PackageReference Include="Spectre.Console" />
     <PackageReference Include="Swashbuckle.AspNetCore" />
   </ItemGroup>

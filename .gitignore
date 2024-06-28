@@ -417,3 +417,4 @@ config.json
 *output/
 
 xcuserdata/
+logs/

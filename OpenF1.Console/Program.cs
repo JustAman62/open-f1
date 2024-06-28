@@ -3,9 +3,9 @@ using System.Text.Json.Serialization;
 using InMemLogger;
 using Microsoft.AspNetCore.Http.Json;
 using Microsoft.OpenApi.Models;
-using Newtonsoft.Json.Serialization;
 using OpenF1.Console;
 using OpenF1.Data;
+using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -17,9 +17,16 @@ builder
     .AddEnvironmentVariables("OPENF1_")
     .Build();
 
+Log.Logger = new LoggerConfiguration()
+    .WriteTo.File(
+        path: Path.Join(LiveTimingOptions.BaseDirectory, "logs/openf1-console.log"), 
+        rollOnFileSizeLimit: true,
+        rollingInterval: RollingInterval.Hour)
+    .CreateLogger();
+
 builder
     .Services.AddOptions()
-    .AddLogging(configure => configure.ClearProviders().AddInMemory())
+    .AddLogging(configure => configure.ClearProviders().AddInMemory().AddSerilog())
     .AddSingleton<ConsoleLoop>()
     .AddSingleton<State>()
     .AddInputHandlers()

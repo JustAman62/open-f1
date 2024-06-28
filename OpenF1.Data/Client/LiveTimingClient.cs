@@ -1,14 +1,15 @@
 ﻿using System.Text.Json.Nodes;
-using Microsoft.AspNet.SignalR.Client;
+using Microsoft.AspNetCore.SignalR.Client;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using Newtonsoft.Json.Linq;
 
 namespace OpenF1.Data;
 
 public sealed class LiveTimingClient(
     ITimingService timingService,
     IOptions<LiveTimingOptions> options,
+    ILoggerProvider loggerProvider,
     ILogger<LiveTimingClient> logger
 ) : ILiveTimingClient, IDisposable
 {
@@ -48,35 +49,22 @@ public sealed class LiveTimingClient(
         if (Connection is not null)
             logger.LogWarning("Live timing connection already exists, restarting it");
 
-        // Fetch the cookie value that is hardcoded below
-        // Leaving this here to show how I did it. I don't think I need to change the value yet.
-        //var httpClient = new HttpClient();
-        //var res = await httpClient.GetAsync("https://livetiming.formula1.com/signalr/negotiate");
-        //Console.WriteLine(res.Headers.First(x => x.Key == "Set-Cookie"));
-
         DisposeConnection();
-        Connection = new HubConnection("https://livetiming.formula1.com");
-        // Headers taken from the Fast F1 implementation
-        Connection.Headers.Add("User-agent", "BestHTTP");
-        Connection.Headers.Add("Accept-Encoding", "gzip, identity");
-        Connection.Headers.Add("Connection", "keep-alive, Upgrade");
-        Connection.Headers.Add("Cookie", "GCLB=CJulhoyzt5qwpgE;");
+        Connection = new HubConnectionBuilder()
+            .WithUrl("https://livetiming.formula1.com/signalrcore")
+            .ConfigureLogging(x => x.AddProvider(loggerProvider))
+            .AddJsonProtocol()
+            .Build();
 
-        Connection.EnsureReconnecting();
+        Connection.On<string>("feed", HandleData);
+        Connection.On<string, JsonObject, DateTime>("feed", (a, b, c) => logger.LogInformation("received {A}, {B}, {C}", a, b, c));
 
-        Connection.Error += (ex) =>
-            logger.LogError(ex, "Error in live timing client: {}", ex.ToString());
-        Connection.Reconnecting += () => logger.LogWarning("Live timing client is reconnecting");
-        Connection.Received += HandleData;
+        await Connection.StartAsync();
 
-        var proxy = Connection.CreateHubProxy("Streaming");
-
-        await Connection.Start();
-
-        logger.LogInformation("Subscribing to lots of topics");
-
-        var res = await proxy.Invoke<JObject>("Subscribe", new[] { _topics });
+        logger.LogInformation("Subscribing");
+        var res = await Connection.InvokeAsync<JsonObject>("Subscribe", _topics);
         HandleSubscriptionResponse(res.ToString());
+
         logger.LogInformation("Started Live Timing client");
     }
 
@@ -106,6 +94,7 @@ public sealed class LiveTimingClient(
 
     private void HandleData(string res)
     {
+        logger.LogInformation("Handling data {}", res);
         try
         {
             // Remove line endings and indents to optimise the size of the string when saved to file
@@ -145,7 +134,7 @@ public sealed class LiveTimingClient(
 
     private void DisposeConnection()
     {
-        Connection?.Dispose();
+        Connection?.DisposeAsync();
         Connection = null;
     }
 
