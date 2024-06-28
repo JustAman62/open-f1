@@ -13,8 +13,9 @@ public class TimingTowerDisplay(
     TrackStatusProcessor trackStatusProcessor,
     LapCountProcessor lapCountProcessor,
     SessionInfoProcessor sessionInfoProcessor,
-    ExtrapolatedClockProcessor extrapolatedClockProcessor,
-    PositionDataProcessor positionDataProcessor,
+    ExtrapolatedClockProcessor extrapolatedClock,
+    PositionDataProcessor positionData,
+    CarDataProcessor carData,
     IDateTimeProvider dateTimeProvider
 ) : IDisplay
 {
@@ -53,21 +54,22 @@ public class TimingTowerDisplay(
     private IRenderable GetRaceTimingTower()
     {
         var table = new Table();
+        var lap = lapCountProcessor.Latest;
         table
             .AddColumns(
-                $"LAP {lapCountProcessor.Latest?.CurrentLap, 2}/{lapCountProcessor.Latest?.TotalLaps}",
-                "Gap   ",
-                "Interval",
-                "Best Lap",
-                "Last Lap",
-                "S1",
-                "S2",
-                "S3",
-                "Pit",
-                "Tyre",
-                "Compare",
-                "Driver",
-                " "
+                new TableColumn($"LAP {lap?.CurrentLap, 2}/{lap?.TotalLaps}"),
+                new TableColumn("Leader") { Width = 6, Alignment = Justify.Right },
+                new TableColumn("Gap") { Width = 6, Alignment = Justify.Right },
+                new TableColumn("Best Lap"),
+                new TableColumn("Last Lap"),
+                new TableColumn("S1") { Width = 6 },
+                new TableColumn("S2") { Width = 6 },
+                new TableColumn("S3") { Width = 6 },
+                new TableColumn("Pit"),
+                new TableColumn("Tyre"),
+                new TableColumn("Compare"),
+                new TableColumn("Driver"),
+                new TableColumn("") { Width = 1 }
             )
             .RemoveColumnPadding();
 
@@ -84,9 +86,10 @@ public class TimingTowerDisplay(
         {
             var driver = driverList.Latest?.GetValueOrDefault(driverNumber) ?? new();
             var position =
-                positionDataProcessor
+                positionData
                     .Latest.Position.LastOrDefault()
                     ?.Entries.GetValueOrDefault(driverNumber) ?? new();
+            var car = carData.Latest.Entries.FirstOrDefault()?.Cars.GetValueOrDefault(driverNumber);
             var appData = timingAppData.Latest?.Lines.GetValueOrDefault(driverNumber) ?? new();
             var stint = appData.Stints.LastOrDefault().Value;
 
@@ -98,27 +101,27 @@ public class TimingTowerDisplay(
             table.AddRow(
                 DisplayUtils.DriverTag(driver, line, isComparisonLine),
                 new Text(
-                    $"{line.GapToLeader, 7}",
+                    $"{line.GapToLeader}",
                     isComparisonLine ? DisplayUtils.STYLE_INVERT : DisplayUtils.STYLE_NORMAL
                 ),
                 position.Status == PositionDataPoint.PositionData.Entry.DriverStatus.OffTrack
                     ? new Text("OFF TRK", new Style(background: Color.Red, foreground: Color.White))
                     : new Text(
-                        $"{line.IntervalToPositionAhead?.Value, 8}{(line.IntervalToPositionAhead?.Catching ?? false ? "▲" : string.Empty)}",
-                        GetStyle(line.IntervalToPositionAhead, isComparisonLine)
+                        $"{(car?.Channels.Drs >= 8 ? "•" : "")}{line.IntervalToPositionAhead?.Value}",
+                        GetStyle(line.IntervalToPositionAhead, isComparisonLine, car)
                     ),
                 new Text(line.BestLapTime?.Value ?? "NULL", DisplayUtils.STYLE_NORMAL),
                 new Text(line.LastLapTime?.Value ?? "NULL", GetStyle(line.LastLapTime)),
                 new Text(
-                    line.Sectors.GetValueOrDefault("0")?.Value?.PadLeft(6) ?? "      ",
+                    $"{line.Sectors.GetValueOrDefault("0")?.Value}",
                     GetStyle(line.Sectors.GetValueOrDefault("0"))
                 ),
                 new Text(
-                    line.Sectors.GetValueOrDefault("1")?.Value?.PadLeft(6) ?? "      ",
+                    $"{line.Sectors.GetValueOrDefault("1")?.Value}",
                     GetStyle(line.Sectors.GetValueOrDefault("1"))
                 ),
                 new Text(
-                    line.Sectors.GetValueOrDefault("2")?.Value?.PadLeft(6) ?? "      ",
+                    $"{line.Sectors.GetValueOrDefault("2")?.Value}",
                     GetStyle(line.Sectors.GetValueOrDefault("2"))
                 ),
                 new Text(
@@ -191,7 +194,7 @@ public class TimingTowerDisplay(
         {
             var driver = driverList.Latest?.GetValueOrDefault(driverNumber) ?? new();
             var position =
-                positionDataProcessor
+                positionData
                     .Latest.Position.LastOrDefault()
                     ?.Entries.GetValueOrDefault(driverNumber) ?? new();
             var appData = timingAppData.Latest?.Lines.GetValueOrDefault(driverNumber) ?? new();
@@ -322,7 +325,11 @@ public class TimingTowerDisplay(
         };
     }
 
-    private Style GetStyle(TimingDataPoint.Driver.Interval? interval, bool isComparisonLine)
+    private Style GetStyle(
+        TimingDataPoint.Driver.Interval? interval,
+        bool isComparisonLine,
+        CarDataPoint.Entry.Car? car = null
+    )
     {
         if (interval is null)
             return DisplayUtils.STYLE_NORMAL;
@@ -341,6 +348,11 @@ public class TimingTowerDisplay(
             foreground = Color.Green3;
         }
 
+        if (car is { Channels: { Drs: > 8 } })
+        {
+            foreground = Color.White;
+            background = Color.Green3;
+        }
         return new Style(foreground: foreground, background: background);
     }
 
@@ -536,7 +548,7 @@ public class TimingTowerDisplay(
         }
 
         items.Add(new Text($@"{dateTimeProvider.Utc:HH\:mm\:ss}"));
-        items.Add(new Text($@"{extrapolatedClockProcessor.ExtrapolatedRemaining():hh\:mm\:ss}"));
+        items.Add(new Text($@"{extrapolatedClock.ExtrapolatedRemaining():hh\:mm\:ss}"));
 
         var rows = new Rows(items);
         return new Panel(rows)

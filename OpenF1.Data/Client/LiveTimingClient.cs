@@ -57,7 +57,14 @@ public sealed class LiveTimingClient(
             .Build();
 
         Connection.On<string>("feed", HandleData);
-        Connection.On<string, JsonObject, DateTime>("feed", (a, b, c) => logger.LogInformation("received {A}, {B}, {C}", a, b, c));
+        Connection.On<string, JsonObject, DateTime>(
+            "feed",
+            (a, b, c) => logger.LogInformation("received {A}, {B}, {C}", a, b, c)
+        );
+        Connection.On<string, string, string>(
+            "feed",
+            (a, b, c) => logger.LogInformation("received2 {A}, {B}, {C}", a, b, c)
+        );
 
         await Connection.StartAsync();
 

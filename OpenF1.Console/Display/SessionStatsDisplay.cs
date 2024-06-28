@@ -16,7 +16,7 @@ public sealed class ChampionshipStatsDisplay(
     {
         var layout = new Layout("Root").SplitColumns(
             new Layout("Left", GetTeamsChampionshipTable()),
-            new Layout("Right", GetDriversChampionshipTable())
+            new Layout("Right", GetDriversChampionshipTable()) { Size = 37 }
         );
 
         return Task.FromResult<IRenderable>(layout);
@@ -26,10 +26,10 @@ public sealed class ChampionshipStatsDisplay(
     {
         var table = new Table();
         table.AddColumns(
-            new TableColumn("Pos") { Width = 2, Alignment = Justify.Left },
+            new TableColumn("Pos") { Width = 3, Alignment = Justify.Left },
             new TableColumn("Driver") { Alignment = Justify.Right },
             new TableColumn("Rel") { Width = 3, Alignment = Justify.Right },
-            new TableColumn("Points") { Width = 5, Alignment = Justify.Right },
+            new TableColumn("Points") { Width = 6, Alignment = Justify.Right },
             new TableColumn("Chg") { Width = 3, Alignment = Justify.Right }
         );
         table.Expand();
@@ -72,10 +72,10 @@ public sealed class ChampionshipStatsDisplay(
     {
         var table = new Table();
         table.AddColumns(
-            new TableColumn("Pos") { Width = 2, Alignment = Justify.Left },
+            new TableColumn("Pos") { Width = 4, Alignment = Justify.Left },
             new TableColumn("Team"),
-            new TableColumn("Rel") { Alignment = Justify.Right },
-            new TableColumn("Points") { Width = 5, Alignment = Justify.Right },
+            new TableColumn("Rel") { Width = 4, Alignment = Justify.Right },
+            new TableColumn("Points") { Width = 6, Alignment = Justify.Right },
             new TableColumn("Chg") { Width = 3, Alignment = Justify.Right }
         );
         table.Expand();

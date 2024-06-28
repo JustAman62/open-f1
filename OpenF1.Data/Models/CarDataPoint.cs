@@ -39,6 +39,18 @@ public sealed class CarDataPoint : ILiveTimingDataPoint
                 [JsonPropertyName("5")]
                 public int? Brake { get; set; }
 
+                /// <summary>
+                /// From FastF1s understanding of this field:
+                /// - DRS: 0-14 (Odd DRS is Disabled, Even DRS is Enabled?)
+                ///  - 0 =  Off
+                ///  - 1 =  Off
+                ///  - 2 =  (?)
+                ///  - 3 =  (?)
+                ///  - 8 =  Detected, Eligible once in Activation Zone (Noted Sometimes)
+                ///  - 10 = On (Unknown Distinction)
+                ///  - 12 = On (Unknown Distinction)
+                ///  - 14 = On (Unknown Distinction)
+                /// </summary>
                 [JsonPropertyName("45")]
                 public int? Drs { get; set; }
             }

@@ -19,9 +19,11 @@ builder
 
 Log.Logger = new LoggerConfiguration()
     .WriteTo.File(
-        path: Path.Join(LiveTimingOptions.BaseDirectory, "logs/openf1-console.log"), 
+        path: Path.Join(LiveTimingOptions.BaseDirectory, "logs/openf1-console.log"),
         rollOnFileSizeLimit: true,
-        rollingInterval: RollingInterval.Hour)
+        rollingInterval: RollingInterval.Hour,
+        retainedFileCountLimit: 5
+    )
     .CreateLogger();
 
 builder
@@ -40,7 +42,9 @@ builder
     .Services.AddEndpointsApiExplorer()
     .AddSwaggerGen(c =>
     {
-        c.CustomSchemaIds(type => type.FullName!.Replace("OpenF1.Data.", string.Empty).Replace("+", string.Empty));
+        c.CustomSchemaIds(type =>
+            type.FullName!.Replace("OpenF1.Data.", string.Empty).Replace("+", string.Empty)
+        );
         c.SwaggerDoc("v1", new OpenApiInfo { Title = "Open F1 API", Version = "v1" });
     });
 
