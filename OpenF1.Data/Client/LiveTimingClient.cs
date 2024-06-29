@@ -1,4 +1,5 @@
-﻿using System.Text.Json.Nodes;
+﻿using System.Text.Json;
+using System.Text.Json.Nodes;
 using Microsoft.AspNetCore.SignalR.Client;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -13,6 +14,7 @@ public sealed class LiveTimingClient(
     ILogger<LiveTimingClient> logger
 ) : ILiveTimingClient, IDisposable
 {
+    private readonly JsonSerializerOptions _jsonSerializerOptions = new() { WriteIndented = false };
     private readonly string[] _topics =
     [
         "Heartbeat",
@@ -56,15 +58,7 @@ public sealed class LiveTimingClient(
             .AddJsonProtocol()
             .Build();
 
-        Connection.On<string>("feed", HandleData);
-        Connection.On<string, JsonObject, DateTime>(
-            "feed",
-            (a, b, c) => logger.LogInformation("received {A}, {B}, {C}", a, b, c)
-        );
-        Connection.On<string, string, string>(
-            "feed",
-            (a, b, c) => logger.LogInformation("received2 {A}, {B}, {C}", a, b, c)
-        );
+        Connection.On<string, JsonNode, DateTimeOffset>("feed", HandleData);
 
         await Connection.StartAsync();
 
@@ -99,43 +93,37 @@ public sealed class LiveTimingClient(
         timingService.ProcessSubscriptionData(res);
     }
 
-    private void HandleData(string res)
+    private void HandleData(string type, JsonNode json, DateTimeOffset dateTime)
     {
-        logger.LogInformation("Handling data {}", res);
+        if (type.EndsWith(".z"))
+        {
+            logger.LogInformation("Handling data type: {Type}, json: {Json}, date: {Date}", type, json, dateTime);
+        }
+        
         try
         {
-            // Remove line endings and indents to optimise the size of the string when saved to file
-            res = res.ReplaceLineEndings(string.Empty).Replace("    ", string.Empty);
-
+            var raw = new RawTimingDataPoint(type, json, dateTime);
+            var rawText = JsonSerializer.Serialize(raw, _jsonSerializerOptions);
             File.AppendAllText(
                 Path.Join(options.Value.DataDirectory, $"{_sessionKey}/live.txt"),
-                res + Environment.NewLine
+                rawText + Environment.NewLine
             );
 
-            RecentDataPoints.Enqueue(res);
+            RecentDataPoints.Enqueue(rawText);
             if (RecentDataPoints.Count > 5)
                 RecentDataPoints.Dequeue();
 
-            var json = JsonNode.Parse(res);
-            var data = json?["A"];
-
-            if (data is null)
-                return;
-
-            if (data.AsArray().Count != 3)
-                return;
-
-            var eventData = data[1] is JsonValue ? data[1]!.ToString() : data[1]!.ToJsonString();
-
-            timingService.EnqueueAsync(
-                data[0]!.ToString(),
-                eventData,
-                DateTimeOffset.Parse(data[2]!.ToString())
-            );
+            timingService.EnqueueAsync(type, json.ToString(), dateTime);
         }
         catch (Exception ex)
         {
-            logger.LogError(ex, "Failed to handle live timing data: {res}", res);
+            logger.LogError(
+                ex,
+                "Failed to handle live timing data: {Type} :: {Json} :: {DateTime}",
+                type,
+                json,
+                dateTime
+            );
         }
     }
 
