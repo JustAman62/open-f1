@@ -35,6 +35,7 @@ Feature Highlights:
     - [Managing Delay](#managing-delay)
     - [Using the Cursor](#using-the-cursor)
 - [Configuration](#configuration)
+- [Logging](#logging)
 - [Live Timing Data Source](#live-timing-data-source)
 - [Data Recording and Replay](#data-recording-and-replay)
 - [OpenF1 Console in Action](#openf1-console-in-action)
@@ -138,6 +139,16 @@ OpenF1 can be configured using a simple `config.json` file, through the command 
 | `dataDirectory` | `--dataDirectory` | `OPENF1_DATADIRECTORY` | The directory in which JSON timing data is read or written from.                                             |
 | `verbose`       | `-v\|--verbose`   | `OPENF1_VERBOSE`       | Whether verbose logging should be enabled. Default: `false`. Values: `true` or `false`.                      |
 | `apiEnabled`    | `--apiEnabled`    | `OPENF1_APIENABLED`    | Whether the app should expose an API at http://localhost:61937. Default: `false`. Values: `true` or `false`. |
+
+## Logging
+
+`OpenF1.Data` writes logs using the standard `ILogger` implementation. SignalR client logs are also passed to the standard `ILoggerProvider`. 
+
+When running `openf1-console` logs are available in two places:
+* Logs are stored in memory and viewable the <kbd>L</kbd> `Logs` screen. Logs can be scrolled on this screen, and the minimum level of logs shown can be changed with the <kbd>M</kbd> `Minimum Log Level` action.
+* Log files are written to `~/open-f1/logs`.
+
+Default log level is set to `Information`. More verbose logging can be enabled with the [`verbose` config option](#configuration).
 
 ## Live Timing Data Source
 
