@@ -12,5 +12,5 @@ public class ProcessorBase<T>(IMapper mapper) : IProcessor<T>
 {
     public T Latest { get; private set; } = new();
 
-    public void Process(T data) => mapper.Map(data, Latest);
+    public virtual void Process(T data) => mapper.Map(data, Latest);
 }

@@ -8,8 +8,6 @@ public class HeartbeatProcessor(IMapper mapper) : ProcessorBase<HeartbeatDataPoi
 
 public class LapCountProcessor(IMapper mapper) : ProcessorBase<LapCountDataPoint>(mapper);
 
-public class SessionInfoProcessor(IMapper mapper) : ProcessorBase<SessionInfoDataPoint>(mapper);
-
 public class TimingAppDataProcessor(IMapper mapper) : ProcessorBase<TimingAppDataPoint>(mapper);
 
 public class TrackStatusProcessor(IMapper mapper) : ProcessorBase<TrackStatusDataPoint>(mapper);
