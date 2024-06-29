@@ -59,7 +59,6 @@ public sealed class LiveTimingClient(
             .Build();
 
         Connection.On<string, JsonNode, DateTimeOffset>("feed", HandleData);
-        Connection.On<string, string, DateTimeOffset>("feedz", (a, b, c) => logger.LogInformation("r {}, {}, {}", a, b, c));
 
         await Connection.StartAsync();
 
