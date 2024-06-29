@@ -91,11 +91,20 @@ public class JsonTimingClient(
     private (string type, string? data, DateTimeOffset timestamp) ProcessLine(string line)
     {
         var json = JsonNode.Parse(line);
-        var parts = json?["A"]?.AsArray() ?? json!.AsArray();
-        var data =
-            parts[1]!.GetValueKind() == JsonValueKind.Object
-                ? parts[1]!.ToJsonString()
-                : parts[1]!.ToString();
-        return (parts[0]!.ToString(), data, DateTimeOffset.Parse(parts[2]!.ToString()));
+        // When we used the old ASP.NET SignalR, we received messages in an older format
+        // Newer ASP.NET SignalR session recording saved RawTimingDataPoints instead
+        if (json?["A"] is not null)
+        {
+            var parts = json["A"]!.AsArray();
+            var data =
+                parts[1]!.GetValueKind() == JsonValueKind.Object
+                    ? parts[1]!.ToJsonString()
+                    : parts[1]!.ToString();
+            return (parts[0]!.ToString(), data, DateTimeOffset.Parse(parts[2]!.ToString()));
+        }
+        else {
+            var parts = json.Deserialize<RawTimingDataPoint>();
+            return (parts.Type, parts.Json.ToString(), parts.DateTime);
+        }
     }
 }

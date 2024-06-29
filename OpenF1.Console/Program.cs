@@ -6,18 +6,30 @@ using Microsoft.OpenApi.Models;
 using OpenF1.Console;
 using OpenF1.Data;
 using Serilog;
+using Serilog.Events;
 
-var builder = WebApplication.CreateBuilder(args);
+var builder = WebApplication.CreateBuilder();
+
+var switchMapping = new Dictionary<string, string> {
+    ["-v"] = "Verbose",
+    ["--verbose"] = "Verbose",
+};
 
 builder
     .Configuration.AddJsonFile(
         Path.Join(LiveTimingOptions.BaseDirectory, "config.json"),
         optional: true
     )
+    .AddCommandLine(args, switchMapping)
     .AddEnvironmentVariables("OPENF1_")
     .Build();
 
+var (inMemoryLogLevel, fileLogLevel) = builder.Configuration.GetSection("VERBOSE").Get<bool>()
+    ? (LogLevel.Trace, LogEventLevel.Verbose)
+    : (LogLevel.Information, LogEventLevel.Information);
+
 Log.Logger = new LoggerConfiguration()
+    .MinimumLevel.Is(fileLogLevel)
     .WriteTo.File(
         path: Path.Join(LiveTimingOptions.BaseDirectory, "logs/openf1-console.log"),
         rollOnFileSizeLimit: true,
@@ -28,7 +40,7 @@ Log.Logger = new LoggerConfiguration()
 
 builder
     .Services.AddOptions()
-    .AddLogging(configure => configure.ClearProviders().AddInMemory().AddSerilog())
+    .AddLogging(configure => configure.ClearProviders().SetMinimumLevel(inMemoryLogLevel).AddInMemory().AddSerilog())
     .AddSingleton<ConsoleLoop>()
     .AddSingleton<State>()
     .AddInputHandlers()

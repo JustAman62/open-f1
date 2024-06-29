@@ -20,6 +20,8 @@ public sealed class LiveTimingClient(
         "Heartbeat",
         "CarData.z",
         "Position.z",
+        "CarData",
+        "Position",
         "ExtrapolatedClock",
         "TopThree",
         "TimingStats",
@@ -52,11 +54,12 @@ public sealed class LiveTimingClient(
         DisposeConnection();
         Connection = new HubConnectionBuilder()
             .WithUrl("https://livetiming.formula1.com/signalrcore")
-            .ConfigureLogging(x => x.AddProvider(loggerProvider))
+            .ConfigureLogging(x => x.SetMinimumLevel(LogLevel.Trace).AddProvider(loggerProvider))
             .AddJsonProtocol()
             .Build();
 
         Connection.On<string, JsonNode, DateTimeOffset>("feed", HandleData);
+        Connection.On<string, string, DateTimeOffset>("feedz", (a, b, c) => logger.LogInformation("r {}, {}, {}", a, b, c));
 
         await Connection.StartAsync();
 
@@ -80,12 +83,14 @@ public sealed class LiveTimingClient(
         var filePath = Path.Join(options.Value.DataDirectory, $"{_sessionKey}/subscribe.txt");
         if (!File.Exists(filePath))
         {
-            Directory.CreateDirectory($"{options.Value.DataDirectory}/{_sessionKey}");
+            var path = $"{options.Value.DataDirectory}/{_sessionKey}";
+            Directory.CreateDirectory(path);
+            logger.LogInformation("Writing subscription response to {}", path);
             File.WriteAllText(filePath, res);
         }
         else
         {
-            logger.LogError("Data Subscription file already exists, will not create a new one");
+            logger.LogWarning("Data Subscription file already exists, will not create a new one");
         }
 
         timingService.ProcessSubscriptionData(res);
@@ -95,7 +100,12 @@ public sealed class LiveTimingClient(
     {
         if (type.EndsWith(".z"))
         {
-            logger.LogInformation("Handling data type: {Type}, json: {Json}, date: {Date}", type, json, dateTime);
+            logger.LogInformation(
+                "Handling data type: {Type}, json: {Json}, date: {Date}",
+                type,
+                json,
+                dateTime
+            );
         }
 
         try
