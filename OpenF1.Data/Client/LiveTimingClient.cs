@@ -40,8 +40,6 @@ public sealed class LiveTimingClient(
 
     public HubConnection? Connection { get; private set; }
 
-    public Queue<string> RecentDataPoints { get; } = new();
-
     private string _sessionKey = "UnknownSession";
 
     public async Task StartAsync()
@@ -99,7 +97,7 @@ public sealed class LiveTimingClient(
         {
             logger.LogInformation("Handling data type: {Type}, json: {Json}, date: {Date}", type, json, dateTime);
         }
-        
+
         try
         {
             var raw = new RawTimingDataPoint(type, json, dateTime);
@@ -109,11 +107,7 @@ public sealed class LiveTimingClient(
                 rawText + Environment.NewLine
             );
 
-            RecentDataPoints.Enqueue(rawText);
-            if (RecentDataPoints.Count > 5)
-                RecentDataPoints.Dequeue();
-
-            timingService.EnqueueAsync(type, json.ToString(), dateTime);
+            timingService.EnqueueAsync(type, JsonSerializer.Serialize(json), dateTime);
         }
         catch (Exception ex)
         {
