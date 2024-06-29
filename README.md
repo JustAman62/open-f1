@@ -131,15 +131,17 @@ There is a global cursor that is controlled with the <kbd>▼</kbd> `Down (1)` a
 
 ## Configuration
 
-OpenF1 can be configured using a simple `config.json` file, or using environment variables. JSON configuration will be loaded from `~/open-f1/config.json`.
+OpenF1 can be configured using a simple `config.json` file, through the command line at startup, or using environment variables. JSON configuration will be loaded from `~/open-f1/config.json`.
 
-| Name           | JSON Path       | Environment Variable   | Description                                                     |
-| -------------- | --------------- | ---------------------- | --------------------------------------------------------------- |
-| Data Directory | `dataDirectory` | `OPENF1_DATADIRECTORY` | The directory in which JSON timing data is read or written from |
+| JSON Path       | Command Line      | Environment Variable   | Description                                                                                                  |
+| --------------- | ----------------- | ---------------------- | ------------------------------------------------------------------------------------------------------------ |
+| `dataDirectory` | `--dataDirectory` | `OPENF1_DATADIRECTORY` | The directory in which JSON timing data is read or written from.                                             |
+| `verbose`       | `-v\|--verbose`   | `OPENF1_VERBOSE`       | Whether verbose logging should be enabled. Default: `false`. Values: `true` or `false`.                      |
+| `apiEnabled`    | `--apiEnabled`    | `OPENF1_APIENABLED`    | Whether the app should expose an API at http://localhost:61937. Default: `false`. Values: `true` or `false`. |
 
 ## Live Timing Data Source
 
-F1 live timing is streamed using `SignalR` (the old ASP.NET version, not the newer ASP.NETCore protocol) at <https://livetiming.formula1.com/signalr>. The `OpenF1.Data` simply connects to this endpoint, subscribes to the "Streaming" `Hub`, and listens for messages. It subscribes to the following "topics":
+F1 live timing is streamed using `SignalR 2`. The `OpenF1.Data` simply connects to this endpoint, subscribes to the data feed, and listens for messages. It subscribes to the following "topics":
 
 * `Heartbeat`
 * `ExtrapolatedClock`
