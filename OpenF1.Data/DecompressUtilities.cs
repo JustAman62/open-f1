@@ -5,7 +5,7 @@ namespace OpenF1.Data;
 
 public static class DecompressUtilities
 {
-    public static string DeflateDecompress(string data)
+    public static string InflateBase64Data(string data)
     {
         using var inputStream = new MemoryStream(Convert.FromBase64String(data));
         using var compressionStream = new DeflateStream(inputStream, CompressionMode.Decompress);

@@ -132,7 +132,7 @@ public class TimingService(
         if (type.EndsWith(".z"))
         {
             type = type.Replace(".z", string.Empty);
-            data = DecompressUtilities.DeflateDecompress(data);
+            data = DecompressUtilities.InflateBase64Data(data);
         }
 
         Logger.LogDebug($"Processing {type} data point for timestamp {timestamp:s} :: {data}");

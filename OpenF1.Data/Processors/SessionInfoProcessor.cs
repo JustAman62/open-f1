@@ -25,11 +25,11 @@ public class SessionInfoProcessor(IMapper mapper, ILogger<SessionInfoProcessor> 
             using var httpClient = new HttpClient();
             var url = $"https://api.multiviewer.app/api/v1/circuits/{circuitKey}/{DateTimeOffset.UtcNow.Year}";
             var circuitInfo = await httpClient.GetFromJsonAsync<CircuitInfoResponse>(url).ConfigureAwait(false);
-            Latest.CircuitPoints = circuitInfo!.X.Zip(circuitInfo.Y).Select(x => (x.First, x.Second)).ToList();
+            Latest.CircuitPoints = circuitInfo!.X.Zip(circuitInfo.Y).ToList();
         }
         catch (Exception ex)
         {
-            logger.LogError(ex, "Failed to load circuit data");
+            logger.LogError(ex, "Failed to load circuit data for key {CircuitKey}", circuitKey);
         }
     }
 
