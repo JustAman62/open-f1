@@ -6,7 +6,7 @@ public class IncreaseDelayInputHandler(IDateTimeProvider dateTimeProvider) : IIn
 {
     public bool IsEnabled => true;
 
-    public Screen[] ApplicableScreens => [Screen.ManageSession, Screen.RaceControl];
+    public Screen[] ApplicableScreens => [Screen.ManageSession, Screen.RaceControl, Screen.TimingTower];
 
     public ConsoleKey[] Keys => [ConsoleKey.N, ConsoleKey.M];
 
