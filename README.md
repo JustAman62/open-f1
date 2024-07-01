@@ -134,11 +134,11 @@ There is a global cursor that is controlled with the <kbd>▼</kbd> `Down (1)` a
 
 OpenF1 can be configured using a simple `config.json` file, through the command line at startup, or using environment variables. JSON configuration will be loaded from `~/open-f1/config.json`.
 
-| JSON Path       | Command Line      | Environment Variable   | Description                                                                                                  |
-| --------------- | ----------------- | ---------------------- | ------------------------------------------------------------------------------------------------------------ |
-| `dataDirectory` | `--dataDirectory` | `OPENF1_DATADIRECTORY` | The directory in which JSON timing data is read or written from.                                             |
-| `verbose`       | `-v\|--verbose`   | `OPENF1_VERBOSE`       | Whether verbose logging should be enabled. Default: `false`. Values: `true` or `false`.                      |
-| `apiEnabled`    | `--apiEnabled`    | `OPENF1_APIENABLED`    | Whether the app should expose an API at http://localhost:61937. Default: `false`. Values: `true` or `false`. |
+| JSON Path       | Command Line       | Environment Variable   | Description                                                                                                  |
+| --------------- | ------------------ | ---------------------- | ------------------------------------------------------------------------------------------------------------ |
+| `dataDirectory` | `--data-directory` | `OPENF1_DATADIRECTORY` | The directory in which JSON timing data is read or written from.                                             |
+| `verbose`       | `-v\|--verbose`    | `OPENF1_VERBOSE`       | Whether verbose logging should be enabled. Default: `false`. Values: `true` or `false`.                      |
+| `apiEnabled`    | `--with-api`       | `OPENF1_APIENABLED`    | Whether the app should expose an API at http://localhost:61937. Default: `false`. Values: `true` or `false`. |
 
 ## Logging
 

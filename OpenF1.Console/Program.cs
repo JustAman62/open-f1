@@ -1,94 +1,61 @@
-﻿using System.Text.Json;
-using System.Text.Json.Serialization;
-using InMemLogger;
-using Microsoft.AspNetCore.Hosting.Server;
-using Microsoft.AspNetCore.Http.Json;
-using Microsoft.OpenApi.Models;
+﻿using System.CommandLine;
 using OpenF1.Console;
-using OpenF1.Data;
-using Serilog;
-using Serilog.Events;
 
-var builder = WebApplication.CreateEmptyBuilder(new() { ApplicationName = "openf1-console" });
+var rootCommand = new RootCommand("openf1-console");
 
-var switchMapping = new Dictionary<string, string>
+var isVerboseOption = new Option<bool>(
+    ["--verbose", "-v"],
+    () => false,
+    "Whether verbose logging should be enabled"
+);
+
+rootCommand.AddGlobalOption(isVerboseOption);
+
+var isApiEnabledOption = new Option<bool>(
+    "--with-api",
+    () => false,
+    "Whether the API endpoint should be exposed at http://localhost:61937"
+);
+
+var dataDirectoryOption = new Option<string>(
+    "--data-directory",
+    "The directory to which timing data will be read from and written to"
+);
+
+rootCommand.AddOption(isApiEnabledOption);
+rootCommand.SetHandler(
+    CommandHandler.Root,
+    isApiEnabledOption,
+    dataDirectoryOption,
+    isVerboseOption
+);
+
+var importCommand = new Command(
+    "import",
+    "Import data from the F1 Live Timing API, if you have missed recording a session live."
+);
+
+var listYearOption = new Option<int>(
+    "--year",
+    "Lists all meetings that took place in the provided year."
+)
 {
-    ["-v"] = "Verbose",
-    ["--verbose"] = "Verbose",
+    IsRequired = true
 };
+var listMeetingKeyOption = new Option<int?>(
+    "--meeting-key",
+    "List sessions inside the specified meeting. If not provided, all meetings in the year will be listed."
+);
+var importListCommand = new Command(
+    "list",
+    "List the available Meetings and Sessions that can be imported."
+);
+importListCommand.AddOption(listYearOption);
+importListCommand.AddOption(listMeetingKeyOption);
+importListCommand.SetHandler(CommandHandler.ListMeetings, listYearOption, listMeetingKeyOption);
 
-builder
-    .Configuration.AddJsonFile(Path.Join(AppContext.BaseDirectory, "appsettings.json"))
-    .AddJsonFile(Path.Join(LiveTimingOptions.BaseDirectory, "config.json"), optional: true)
-    .AddEnvironmentVariables("OPENF1_")
-    .AddCommandLine(args, switchMapping)
-    .Build();
+importCommand.AddCommand(importListCommand);
 
-var (inMemoryLogLevel, fileLogLevel) = builder.Configuration.GetSection("Verbose").Get<bool>()
-    ? (LogLevel.Trace, LogEventLevel.Verbose)
-    : (LogLevel.Information, LogEventLevel.Information);
+rootCommand.AddCommand(importCommand);
 
-Log.Logger = new LoggerConfiguration()
-    .MinimumLevel.Is(fileLogLevel)
-    .WriteTo.File(
-        path: Path.Join(LiveTimingOptions.BaseDirectory, "logs/openf1-console.log"),
-        rollOnFileSizeLimit: true,
-        rollingInterval: RollingInterval.Hour,
-        retainedFileCountLimit: 5
-    )
-    .CreateLogger();
-
-builder
-    .Services.AddOptions()
-    .AddLogging(configure =>
-        configure.ClearProviders().SetMinimumLevel(inMemoryLogLevel).AddInMemory().AddSerilog()
-    )
-    .AddSingleton<ConsoleLoop>()
-    .AddSingleton<State>()
-    .AddInputHandlers()
-    .AddDisplays()
-    .AddLiveTiming(builder.Configuration)
-    .AddSingleton<INotifyHandler, NotifyHandler>()
-    .AddSingleton<ConsoleLoop>()
-    .AddHostedService(sp => sp.GetRequiredService<ConsoleLoop>());
-
-var enableApi = builder.Configuration.GetSection("ApiEnabled").Get<bool>();
-
-if (enableApi)
-{
-    builder.WebHost.UseKestrel(opt => opt.ListenAnyIP(0xF1F1)); // listens on 61937
-
-    builder
-        .Services.AddRouting()
-        .AddEndpointsApiExplorer()
-        .AddSwaggerGen(c =>
-        {
-            c.CustomSchemaIds(type =>
-                type.FullName!.Replace("OpenF1.Data.", string.Empty).Replace("+", string.Empty)
-            );
-            c.SwaggerDoc("v1", new OpenApiInfo { Title = "Open F1 API", Version = "v1" });
-        });
-}
-else
-{
-    builder.WebHost.UseServer(new NullServer());
-}
-
-builder.Services.Configure<JsonOptions>(x =>
-{
-    x.SerializerOptions.Converters.Add(new JsonStringEnumConverter());
-    x.SerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
-});
-
-var app = builder.Build();
-
-if (enableApi)
-{
-    app.UseSwagger().UseSwaggerUI();
-
-    app.MapSwagger();
-
-    app.MapTimingEndpoints();
-}
-
-await app.RunAsync();
+await rootCommand.InvokeAsync(args);

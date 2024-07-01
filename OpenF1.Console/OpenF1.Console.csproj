@@ -25,6 +25,7 @@
     <PackageReference Include="SkiaSharp" />
     <PackageReference Include="Spectre.Console" />
     <PackageReference Include="Swashbuckle.AspNetCore" />
+    <PackageReference Include="system.commandline" />
   </ItemGroup>
 
   <ItemGroup>
