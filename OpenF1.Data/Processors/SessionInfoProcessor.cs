@@ -23,6 +23,7 @@ public class SessionInfoProcessor(IMapper mapper, ILogger<SessionInfoProcessor> 
         {
             logger.LogInformation("Loading circuit data for key {CircuitKey}", circuitKey);
             using var httpClient = new HttpClient();
+            httpClient.DefaultRequestHeaders.Add("User-Agent", $"open-f1/{ThisAssembly.AssemblyInformationalVersion}");
             var url = $"https://api.multiviewer.app/api/v1/circuits/{circuitKey}/{DateTimeOffset.UtcNow.Year}";
             var circuitInfo = await httpClient.GetFromJsonAsync<CircuitInfoResponse>(url).ConfigureAwait(false);
             Latest.CircuitPoints = circuitInfo!.X.Zip(circuitInfo.Y).ToList();
