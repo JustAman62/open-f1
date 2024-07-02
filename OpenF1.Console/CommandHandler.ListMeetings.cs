@@ -42,13 +42,17 @@ public static partial class CommandHandler
 
     private static void WriteMeetings(List<ListMeetingsApiResponse.Meeting> meetings)
     {
-        var table = new Table().AddColumns(new TableColumn("Key"), new("Meeting Name"));
+        var table = new Table().AddColumns(
+            new TableColumn("Key"),
+            new("Meeting Name"),
+            new("Location")
+        );
 
         table.Title = new TableTitle("Available Meetings");
 
         foreach (var meeting in meetings)
         {
-            table.AddRow(meeting.Key.ToString(), meeting.Name);
+            table.AddRow(meeting.Key.ToString(), meeting.Name, meeting.Location);
         }
 
         AnsiConsole.Write(table);
@@ -59,14 +63,15 @@ public static partial class CommandHandler
         var table = new Table().AddColumns(
             new TableColumn("Key"),
             new("Meeting Name"),
-            new("Session Name")
+            new("Session Name"),
+            new("Session Start")
         );
 
         table.Title = new TableTitle("Available Sessions");
 
         foreach (var session in meeting.Sessions)
         {
-            table.AddRow(session.Key.ToString(), meeting.Name, session.Name);
+            table.AddRow(session.Key.ToString(), meeting.Name, session.Name, $"{session.StartDate - session.GmtOffset:u}");
         }
 
         AnsiConsole.Write(table);
