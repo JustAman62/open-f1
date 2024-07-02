@@ -111,10 +111,12 @@ public sealed class DataImporter(IOptions<LiveTimingOptions> options, ILogger<Da
 
         var prefix = $"https://livetiming.formula1.com/static/{session.Path}";
 
-        var sessionDataPoint = await GetDataAsync(prefix, "SessionInfo").ConfigureAwait(false);
+        var startDate = new DateTimeOffset(session.StartDate, TimeSpan.Zero) - session.GmtOffset;
+        var sessionDataPoint = await GetDataAsync(prefix, "SessionInfo", startDate)
+            .ConfigureAwait(false);
 
         var topics = session.Type == "Race" ? _raceTopics : _nonRaceTopics;
-        var tasks = topics.Select(topic => GetDataAsync(prefix, topic));
+        var tasks = topics.Select(topic => GetDataAsync(prefix, topic, startDate));
 
         var dataPointsCollection = await Task.WhenAll(tasks).ConfigureAwait(false);
         var lines = dataPointsCollection
@@ -130,14 +132,25 @@ public sealed class DataImporter(IOptions<LiveTimingOptions> options, ILogger<Da
         await File.WriteAllLinesAsync(liveFilePath, lines, Encoding.UTF8).ConfigureAwait(false);
 
         logger.LogInformation("Saving session data to {FilePath}", subscribeFilePath);
-        var subscribeJson = new JsonObject { ["SessionInfo"] = sessionDataPoint.First().Json };
+        var subscribeJson = new JsonObject
+        {
+            ["SessionInfo"] = sessionDataPoint.First().Json,
+            ["Heartbeat"] = new JsonObject
+            {
+                ["Utc"] = startDate.ToString(@"yyyy-MM-dd\THH:mm:ss.ffffff\Z")
+            }
+        };
         await File.WriteAllTextAsync(subscribeFilePath, subscribeJson.ToString(), Encoding.UTF8)
             .ConfigureAwait(false);
 
         logger.LogInformation("Written {LineCount} lines of session data", lines.Count);
     }
 
-    private async Task<List<RawTimingDataPoint>> GetDataAsync(string urlPrefix, string type)
+    private async Task<List<RawTimingDataPoint>> GetDataAsync(
+        string urlPrefix,
+        string type,
+        DateTimeOffset startDateTime
+    )
     {
         var url = $"{urlPrefix}{type}.jsonStream";
         logger.LogInformation("Downloading {Type} data from {Url}", type, url);
@@ -153,7 +166,7 @@ public sealed class DataImporter(IOptions<LiveTimingOptions> options, ILogger<Da
                 .Select(line => new RawTimingDataPoint(
                     type,
                     JsonNode.Parse(line[12..])!,
-                    DateTimeOffset.Parse(line[..12])
+                    startDateTime + TimeSpan.Parse(line[..12])
                 ))
                 .ToList();
         }

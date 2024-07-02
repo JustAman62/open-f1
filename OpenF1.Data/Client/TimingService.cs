@@ -57,13 +57,13 @@ public class TimingService(
                         {
                             // If we have to wait for more than a second, then wait for just a second and repeat the loop.
                             // This way if the Delay is reduced by the user, we can react to it after at most a second.
-                            Logger.LogDebug($"Delaying for 1 second");
+                            Logger.LogDebug("Delaying for 1 second. Current: {CurrentTime}, Target: {TargetTime}", dateTimeProvider.Utc, res.timestamp);
                             await Task.Delay(TimeSpan.FromSeconds(1), cancellationToken)
                                 .ConfigureAwait(false);
                             continue;
                         }
 
-                        Logger.LogDebug($"Delaying for {timeToWait}");
+                        Logger.LogDebug("Delaying for {TimeToWait}. Current: {CurrentTime}, Target: {TargetTime}", timeToWait, dateTimeProvider.Utc, res.timestamp);
                         await Task.Delay(timeToWait, cancellationToken).ConfigureAwait(false);
                     }
 
