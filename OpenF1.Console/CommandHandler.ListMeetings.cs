@@ -1,16 +1,17 @@
+using OpenF1.Data;
 using Spectre.Console;
 
 namespace OpenF1.Console;
 
 public static partial class CommandHandler
 {
-    public static async Task ListMeetings(int year, int? meetingKey)
+    public static async Task ListMeetings(int year, int? meetingKey, bool isVerbose)
     {
-        var httpClient = new HttpClient();
-        var url = $"https://livetiming.formula1.com/static/{year}/Index.json";
-        var res =
-            await httpClient.GetFromJsonAsync<ListMeetingsApiResponse>(url)
-            ?? throw new InvalidOperationException("An error occurred parsing the API response");
+        var builder = GetBuilder(isVerbose: isVerbose, useConsoleLogging: true);
+        var app = builder.Build();
+
+        var importer = app.Services.GetRequiredService<IDataImporter>();
+        var res = await importer.GetMeetingsAsync(year);
 
         if (meetingKey is null)
         {
@@ -41,10 +42,7 @@ public static partial class CommandHandler
 
     private static void WriteMeetings(List<ListMeetingsApiResponse.Meeting> meetings)
     {
-        var table = new Table().AddColumns(
-            new TableColumn("Key"),
-            new("Meeting Name")
-        );
+        var table = new Table().AddColumns(new TableColumn("Key"), new("Meeting Name"));
 
         table.Title = new TableTitle("Available Meetings");
 
@@ -72,25 +70,5 @@ public static partial class CommandHandler
         }
 
         AnsiConsole.Write(table);
-    }
-
-    private record ListMeetingsApiResponse
-    {
-        public required int Year { get; set; }
-        public required List<Meeting> Meetings { get; set; }
-
-        public record Meeting
-        {
-            public required int Key { get; set; }
-            public required string Name { get; set; }
-            public required string Location { get; set; }
-            public required List<Session> Sessions { get; set; }
-
-            public record Session
-            {
-                public required int Key { get; set; }
-                public required string Name { get; set; }
-            }
-        }
     }
 }

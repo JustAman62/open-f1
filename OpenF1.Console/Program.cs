@@ -17,7 +17,7 @@ var isApiEnabledOption = new Option<bool>(
     "Whether the API endpoint should be exposed at http://localhost:61937"
 );
 
-var dataDirectoryOption = new Option<string>(
+var dataDirectoryOption = new Option<DirectoryInfo>(
     "--data-directory",
     "The directory to which timing data will be read from and written to"
 );
@@ -35,26 +35,51 @@ var importCommand = new Command(
     "Import data from the F1 Live Timing API, if you have missed recording a session live."
 );
 
-var listYearOption = new Option<int>(
-    "--year",
-    "Lists all meetings that took place in the provided year."
-)
-{
-    IsRequired = true
-};
+var yearArgument = new Argument<int>("year", "The year the meeting took place.");
 var listMeetingKeyOption = new Option<int?>(
-    "--meeting-key",
+    ["--meeting-key", "--meeting"],
     "List sessions inside the specified meeting. If not provided, all meetings in the year will be listed."
 );
 var importListCommand = new Command(
     "list",
     "List the available Meetings and Sessions that can be imported."
 );
-importListCommand.AddOption(listYearOption);
 importListCommand.AddOption(listMeetingKeyOption);
-importListCommand.SetHandler(CommandHandler.ListMeetings, listYearOption, listMeetingKeyOption);
+importListCommand.SetHandler(
+    CommandHandler.ListMeetings,
+    yearArgument,
+    listMeetingKeyOption,
+    isVerboseOption
+);
 
 importCommand.AddCommand(importListCommand);
+
+var meetingKeyOption = new Option<int>(
+    ["--meeting-key", "--meeting"],
+    "The Meeting Key of the session to import"
+)
+{
+    IsRequired = true
+};
+
+var sessionKeyOption = new Option<int>(
+    ["--session-key", "--session"],
+    "The Session Key of the session inside the selected meeting to import"
+)
+{
+    IsRequired = true
+};
+importCommand.AddArgument(yearArgument);
+importCommand.AddOption(meetingKeyOption);
+importCommand.AddOption(sessionKeyOption);
+importCommand.SetHandler(
+    CommandHandler.ImportSession,
+    yearArgument,
+    meetingKeyOption,
+    sessionKeyOption,
+    dataDirectoryOption,
+    isVerboseOption
+);
 
 rootCommand.AddCommand(importCommand);
 

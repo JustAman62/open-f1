@@ -15,7 +15,10 @@ public sealed class LiveTimingClient(
 ) : ILiveTimingClient, IDisposable
 {
     private readonly JsonSerializerOptions _jsonSerializerOptions = new() { WriteIndented = false };
-    private readonly string[] _topics =
+    private bool _disposedValue;
+    private string _sessionKey = "UnknownSession";
+
+    private static readonly string[] _topics =
     [
         "Heartbeat",
         "CarData.z",
@@ -38,11 +41,7 @@ public sealed class LiveTimingClient(
         "TeamRadio"
     ];
 
-    private bool _disposedValue;
-
     public HubConnection? Connection { get; private set; }
-
-    private string _sessionKey = "UnknownSession";
 
     public async Task StartAsync()
     {

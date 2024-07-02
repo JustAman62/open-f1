@@ -9,8 +9,9 @@ public static partial class CommandHandler
 {
     private static WebApplicationBuilder GetBuilder(
         bool isApiEnabled = false,
-        string? dataDirectory = null,
-        bool isVerbose = false
+        DirectoryInfo? dataDirectory = null,
+        bool isVerbose = false,
+        bool useConsoleLogging = false
     )
     {
         var builder = WebApplication.CreateEmptyBuilder(
@@ -26,7 +27,7 @@ public static partial class CommandHandler
                 {
                     [nameof(LiveTimingOptions.Verbose)] = isVerbose.ToString(),
                     [nameof(LiveTimingOptions.ApiEnabled)] = isApiEnabled.ToString(),
-                    [nameof(LiveTimingOptions.DataDirectory)] = dataDirectory
+                    [nameof(LiveTimingOptions.DataDirectory)] = dataDirectory?.FullName
                 }
             );
 
@@ -49,12 +50,31 @@ public static partial class CommandHandler
         builder
             .Services.AddOptions()
             .AddLogging(configure =>
-                configure
-                    .ClearProviders()
-                    .SetMinimumLevel(inMemoryLogLevel)
-                    .AddInMemory()
-                    .AddSerilog()
-            );
+            {
+                if (useConsoleLogging)
+                {
+                    configure
+                        .ClearProviders()
+                        .SetMinimumLevel(inMemoryLogLevel)
+                        .AddSerilog()
+                        .AddSimpleConsole(opt =>
+                        {
+                            opt.SingleLine = true;
+                            opt.IncludeScopes = false;
+                        });
+                }
+                else
+                {
+                    configure
+                        .ClearProviders()
+                        .SetMinimumLevel(inMemoryLogLevel)
+                        .AddInMemory()
+                        .AddSerilog();
+                }
+            })
+            .AddLiveTiming(builder.Configuration);
+
+        builder.WebHost.UseServer(new NullServer());
 
         return builder;
     }

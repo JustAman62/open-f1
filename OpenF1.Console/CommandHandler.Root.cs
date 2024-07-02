@@ -8,7 +8,7 @@ namespace OpenF1.Console;
 
 public static partial class CommandHandler
 {
-    public static async Task Root(bool isApiEnabled, string dataDirectory, bool isVerbose)
+    public static async Task Root(bool isApiEnabled, DirectoryInfo dataDirectory, bool isVerbose)
     {
         var builder = GetBuilder(isApiEnabled, dataDirectory, isVerbose);
 
@@ -17,7 +17,6 @@ public static partial class CommandHandler
             .AddSingleton<State>()
             .AddInputHandlers()
             .AddDisplays()
-            .AddLiveTiming(builder.Configuration)
             .AddSingleton<INotifyHandler, NotifyHandler>()
             .AddSingleton<ConsoleLoop>()
             .AddHostedService(sp => sp.GetRequiredService<ConsoleLoop>());
@@ -39,10 +38,6 @@ public static partial class CommandHandler
                     );
                     c.SwaggerDoc("v1", new OpenApiInfo { Title = "Open F1 API", Version = "v1" });
                 });
-        }
-        else
-        {
-            builder.WebHost.UseServer(new NullServer());
         }
 
         builder.Services.Configure<JsonOptions>(x =>
