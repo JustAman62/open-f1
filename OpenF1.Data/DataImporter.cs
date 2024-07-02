@@ -77,6 +77,12 @@ public sealed class DataImporter(IOptions<LiveTimingOptions> options, ILogger<Da
         var location = meeting.Location;
         var sessionName = session.Name;
 
+        logger.LogInformation(
+            "Downloading data for session {Location} {SessionName}",
+            location,
+            sessionName
+        );
+
         var directory = Path.Join(
             options.Value.DataDirectory,
             $"{location}_{sessionName}".Replace(' ', '_')
@@ -102,12 +108,6 @@ public sealed class DataImporter(IOptions<LiveTimingOptions> options, ILogger<Da
             );
             return;
         }
-
-        logger.LogInformation(
-            "Downloading data for session {Location} {SessionName}",
-            location,
-            sessionName
-        );
 
         var prefix = $"https://livetiming.formula1.com/static/{session.Path}";
 
