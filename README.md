@@ -31,6 +31,7 @@ Feature Highlights:
     - [Run directly from Source](#run-directly-from-source)
   - [Start Timing for a Live Session](#start-timing-for-a-live-session)
   - [Start Timing for a Pre-recorded Session](#start-timing-for-a-pre-recorded-session)
+  - [Download a previous session data for replay](#download-a-previous-session-data-for-replay)
   - [During the Session](#during-the-session)
     - [Managing Delay](#managing-delay)
     - [Using the Cursor](#using-the-cursor)
@@ -117,6 +118,14 @@ Data for pre-recorded sessions should be stored in the `~/open-f1/data/<session-
 5. Press <kbd>Esc</kbd> ` to return to the main screen
 6. Switch to the Timing Tower screen with the <kbd>O</kbd> `Timing Tower` action
 7. Optionally skip forward in time a bit by decreasing the delay with <kbd>←</kbd> (or <kbd>⇧ Shift</kbd> + <kbd>←</kbd> to decrease by 30 seconds).
+
+### Download a previous session data for replay
+
+F1 provide static timing data files for already completed sessions. This data can be downloaded and converted into the same format `openf1-console` uses to save live recorded data.
+
+1. List the available meetings for the chosen year with `openf1-console import <year> list`
+2. Review the list of meetings returned from the command, and view the session inside the chosen meeting with `openf1-console import <year> list --meeting-key <meeting-key>`
+3. Review the list of session, and select one to import: `openf1-console import <year> --meeting-key <meeting-key> --session-key <session-key>`
 
 ### During the Session
 
