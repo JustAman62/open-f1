@@ -319,7 +319,7 @@ public class TimingTowerDisplay(
             "HARD" => new Style(foreground: Color.White, background: Color.Grey),
             "MEDIUM" => new Style(foreground: Color.Black, background: Color.Yellow),
             "SOFT" => new Style(foreground: Color.White, background: Color.Red),
-            "INTER" => new Style(foreground: Color.Black, background: Color.Green),
+            "INTERMEDIATE" => new Style(foreground: Color.Black, background: Color.Green),
             "WET" => new Style(foreground: Color.Black, background: Color.Blue),
             _ => DisplayUtils.STYLE_NORMAL
         };

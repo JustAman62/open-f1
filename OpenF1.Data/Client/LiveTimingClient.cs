@@ -61,7 +61,7 @@ public sealed class LiveTimingClient(
 
         await Connection.StartAsync();
 
-        logger.LogInformation("Subscribing");
+        logger.LogInformation("Subscribing");   
         var res = await Connection.InvokeAsync<JsonObject>("Subscribe", _topics);
         HandleSubscriptionResponse(res.ToString());
 
@@ -76,14 +76,14 @@ public sealed class LiveTimingClient(
         var sessionName = sessionInfo?["Name"] ?? "UnknownName";
         _sessionKey = $"{location}_{sessionName}".Replace(' ', '_');
 
-        logger.LogInformation($"Found session key from subscription data: {_sessionKey}");
+        logger.LogInformation("Found session key from subscription data: {SessionKey}", _sessionKey);
 
         var filePath = Path.Join(options.Value.DataDirectory, $"{_sessionKey}/subscribe.txt");
         if (!File.Exists(filePath))
         {
             var path = $"{options.Value.DataDirectory}/{_sessionKey}";
             Directory.CreateDirectory(path);
-            logger.LogInformation("Writing subscription response to {}", path);
+            logger.LogInformation("Writing subscription response to {Path}", path);
             File.WriteAllText(filePath, res);
         }
         else
@@ -99,7 +99,7 @@ public sealed class LiveTimingClient(
         if (type.EndsWith(".z"))
         {
             logger.LogInformation(
-                "Handling data type: {Type}, json: {Json}, date: {Date}",
+                "Handling compressed data type: {Type}, json: {Json}, date: {Date}",
                 type,
                 json,
                 dateTime

@@ -33,6 +33,16 @@ public sealed record TimingDataPoint: ILiveTimingDataPoint
 
         public BestLap BestLapTime { get; set; } = new();
 
+        /// <summary>
+        /// In qualifying, indicates if the driver is knocked out of qualifying
+        /// </summary>
+        public bool? KnockedOut { get; set; }
+
+        /// <summary>
+        /// This is actually a flags enum, need to determine what the values mean
+        /// </summary>
+        public int Status { get; set; }
+
         public sealed record Interval
         {
             /// <summary>
