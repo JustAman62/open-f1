@@ -1,16 +1,18 @@
-﻿using System.Text.Json;
+﻿using System.Net;
+using System.Text.Encodings.Web;
+using System.Text.Json;
 using System.Text.Json.Nodes;
-using Microsoft.AspNetCore.SignalR.Client;
-using Microsoft.Extensions.DependencyInjection;
+using System.Text.Unicode;
+using Microsoft.AspNet.SignalR.Client;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using Newtonsoft.Json.Linq;
 
 namespace OpenF1.Data;
 
 public sealed class LiveTimingClient(
     ITimingService timingService,
     IOptions<LiveTimingOptions> options,
-    ILoggerProvider loggerProvider,
     ILogger<LiveTimingClient> logger
 ) : ILiveTimingClient, IDisposable
 {
@@ -51,18 +53,26 @@ public sealed class LiveTimingClient(
             logger.LogWarning("Live timing connection already exists, restarting it");
 
         DisposeConnection();
-        Connection = new HubConnectionBuilder()
-            .WithUrl("https://livetiming.formula1.com/signalrcore")
-            .ConfigureLogging(x => x.SetMinimumLevel(LogLevel.Trace).AddProvider(loggerProvider))
-            .AddJsonProtocol()
-            .Build();
 
-        Connection.On<string, JsonNode, DateTimeOffset>("feed", HandleData);
+        Connection = new HubConnection("http://livetiming.formula1.com/signalr")
+        {
+            CookieContainer = new CookieContainer()
+        };
 
-        await Connection.StartAsync();
+        Connection.EnsureReconnecting();
 
-        logger.LogInformation("Subscribing");   
-        var res = await Connection.InvokeAsync<JsonObject>("Subscribe", _topics);
+        Connection.Received += HandleData;
+        Connection.Error += (ex) =>
+            logger.LogError(ex, "Error in live timing client: {}", ex.ToString());
+        Connection.Reconnecting += () => logger.LogWarning("Live timing client is reconnecting");
+
+        var hub = Connection.CreateHubProxy("Streaming");
+        // hub.On<string, JToken, DateTimeOffset>("feed", HandleData);
+
+        await Connection.Start();
+
+        logger.LogInformation("Subscribing");
+        var res = await hub.Invoke<JObject>("Subscribe", new[] { _topics });
         HandleSubscriptionResponse(res.ToString());
 
         logger.LogInformation("Started Live Timing client");
@@ -76,7 +86,10 @@ public sealed class LiveTimingClient(
         var sessionName = sessionInfo?["Name"] ?? "UnknownName";
         _sessionKey = $"{location}_{sessionName}".Replace(' ', '_');
 
-        logger.LogInformation("Found session key from subscription data: {SessionKey}", _sessionKey);
+        logger.LogInformation(
+            "Found session key from subscription data: {SessionKey}",
+            _sessionKey
+        );
 
         var filePath = Path.Join(options.Value.DataDirectory, $"{_sessionKey}/subscribe.txt");
         if (!File.Exists(filePath))
@@ -94,28 +107,31 @@ public sealed class LiveTimingClient(
         timingService.ProcessSubscriptionData(res);
     }
 
-    private void HandleData(string type, JsonNode json, DateTimeOffset dateTime)
+    private void HandleData(string res)
     {
-        if (type.EndsWith(".z"))
-        {
-            logger.LogInformation(
-                "Handling compressed data type: {Type}, json: {Json}, date: {Date}",
-                type,
-                json,
-                dateTime
-            );
-        }
-
         try
         {
-            var raw = new RawTimingDataPoint(type, json, dateTime);
-            var rawText = JsonSerializer.Serialize(raw, _jsonSerializerOptions);
+            // Remove line endings and indents to optimise the size of the string when saved to file
+            res = res.ReplaceLineEndings(string.Empty).Replace("    ", string.Empty);
             File.AppendAllText(
                 Path.Join(options.Value.DataDirectory, $"{_sessionKey}/live.txt"),
-                rawText + Environment.NewLine
+                res + Environment.NewLine
             );
 
-            timingService.EnqueueAsync(type, JsonSerializer.Serialize(json), dateTime);
+            var json = JsonNode.Parse(res);
+            var data = json?["A"];
+
+            if (data is null)
+                return;
+            if (data.AsArray().Count != 3)
+                return;
+
+            var eventData = data[1] is JsonValue ? data[1]!.ToString() : data[1]!.ToJsonString();
+            timingService.EnqueueAsync(
+                data[0]!.ToString(),
+                eventData,
+                DateTimeOffset.Parse(data[2]!.ToString())
+            );
         }
         catch (Exception ex)
         {
@@ -131,7 +147,7 @@ public sealed class LiveTimingClient(
 
     private void DisposeConnection()
     {
-        Connection?.DisposeAsync();
+        Connection?.Dispose();
         Connection = null;
     }
 

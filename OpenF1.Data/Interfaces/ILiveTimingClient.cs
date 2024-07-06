@@ -1,4 +1,4 @@
-using Microsoft.AspNetCore.SignalR.Client;
+using Microsoft.AspNet.SignalR.Client;
 
 namespace OpenF1.Data;
 
