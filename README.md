@@ -105,8 +105,7 @@ dotnet run --project OpenF1.Console/OpenF1.Console.csproj
 1. Start `openf1-console` as described above
 2. Navigate to the <kbd>S</kbd> `Session` Screen
 3. Start a Live Session with the <kbd>L</kbd> `Start Live Session` action.
-4. Press <kbd>Esc</kbd> to return to the main screen
-5. Switch to the Timing Tower screen with the <kbd>O</kbd> `Timing Tower` action
+4. Switch to the Timing Tower screen with the <kbd>T</kbd> `Timing Tower` action
 
 During the session, streamed timing data will be written to `~/open-f1/data/<session-name>`. This will allow for [future replays](#start-timing-for-a-pre-recorded-session) of this recorded data.
 
@@ -117,10 +116,9 @@ Data for pre-recorded sessions should be stored in the `~/open-f1/data/<session-
 1. Start `openf1-console` as described above
 2. Navigate to the <kbd>S</kbd> `Session` Screen
 3. Start a Simulated Session with the <kbd>F</kbd> `Start Simulation` action.
-4. Select the session to start using the Up/Down arrows, then pressing <kbd>Enter</kbd> `
-5. Press <kbd>Esc</kbd> ` to return to the main screen
-6. Switch to the Timing Tower screen with the <kbd>O</kbd> `Timing Tower` action
-7. Optionally skip forward in time a bit by decreasing the delay with <kbd>←</kbd> (or <kbd>⇧ Shift</kbd> + <kbd>←</kbd> to decrease by 30 seconds).
+4. Select the session to start using the Up/Down arrows, then pressing <kbd>Enter</kbd>
+5. Switch to the Timing Tower screen with the <kbd>T</kbd> `Timing Tower` action
+6. Optionally skip forward in time a bit by decreasing the delay with <kbd>N</kbd> (or <kbd>⇧ Shift</kbd> + <kbd>←N/kbd> to decrease by 30 seconds).
 
 ### Download a previous session data for replay
 
@@ -134,9 +132,9 @@ F1 provide static timing data files for already completed sessions. This data ca
 
 #### Managing Delay
 
-All session data, whether live or pre-recorded, is sent to a `Channel` that acts as a delayed-queue. After a short delay, data points are pulled from the queue and processed, leading to updates on the timing screens. The amount of this delay can be changed with the <kbd>►</kbd> `Delay+` and <kbd>◄</kbd> `Delay-` actions whilst on the timing screens. When using `openf1-console` during a live session, you may wish to increase this delay to around ~50 seconds (actual number may vary) to match with the broadcast delay and avoid being spoiled about upcoming action.
+All session data, whether live or pre-recorded, is sent to a `Channel` that acts as a delayed-queue. After a short delay, data points are pulled from the queue and processed, leading to updates on the timing screens. The amount of this delay can be changed with the <kbd>M</kbd>/<kbd>N</kbd> `Delay` actions whilst on the timing screens. When using `openf1-console` during a live session, you may wish to increase this delay to around ~50 seconds (actual number may vary) to match with the broadcast delay and avoid being spoiled about upcoming action.
 
-Simulated session start with a calculated delay equal to the amount of time between the start of the actual session and now. This means you can decrease the delay with the <kbd>◄</kbd> `Delay-` action to fast-forward through the session.
+Simulated session start with a calculated delay equal to the amount of time between the start of the actual session and now. This means you can decrease the delay with the <kbd>N</kbd> `Delay` action to fast-forward through the session.
 
 #### Using the Cursor
 
