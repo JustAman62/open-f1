@@ -39,9 +39,9 @@ public sealed record TimingDataPoint: ILiveTimingDataPoint
         public bool? KnockedOut { get; set; }
 
         /// <summary>
-        /// This is actually a flags enum, need to determine what the values mean
+        /// This is actually a flags enum
         /// </summary>
-        public int Status { get; set; }
+        public StatusFlags Status { get; set; }
 
         public sealed record Interval
         {
@@ -67,6 +67,14 @@ public sealed record TimingDataPoint: ILiveTimingDataPoint
         {
             public string? Value { get; set; }
             public int? Lap { get; set; }
+        }
+
+        [Flags]
+        public enum StatusFlags
+        {
+            Unknown16 = 16,
+            Unknown64 = 64,
+            Unknown1024 = 1024 
         }
 
         public override string ToString() => JsonSerializer.Serialize(this);

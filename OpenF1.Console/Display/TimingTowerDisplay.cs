@@ -205,6 +205,12 @@ public class TimingTowerDisplay(
                 line.BestLapTime.ToTimeSpan() - bestDriver.Value.BestLapTime.ToTimeSpan()
             )?.TotalSeconds;
 
+            if (line.KnockedOut.GetValueOrDefault())
+            {
+                table.AddRow(DisplayUtils.DriverTag(driver, line, selected: false));
+                continue;
+            }
+
             table.AddRow(
                 DisplayUtils.DriverTag(driver, line, selected: false),
                 position.Status == PositionDataPoint.PositionData.Entry.DriverStatus.OffTrack
