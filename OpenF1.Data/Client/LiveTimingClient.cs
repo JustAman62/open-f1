@@ -1,8 +1,8 @@
-﻿using System.Net;
-using System.Text.Encodings.Web;
+﻿using System.Globalization;
+using System.Net;
+using System.Text;
 using System.Text.Json;
 using System.Text.Json.Nodes;
-using System.Text.Unicode;
 using Microsoft.AspNet.SignalR.Client;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -56,7 +56,8 @@ public sealed class LiveTimingClient(
 
         Connection = new HubConnection("http://livetiming.formula1.com/signalr")
         {
-            CookieContainer = new CookieContainer()
+            CookieContainer = new CookieContainer(),
+            TraceWriter = new LogWriter(logger),
         };
 
         Connection.EnsureReconnecting();
@@ -153,5 +154,41 @@ public sealed class LiveTimingClient(
             _disposedValue = true;
         }
         GC.SuppressFinalize(this);
+    }
+
+    private sealed class LogWriter : TextWriter
+    {
+        private readonly StringBuilder _buffer;
+        private readonly ILogger _logger;
+        
+        public override Encoding Encoding => Encoding.UTF8;
+
+        public LogWriter(ILogger logger)
+            : base(CultureInfo.InvariantCulture)
+        {
+            _logger = logger;
+            _buffer = new StringBuilder();
+        }
+
+        public override void Write(char value)
+        {
+            lock (_buffer)
+            {
+                if (value == '\n')
+                {
+                    Flush();
+                }
+                else
+                {
+                    _buffer.Append(value);
+                }
+            }
+        }
+
+        public override void Flush()
+        {
+            _logger.LogDebug("SignalR Trace: {Message}", _buffer.ToString());
+            _buffer.Clear();
+        }
     }
 }
