@@ -135,13 +135,7 @@ public sealed class LiveTimingClient(
         }
         catch (Exception ex)
         {
-            logger.LogError(
-                ex,
-                "Failed to handle live timing data: {Type} :: {Json} :: {DateTime}",
-                type,
-                json,
-                dateTime
-            );
+            logger.LogError(ex, "Failed to handle live timing data: {Res}", res);
         }
     }
 
