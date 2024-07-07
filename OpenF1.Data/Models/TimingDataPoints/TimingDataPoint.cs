@@ -51,7 +51,7 @@ public sealed record TimingDataPoint: ILiveTimingDataPoint
         /// <summary>
         /// This is actually a flags enum
         /// </summary>
-        public StatusFlags Status { get; set; }
+        public StatusFlags? Status { get; set; }
 
         public sealed record Interval
         {
@@ -83,8 +83,11 @@ public sealed record TimingDataPoint: ILiveTimingDataPoint
         public enum StatusFlags
         {
             Unknown16 = 16,
-            Unknown64 = 64,
-            Unknown1024 = 1024 
+            Unknown64 = 64, 
+            /// <summary>
+            /// Set when the driver passes the chequered flag in quali or race sessions
+            /// </summary>
+            ChequeredFlag = 1024,
         }
 
         public override string ToString() => JsonSerializer.Serialize(this);

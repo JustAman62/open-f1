@@ -31,6 +31,11 @@ public static class DisplayUtils
             lineStyle = lineStyle.Combine(new Style(background: Color.Red));
         }
 
+        if (line.Status.HasValue && line.Status.Value.HasFlag(TimingDataPoint.Driver.StatusFlags.ChequeredFlag))
+        {
+            lineStyle = lineStyle.Combine(new Style(decoration: Decoration.Invert));
+        }
+
         return new Markup($"{line.Line, 2} {MarkedUpDriverNumber(driver)}", lineStyle);
     }
 
