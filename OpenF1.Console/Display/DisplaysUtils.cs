@@ -21,9 +21,14 @@ public static class DisplayUtils
     )
     {
         var lineStyle = selected ? STYLE_INVERT : STYLE_NORMAL;
-        if (line.KnockedOut == true)
+        if (line.KnockedOut == true || line.Retired == true)
         {
             lineStyle = lineStyle.Combine(new Style(decoration: Decoration.Dim));
+        }
+
+        if (line.Retired != true && line.Stopped == true)
+        {
+            lineStyle = lineStyle.Combine(new Style(background: Color.Red));
         }
 
         return new Markup($"{line.Line, 2} {MarkedUpDriverNumber(driver)}", lineStyle);

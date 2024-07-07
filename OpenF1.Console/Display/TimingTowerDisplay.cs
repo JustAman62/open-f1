@@ -98,6 +98,12 @@ public class TimingTowerDisplay(
 
             var isComparisonLine = line == comparisonDataPoint.Value;
 
+            if (line.Retired.GetValueOrDefault())
+            {
+                table.AddRow(DisplayUtils.DriverTag(driver, line, selected: false));
+                continue;
+            }
+
             table.AddRow(
                 DisplayUtils.DriverTag(driver, line, isComparisonLine),
                 new Text(

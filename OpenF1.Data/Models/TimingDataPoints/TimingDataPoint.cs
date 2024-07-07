@@ -39,6 +39,16 @@ public sealed record TimingDataPoint: ILiveTimingDataPoint
         public bool? KnockedOut { get; set; }
 
         /// <summary>
+        /// In race sessions, indicates if the driver has retired
+        /// </summary>
+        public bool? Retired { get; set; }
+
+        /// <summary>
+        /// Whether the car has stopped or not. Usually means retried.
+        /// </summary>
+        public bool? Stopped { get; set; }
+
+        /// <summary>
         /// This is actually a flags enum
         /// </summary>
         public StatusFlags Status { get; set; }
