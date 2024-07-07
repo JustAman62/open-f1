@@ -1,5 +1,3 @@
-using System.Text.Json;
-
 namespace OpenF1.Data;
 
 public sealed record TimingDataPoint: ILiveTimingDataPoint
@@ -89,7 +87,5 @@ public sealed record TimingDataPoint: ILiveTimingDataPoint
             /// </summary>
             ChequeredFlag = 1024,
         }
-
-        public override string ToString() => JsonSerializer.Serialize(this);
     }
 }
