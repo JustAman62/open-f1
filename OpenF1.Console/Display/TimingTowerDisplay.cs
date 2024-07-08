@@ -80,6 +80,9 @@ public class TimingTowerDisplay(
             x.Value.Line == state.CursorOffset
         );
 
+        var fastestLastLap = timingData.Latest.Lines.Values.MinBy(x => x.LastLapTime?.ToTimeSpan())?.LastLapTime;
+        var fastestBestLap = timingData.Latest.Lines.Values.MinBy(x => x.BestLapTime?.ToTimeSpan())?.BestLapTime;
+
         var lapNumber = lapCountProcessor.Latest?.CurrentLap ?? 0;
 
         foreach (var (driverNumber, line) in timingData.Latest.GetOrderedLines())
@@ -116,8 +119,8 @@ public class TimingTowerDisplay(
                         $"{(car?.Channels.Drs >= 8 ? "•" : "")}{line.IntervalToPositionAhead?.Value}",
                         GetStyle(line.IntervalToPositionAhead, isComparisonLine, car)
                     ),
-                new Text(line.BestLapTime?.Value ?? "NULL", DisplayUtils.STYLE_NORMAL),
-                new Text(line.LastLapTime?.Value ?? "NULL", GetStyle(line.LastLapTime)),
+                new Text(line.BestLapTime?.Value ?? "NULL", GetStyle(line.BestLapTime, fastestBestLap).Combine(new Style(decoration: Decoration.Dim))),
+                new Text(line.LastLapTime?.Value ?? "NULL", GetStyle(line.LastLapTime, fastestLastLap)),
                 new Text(
                     $"{line.Sectors.GetValueOrDefault("0")?.Value}",
                     GetStyle(line.Sectors.GetValueOrDefault("0"))
@@ -315,6 +318,13 @@ public class TimingTowerDisplay(
             return DisplayUtils.STYLE_PB;
         return DisplayUtils.STYLE_NORMAL;
     }
+
+    private Style GetStyle(
+        TimingDataPoint.Driver.BestLap? time,
+        TimingDataPoint.Driver.BestLap? bestLap = null
+    ) => bestLap?.ToTimeSpan() == time?.ToTimeSpan()
+            ? DisplayUtils.STYLE_BEST
+            : DisplayUtils.STYLE_NORMAL;
 
     [System.Diagnostics.CodeAnalysis.SuppressMessage(
         "Style",
