@@ -7,6 +7,7 @@ namespace OpenF1.Console;
 
 public sealed class ChampionshipStatsDisplay(
     ChampionshipPredictionProcessor championshipPrediction,
+    TimingStatsProcessor timingStatsProcessor,
     DriverListProcessor driverList
 ) : IDisplay
 {
@@ -15,7 +16,10 @@ public sealed class ChampionshipStatsDisplay(
     public Task<IRenderable> GetContentAsync()
     {
         var layout = new Layout("Root").SplitColumns(
-            new Layout("Left", GetTeamsChampionshipTable()),
+            new Layout("Left").SplitRows(
+                new Layout("ChampionshipTable", GetTeamsChampionshipTable()),
+                new Layout("SpeedTraps", GetSpeedTrapTable())
+            ),
             new Layout("Right", GetDriversChampionshipTable()) { Size = 37 }
         );
 
@@ -112,5 +116,32 @@ public sealed class ChampionshipStatsDisplay(
         }
 
         return table;
+    }
+
+    private IRenderable GetSpeedTrapTable()
+    {
+        var traps = new string[] {"FL", "I1", "I2", "ST"};
+        var tables = new List<Table>();
+
+        var stats = timingStatsProcessor.Latest.Lines.Values;
+
+        foreach (var trapKey in traps)
+        {
+            var table = new Table() { Title = new TableTitle(trapKey) };
+            table.AddColumns("Driver", "Val");
+            var lines = stats.OrderBy(x => x.BestSpeeds.GetValueOrDefault(trapKey)?.Position);
+            foreach (var line in lines)
+            {
+                var driver = driverList.Latest.GetValueOrDefault(line.RacingNumber ?? "", new() { RacingNumber = line.RacingNumber });
+                table.AddRow(
+                    new Markup(DisplayUtils.MarkedUpDriverNumber(driver)),
+                    new Text(line.BestSpeeds.GetValueOrDefault(trapKey)?.Value ?? "UNK")
+                );
+            }
+
+            tables.Add(table);
+        }
+
+        return new Columns(tables);
     }
 }

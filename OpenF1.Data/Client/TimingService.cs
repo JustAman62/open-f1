@@ -113,6 +113,7 @@ public class TimingService(
             );
             ProcessData("TimingData", obj["TimingData"]?.ToString(), DateTimeOffset.UtcNow);
             ProcessData("TimingAppData", obj["TimingAppData"]?.ToString(), DateTimeOffset.UtcNow);
+            ProcessData("TimingStats", obj["TimingStats"]?.ToString(), DateTimeOffset.UtcNow);
             ProcessData(
                 "RaceControlMessages",
                 obj["RaceControlMessages"]?.ToString(),
@@ -151,6 +152,9 @@ public class TimingService(
             case LiveTimingDataType.RaceControlMessages:
                 json["Messages"] = ArrayToIndexedDictionary(json["Messages"]);
                 SendToProcessor<RaceControlMessageDataPoint>(json);
+                break;
+            case LiveTimingDataType.TimingStats:
+                SendToProcessor<TimingStatsDataPoint>(json);
                 break;
             case LiveTimingDataType.TimingData:
                 var linesToProcess = json["Lines"]?.AsObject() ?? [];
