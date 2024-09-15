@@ -1,4 +1,3 @@
-using System.Security.Cryptography;
 using OpenF1.Data;
 using Spectre.Console;
 using Spectre.Console.Rendering;
@@ -17,7 +16,7 @@ public sealed class ChampionshipStatsDisplay(
     {
         var layout = new Layout("Root").SplitColumns(
             new Layout("Left").SplitRows(
-                new Layout("ChampionshipTable", GetTeamsChampionshipTable()),
+                new Layout("ChampionshipTable", GetTeamsChampionshipTable()) { Size = 15 },
                 new Layout("SpeedTraps", GetSpeedTrapTable())
             ),
             new Layout("Right", GetDriversChampionshipTable()) { Size = 37 }
@@ -32,12 +31,12 @@ public sealed class ChampionshipStatsDisplay(
         table.AddColumns(
             new TableColumn("Pos") { Width = 3, Alignment = Justify.Left },
             new TableColumn("Driver") { Alignment = Justify.Right },
-            new TableColumn("Rel") { Width = 3, Alignment = Justify.Right },
+            new TableColumn("Chg") { Width = 3, Alignment = Justify.Right },
             new TableColumn("Points") { Width = 6, Alignment = Justify.Right },
-            new TableColumn("Chg") { Width = 3, Alignment = Justify.Right }
+            new TableColumn("Gap") { Width = 3, Alignment = Justify.Right }
         );
         table.Expand();
-        table.RoundedBorder();
+        table.SimpleBorder();
         table.Title = new TableTitle("Drivers Championship");
 
         var drivers = championshipPrediction.Latest.Drivers.OrderBy(x => x.Value.PredictedPosition);
@@ -61,9 +60,9 @@ public sealed class ChampionshipStatsDisplay(
             table.AddRow(
                 new Text($"{data.PredictedPosition, 2}{indicator}", color),
                 new Markup(DisplayUtils.MarkedUpDriverNumber(driver)),
-                new Text($"{-relative:N0}"),
+                new Text($"+{change:N0}"),
                 new Text($"{data.PredictedPoints.GetValueOrDefault(), 6:N0}"),
-                new Text($"+{change:N0}")
+                new Text($"{-relative:N0}")
             );
 
             prevDriver = data;
@@ -78,12 +77,12 @@ public sealed class ChampionshipStatsDisplay(
         table.AddColumns(
             new TableColumn("Pos") { Width = 4, Alignment = Justify.Left },
             new TableColumn("Team"),
-            new TableColumn("Rel") { Width = 4, Alignment = Justify.Right },
+            new TableColumn("Chg") { Width = 3, Alignment = Justify.Right },
             new TableColumn("Points") { Width = 6, Alignment = Justify.Right },
-            new TableColumn("Chg") { Width = 3, Alignment = Justify.Right }
+            new TableColumn("Gap") { Width = 4, Alignment = Justify.Right }
         );
         table.Expand();
-        table.RoundedBorder();
+        table.SimpleBorder();
         table.Title = new TableTitle("Constructors Championship");
 
         var teams = championshipPrediction.Latest.Teams.OrderBy(x => x.Value.PredictedPosition);
@@ -107,9 +106,9 @@ public sealed class ChampionshipStatsDisplay(
             table.AddRow(
                 new Text($"{data.PredictedPosition, 2}{indicator}", color),
                 new Markup($"[#{driver.TeamColour ?? "000000"} bold]{teamName}[/]"),
-                new Text($"{-relative:N0}"),
+                new Text($"+{change:N0}"),
                 new Text($"{data.PredictedPoints:N0}"),
-                new Text($"+{change:N0}")
+                new Text($"{-relative:N0}")
             );
 
             prevTeam = data;
@@ -128,7 +127,7 @@ public sealed class ChampionshipStatsDisplay(
         foreach (var trapKey in traps)
         {
             var table = new Table() { Title = new TableTitle(trapKey) };
-            table.AddColumns("Driver", "Val");
+            table.AddColumns("Driver", "Kph");
             var lines = stats.OrderBy(x => x.BestSpeeds.GetValueOrDefault(trapKey)?.Position);
             foreach (var line in lines)
             {
@@ -139,9 +138,11 @@ public sealed class ChampionshipStatsDisplay(
                 );
             }
 
+            table.SimpleBorder();
+
             tables.Add(table);
         }
 
-        return new Columns(tables);
+        return new Columns(tables) { Expand = false };
     }
 }
