@@ -110,27 +110,27 @@ public class TimingTowerDisplay(
             table.AddRow(
                 DisplayUtils.DriverTag(driver, line, isComparisonLine),
                 new Text(
-                    $"{line.GapToLeader}",
+                    $"{line.GapToLeader}".ToFixedWidth(7),
                     isComparisonLine ? DisplayUtils.STYLE_INVERT : DisplayUtils.STYLE_NORMAL
                 ),
                 position.Status == PositionDataPoint.PositionData.Entry.DriverStatus.OffTrack
                     ? new Text("OFF TRK", new Style(background: Color.Red, foreground: Color.White))
                     : new Text(
-                        $"{(car?.Channels.Drs >= 8 ? "•" : "")}{line.IntervalToPositionAhead?.Value}",
+                        $"{(car?.Channels.Drs >= 8 ? "•" : "")}{line.IntervalToPositionAhead?.Value}".ToFixedWidth(7),
                         GetStyle(line.IntervalToPositionAhead, isComparisonLine, car)
                     ),
                 new Text(line.BestLapTime?.Value ?? "NULL", GetStyle(line.BestLapTime, fastestBestLap).Combine(new Style(decoration: Decoration.Dim))),
                 new Text(line.LastLapTime?.Value ?? "NULL", GetStyle(line.LastLapTime, fastestLastLap)),
                 new Text(
-                    $"{line.Sectors.GetValueOrDefault("0")?.Value}",
+                    $"{line.Sectors.GetValueOrDefault("0")?.Value}".ToFixedWidth(6),
                     GetStyle(line.Sectors.GetValueOrDefault("0"))
                 ),
                 new Text(
-                    $"{line.Sectors.GetValueOrDefault("1")?.Value}",
+                    $"{line.Sectors.GetValueOrDefault("1")?.Value}".ToFixedWidth(6),
                     GetStyle(line.Sectors.GetValueOrDefault("1"))
                 ),
                 new Text(
-                    $"{line.Sectors.GetValueOrDefault("2")?.Value}",
+                    $"{line.Sectors.GetValueOrDefault("2")?.Value}".ToFixedWidth(6),
                     GetStyle(line.Sectors.GetValueOrDefault("2"))
                 ),
                 new Text(
@@ -225,7 +225,7 @@ public class TimingTowerDisplay(
                 position.Status == PositionDataPoint.PositionData.Entry.DriverStatus.OffTrack
                     ? new Text("OFF TRK", new Style(background: Color.Red, foreground: Color.White))
                     : new Text(
-                        $"{(gapToLeader > 0 ? "+" : "")}{gapToLeader:f3}".PadLeft(7),
+                        $"{(gapToLeader > 0 ? "+" : "")}{gapToLeader:f3}".ToFixedWidth(7),
                         DisplayUtils.STYLE_NORMAL
                     ),
                 new Text(line.BestLapTime?.Value ?? "NULL", DisplayUtils.STYLE_NORMAL),
@@ -279,7 +279,7 @@ public class TimingTowerDisplay(
     )
     {
         var sector =
-            $"[{GetStyle(time, bestSector, overrideStyle).ToMarkup()}]{time?.Value?.PadLeft(6)}[/]";
+            $"[{GetStyle(time, bestSector, overrideStyle).ToMarkup()}]{time?.Value?.ToFixedWidth(6)}[/]";
 
         var differenceToBest = time?.ToTimeSpan() - bestSector?.ToTimeSpan();
         var differenceColor = differenceToBest < TimeSpan.Zero ? "green" : "white";
@@ -388,7 +388,7 @@ public class TimingTowerDisplay(
         if (from?.GapToLeaderSeconds() is not null && to.GapToLeaderSeconds() is not null)
         {
             var gap = to.GapToLeaderSeconds() - from.GapToLeaderSeconds();
-            return new Text($"{(gap > 0 ? "+" : "")}{gap, 3}".PadLeft(7));
+            return new Text($"{(gap > 0 ? "+" : "")}{gap, 3}".ToFixedWidth(7));
         }
 
         return new Text("");
@@ -556,14 +556,15 @@ public class TimingTowerDisplay(
             var style = trackStatusProcessor.Latest.Status switch
             {
                 "1" => DisplayUtils.STYLE_PB, // All Clear
-                "2" => new Style(foreground: Color.Black, background: Color.Yellow), // Yellow Flad
+                "2" => new Style(foreground: Color.Black, background: Color.Yellow), // Yellow Flag
                 "4" => new Style(foreground: Color.Black, background: Color.Yellow), // Safety Car
+                "6" => new Style(foreground: Color.Black, background: Color.Yellow), // VSC Deployed
                 "5" => new Style(foreground: Color.White, background: Color.Red), // Red Flag
                 _ => Style.Plain
             };
             items.Add(
                 new Text(
-                    $"{trackStatusProcessor.Latest.Status} {trackStatusProcessor.Latest.Message}",
+                    $"{trackStatusProcessor.Latest.Message}",
                     style
                 )
             );
