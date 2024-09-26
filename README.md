@@ -30,7 +30,7 @@ Feature Highlights:
   - [Installation](#installation)
     - [Install and run as a dotnet tool](#install-and-run-as-a-dotnet-tool)
   - [Install and run the standalone executable](#install-and-run-the-standalone-executable)
-    - [Run directly from Source](#run-directly-from-source)
+  - [Run directly from Source](#run-directly-from-source)
   - [Start Timing for a Live Session](#start-timing-for-a-live-session)
   - [Start Timing for a Pre-recorded Session](#start-timing-for-a-pre-recorded-session)
   - [Download a previous session data for replay](#download-a-previous-session-data-for-replay)
@@ -75,26 +75,21 @@ This method is recommended as it is easy to keep the app updated using `dotnet t
 
 ### Install and run the standalone executable
 
-Standalone executables are attached to each GitHub release. Download the executable for your system OS/architecture and simply run it directly
+Standalone executables are attached to each GitHub release. Download the executable for your system OS/architecture and simply run it directly. The list of artifacts are available on the [release page for the latest release](https://github.com/JustAman62/open-f1/releases/latest).
 
 ```sh
-# Download the latest executable (in this case for macos-arm64)
-curl https://github.com/BrownKnight/open-f1/releases/latest/download/openf1-console-macos-arm64 -o ./openf1-console -L
-
-# On MacOS, you'll likely need to sign the executable as otherwise it'll be blocked. 
-# WARNING: If you don't understand why this needs to be done, you probably shouldn't do this and instead use the NuGet based installation method above.
-#          Signing the executable yourself removes any integrity checks that signing usually provides.
-codesign -s - ./openf1-console
+# Download the latest executable (in this case for osx-arm64)
+curl https://github.com/JustAman62/open-f1/releases/latest/download/openf1-console-osx-arm64 -o ./openf1-console -L
 
 # Execute openf1-console to start the TUI
 ./openf1-console
 ```
 
-#### Run directly from Source
+### Run directly from Source
 
 ```sh
 # Checkout the git repository
-git clone git@github.com:BrownKnight/open-f1.git
+git clone git@github.com:JustAman62/open-f1.git
 
 # Run the console project with `dotnet run`
 dotnet run --project OpenF1.Console/OpenF1.Console.csproj
