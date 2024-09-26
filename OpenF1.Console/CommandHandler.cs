@@ -1,4 +1,5 @@
 using InMemLogger;
+using Microsoft.Extensions.Options;
 using OpenF1.Data;
 using Serilog;
 using Serilog.Events;
@@ -19,8 +20,10 @@ public static partial class CommandHandler
         );
 
         builder
-            .Configuration.AddJsonFile(Path.Join(AppContext.BaseDirectory, "appsettings.json"))
-            .AddJsonFile(Path.Join(LiveTimingOptions.BaseDirectory, "config.json"), optional: true)
+            .Configuration.AddJsonFile(
+                Path.Join(LiveTimingOptions.BaseDirectory, "config.json"),
+                optional: true
+            )
             .AddEnvironmentVariables("OPENF1_")
             .AddInMemoryCollection(
                 new Dictionary<string, string?>
