@@ -55,6 +55,6 @@ jobs:
       uses: svenstaro/upload-release-action@v2
       with:
         repo_token: ${{ secrets.GITHUB_TOKEN }}
-        file: ${{ matrix.target }}-output/openf1-console
-        asset_name: openf1-console-${{ matrix.target }}
+        file: ${{ matrix.target }}-output/${{ contains(matrix.target, 'win') && 'openf1-console.exe'  || 'openf1-console'}}
+        asset_name: openf1-console-${{ matrix.target }}${{ contains(matrix.target, 'win') && '.exe'  || ''}}
         tag: ${{ github.ref }}
