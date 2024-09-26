@@ -55,7 +55,7 @@ jobs:
       run: dotnet publish -r ${{ matrix.target }} --self-contained true -p:PublishSingleFile=true -p:PublicRelease=true OpenF1.Console/OpenF1.Console.csproj -o ${{ matrix.target }}-output
     
     - name: Download codesign certificate
-      if: contains(matrix.target, 'mac')
+      if: contains(matrix.target, 'osx')
       env:
         MAC_CODESIGN_CERT: ${{ secrets.MAC_CODESIGN_CERT }}
       run: |
@@ -63,7 +63,7 @@ jobs:
 
     - name: Sign Executable
       uses: indygreg/apple-code-sign-action@v1
-      if: contains(matrix.target, 'mac')
+      if: contains(matrix.target, 'osx')
       with:
         input_path: ${{ matrix.target }}-output/openf1-console
         p12_file: certificate.p12
