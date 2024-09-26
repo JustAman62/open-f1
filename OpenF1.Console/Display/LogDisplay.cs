@@ -1,5 +1,4 @@
 using InMemLogger;
-using Microsoft.Extensions.Logging;
 using Spectre.Console;
 using Spectre.Console.Rendering;
 

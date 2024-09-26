@@ -1,5 +1,4 @@
 using System.Globalization;
-using System.Net.NetworkInformation;
 
 namespace OpenF1.Data;
 

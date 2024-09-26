@@ -1,5 +1,3 @@
-using Microsoft.Extensions.DependencyInjection;
-
 namespace OpenF1.Console;
 
 public static class ServiceCollectionExtensions
