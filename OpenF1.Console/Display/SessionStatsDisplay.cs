@@ -119,23 +119,30 @@ public sealed class ChampionshipStatsDisplay(
 
     private IRenderable GetSpeedTrapTable()
     {
-        var traps = new string[] {"FL", "I1", "I2", "ST"};
+        var traps = new string[] { "FL", "I1", "I2", "ST" };
         var tables = new List<Table>();
 
-        var stats = timingStatsProcessor.Latest.Lines.Values;
+        var stats = timingStatsProcessor.Latest.Lines;
 
         foreach (var trapKey in traps)
         {
             var table = new Table() { Title = new TableTitle(trapKey) };
             table.AddColumns("Driver", "Kph");
-            var lines = stats.OrderBy(x => x.BestSpeeds.GetValueOrDefault(trapKey)?.Position);
-            foreach (var line in lines)
+            var lines = stats.OrderBy(x => x.Value.BestSpeeds.GetValueOrDefault(trapKey)?.Position);
+            foreach (var (driverNumber, line) in lines)
             {
-                var driver = driverList.Latest.GetValueOrDefault(line.RacingNumber ?? "", new() { RacingNumber = line.RacingNumber });
-                table.AddRow(
-                    new Markup(DisplayUtils.MarkedUpDriverNumber(driver)),
-                    new Text(line.BestSpeeds.GetValueOrDefault(trapKey)?.Value ?? "UNK")
+                var driver = driverList.Latest.GetValueOrDefault(
+                    driverNumber ?? "",
+                    new() { RacingNumber = driverNumber }
                 );
+                var speed = line.BestSpeeds.GetValueOrDefault(trapKey)?.Value ?? "";
+                if (!string.IsNullOrWhiteSpace(speed))
+                {
+                    table.AddRow(
+                        new Markup(DisplayUtils.MarkedUpDriverNumber(driver)),
+                        new Text(speed)
+                    );
+                }
             }
 
             table.SimpleBorder();

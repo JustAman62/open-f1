@@ -9,9 +9,6 @@ public sealed record TimingStatsDataPoint: ILiveTimingDataPoint
 
     public sealed record Driver
     {
-        public int? Line { get; set; }
-        public string? RacingNumber { get; set; }
-
         public Dictionary<string, Stat> BestSpeeds { get; set; } = [];
 
         public record Stat
