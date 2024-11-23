@@ -19,11 +19,11 @@ public record ListMeetingsApiResponse
         {
             public required int Key { get; set; }
             public required string Name { get; set; }
-            public required string Path { get; set; }
             public required string Type { get; set; }
             public required DateTime StartDate { get; set; }
             public required DateTime EndDate { get; set; }
             public required TimeSpan GmtOffset { get; set; }
+            public string? Path { get; set; }
         }
     }
 }

@@ -74,6 +74,11 @@ public sealed class DataImporter(IOptions<LiveTimingOptions> options, ILogger<Da
         var session =
             meeting.Sessions.SingleOrDefault(x => x.Key == sessionKey)
             ?? throw new KeyNotFoundException($"Meeting with key {sessionKey} not found");
+
+        if (string.IsNullOrWhiteSpace(session.Path)) {
+            throw new InvalidOperationException($"This session cannot be imported as it has no Path property defined. This is usually because the session has not completed yet.");
+        }
+
         var location = meeting.Location;
         var sessionName = session.Name;
 
