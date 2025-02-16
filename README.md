@@ -117,7 +117,7 @@ Data for pre-recorded sessions should be stored in the `~/open-f1/data/<session-
 
 ### Download a previous session data for replay
 
-F1 provide static timing data files for already completed sessions. This data can be downloaded and converted into the same format `openf1-console` uses to save live recorded data.
+F1 provides static timing data files for already completed sessions. This data can be downloaded and converted into the same format `openf1-console` uses to save live recorded data. You can then replay the old session using the steps above.
 
 1. List the available meetings for the chosen year with `openf1-console import <year> list`
 2. Review the list of meetings returned from the command, and view the session inside the chosen meeting with `openf1-console import <year> list --meeting-key <meeting-key>`
