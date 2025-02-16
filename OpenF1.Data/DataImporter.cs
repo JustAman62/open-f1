@@ -65,32 +65,40 @@ public sealed class DataImporter(IOptions<LiveTimingOptions> options, ILogger<Da
         var meeting =
             res.Meetings.SingleOrDefault(x => x.Key == meetingKey)
             ?? throw new KeyNotFoundException($"Meeting with key {meetingKey} not found");
-        await ImportSessionAsync(meeting, sessionKey);
+        await ImportSessionAsync(year, meeting, sessionKey);
     }
 
     /// <inheritdoc />
-    public async Task ImportSessionAsync(ListMeetingsApiResponse.Meeting meeting, int sessionKey)
+    public async Task ImportSessionAsync(
+        int year,
+        ListMeetingsApiResponse.Meeting meeting,
+        int sessionKey
+    )
     {
         var session =
             meeting.Sessions.SingleOrDefault(x => x.Key == sessionKey)
             ?? throw new KeyNotFoundException($"Meeting with key {sessionKey} not found");
 
-        if (string.IsNullOrWhiteSpace(session.Path)) {
-            throw new InvalidOperationException($"This session cannot be imported as it has no Path property defined. This is usually because the session has not completed yet.");
+        if (string.IsNullOrWhiteSpace(session.Path))
+        {
+            throw new InvalidOperationException(
+                $"This session cannot be imported as it has no Path property defined. This is usually because the session has not completed yet."
+            );
         }
 
         var location = meeting.Location;
         var sessionName = session.Name;
 
         logger.LogInformation(
-            "Downloading data for session {Location} {SessionName}",
+            "Downloading data for session {Year} {Location} {SessionName}",
+            year,
             location,
             sessionName
         );
 
         var directory = Path.Join(
             options.Value.DataDirectory,
-            $"{location}_{sessionName}".Replace(' ', '_')
+            $"{year}_{location}_{sessionName}".Replace(' ', '_')
         );
 
         var liveFilePath = Path.Join(directory, "live.txt");

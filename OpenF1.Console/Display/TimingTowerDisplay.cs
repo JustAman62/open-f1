@@ -483,7 +483,7 @@ public class TimingTowerDisplay(
             return null;
 
         var chart = new BarChart()
-            .Width(((System.Console.WindowWidth - STATUS_PANEL_WIDTH) / 2) - 1)
+            .Width(((Terminal.Size.Width - STATUS_PANEL_WIDTH) / 2) - 1)
             .Label(
                 $"[#{prevDriver.TeamColour} bold]{prevDriver.Tla}[/] [italic]vs[/] [#{nextDriver.TeamColour} bold]{nextDriver.Tla}[/]"
             );

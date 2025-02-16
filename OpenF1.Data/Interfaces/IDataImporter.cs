@@ -26,5 +26,5 @@ public interface IDataImporter
     /// <param name="meeting">The <see cref="ListMeetingsApiResponse.Meeting"/> which contains the session to import data for.</param>
     /// <param name="session">The key of the session inside the meeting to import data for.</param>
     /// <returns>A <see cref="Task"/> representing the status of the import.</returns>
-    Task ImportSessionAsync(ListMeetingsApiResponse.Meeting meeting, int sessionKey);
+    Task ImportSessionAsync(int year, ListMeetingsApiResponse.Meeting meeting, int sessionKey);
 }
