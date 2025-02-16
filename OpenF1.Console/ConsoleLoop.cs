@@ -39,22 +39,19 @@ public class ConsoleLoop(
         {
             stopwatch.Restart();
 
+            await SetupBufferAsync(cancellationToken);
+            await HandleInputsAsync(cancellationToken);
+
             if (state.CurrentScreen == Screen.Shutdown)
             {
                 await StopAsync(cancellationToken);
                 return;
             }
 
-            await SetupBufferAsync(cancellationToken);
-            await HandleInputsAsync(cancellationToken);
-
             var display = displays.SingleOrDefault(x => x.Screen == state.CurrentScreen);
 
             try
             {
-                await Terminal.OutAsync(ControlSequences.SetScreenBuffer(ScreenBuffer.Main));
-                await Terminal.OutAsync(ControlSequences.MoveCursorTo(0, 0), cancellationToken);
-
                 contentPanel = display is not null
                     ? await display.GetContentAsync()
                     : new Panel($"Unknown Display Selected: {state.CurrentScreen}").Expand();
@@ -88,10 +85,15 @@ public class ConsoleLoop(
 
     public override async Task StopAsync(CancellationToken cancellationToken)
     {
-        await base.StopAsync(cancellationToken);
-        await Terminal.OutLineAsync("Exiting openf1-console...", CancellationToken.None);
+        if (!ExecuteTask?.IsCompleted ?? false)
+        {
+            // Don't log if the token has already been cancelled, as that means we've already stopped.
+            await Terminal.OutLineAsync("Exiting openf1-console...", CancellationToken.None);
+            logger.LogInformation("ConsoleLoop Stopping.");
+        }
         await Terminal.OutAsync(ControlSequences.SetCursorVisibility(true), CancellationToken.None);
         Terminal.DisableRawMode();
+        await base.StopAsync(cancellationToken);
         hostApplicationLifetime.StopApplication();
     }
 
@@ -100,6 +102,7 @@ public class ConsoleLoop(
         Terminal.EnableRawMode();
         await Terminal.OutAsync(ControlSequences.SetCursorVisibility(false), cancellationToken);
         await Terminal.OutAsync(ControlSequences.MoveCursorTo(0, 0), cancellationToken);
+        await Terminal.OutAsync(ControlSequences.ClearScreen(ClearMode.Full), cancellationToken);
     }
 
     private static async Task SetupBufferAsync(CancellationToken cancellationToken) =>
