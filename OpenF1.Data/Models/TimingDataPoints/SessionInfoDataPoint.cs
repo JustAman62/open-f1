@@ -11,8 +11,8 @@ public sealed record SessionInfoDataPoint: ILiveTimingDataPoint
     public int? Key { get; init; }
     public string? Type { get; init; }
     public string? Name { get; init; }
-    public string? StartDate { get; init; }
-    public string? EndDate { get; init; }
+    public DateTime? StartDate { get; init; }
+    public DateTime? EndDate { get; init; }
     public string? GmtOffset { get; init; }
     public string? Path { get; init; }
 

@@ -15,11 +15,17 @@ public class ConsoleLoop(
 ) : BackgroundService
 {
     private const long TargetFrameTimeMs = 100;
+    private const byte ESC = 27; //0x1B
+    private const byte CSI = 91; //0x5B [
+    private const byte ARG_SEP = 59; //0x3B ;
+    private const byte FE_START = 79; //0x4F
 
     protected override async Task ExecuteAsync(CancellationToken cancellationToken)
     {
         // Immediately yield to ensure all the other hosted services start as expected
         await Task.Yield();
+
+        await SetupTerminalAsync(cancellationToken);
 
         var contentPanel = new Panel("Open F1").Expand().RoundedBorder() as IRenderable;
         var layout = new Layout("Root").SplitRows(
@@ -27,10 +33,6 @@ public class ConsoleLoop(
             new Layout("Footer")
         );
         layout["Footer"].Size = 1;
-
-        Terminal.EnableRawMode();
-
-        await Terminal.OutAsync(ControlSequences.SetCursorVisibility(false), cancellationToken);
 
         var stopwatch = Stopwatch.StartNew();
         while (!cancellationToken.IsCancellationRequested)
@@ -43,16 +45,14 @@ public class ConsoleLoop(
                 return;
             }
 
+            await SetupBufferAsync(cancellationToken);
             await HandleInputsAsync(cancellationToken);
 
             var display = displays.SingleOrDefault(x => x.Screen == state.CurrentScreen);
 
             try
             {
-                // await Terminal.OutAsync(
-                //     ControlSequences.ClearScreen(ClearMode.Full),
-                //     cancellationToken
-                // );
+                await Terminal.OutAsync(ControlSequences.SetScreenBuffer(ScreenBuffer.Main));
                 await Terminal.OutAsync(ControlSequences.MoveCursorTo(0, 0), cancellationToken);
 
                 contentPanel = display is not null
@@ -95,6 +95,16 @@ public class ConsoleLoop(
         hostApplicationLifetime.StopApplication();
     }
 
+    private static async Task SetupTerminalAsync(CancellationToken cancellationToken)
+    {
+        Terminal.EnableRawMode();
+        await Terminal.OutAsync(ControlSequences.SetCursorVisibility(false), cancellationToken);
+        await Terminal.OutAsync(ControlSequences.MoveCursorTo(0, 0), cancellationToken);
+    }
+
+    private static async Task SetupBufferAsync(CancellationToken cancellationToken) =>
+        await Terminal.OutAsync(ControlSequences.MoveCursorTo(0, 0), cancellationToken);
+
     private void UpdateInputFooter(Layout layout)
     {
         var commandDescriptions = inputHandlers
@@ -113,8 +123,8 @@ public class ConsoleLoop(
         Array.Fill<byte>(inputBuffer, 0);
         try
         {
-            // wait for 1/4 of a frame to read input
-            var cts = new CancellationTokenSource(millisecondsDelay: 4);
+            // wait for a very short amount of time to read input
+            var cts = new CancellationTokenSource(millisecondsDelay: 5);
 
             await Terminal.ReadAsync(inputBuffer, cts.Token);
 
@@ -158,6 +168,9 @@ public class ConsoleLoop(
     /// Parses raw input from the console in to the appropriate console character.
     /// Intended to parse control sequences (like those for arrow keys) in to the relevant console character.
     /// </summary>
+    /// <remarks>
+    /// See https://gist.github.com/fnky/458719343aabd01cfb17a3a4f7296797 for escape code reference.
+    /// </remarks>
     /// <param name="bytes">The bytes from the input to parse</param>
     /// <returns>
     /// A tuple of (keyChar, consoleKey) if the input can be parsed.
@@ -166,10 +179,6 @@ public class ConsoleLoop(
     /// </returns>
     private bool TryParseRawInput(byte[] bytes, out char keyChar, out ConsoleKey consoleKey)
     {
-        const byte ESC = 0x1B;
-        const byte CSI = 0x5B;
-        const byte FE_START = 0x4F;
-
         switch (bytes)
         {
             case [_, 0, ..]: // Just a normal key press
@@ -177,6 +186,30 @@ public class ConsoleLoop(
                 consoleKey = (ConsoleKey)char.ToUpperInvariant(keyChar);
                 return true;
             case [ESC, CSI, ..]: // An ANSI escape sequence starting with a CSI (Control Sequence Introducer)
+                switch (bytes[2..])
+                {
+                    // Keyboard strings
+                    // these are mappings from keyboard presses (like shift+arrow_)
+                    case [49, ARG_SEP, 50, var key, ..]:
+                        keyChar = (char)key;
+                        consoleKey = key switch
+                        {
+                            68 => ConsoleKey.LeftArrow,
+                            65 => ConsoleKey.UpArrow,
+                            66 => ConsoleKey.DownArrow,
+                            67 => ConsoleKey.RightArrow,
+                            _ => default
+                        };
+                        if (consoleKey == default)
+                        {
+                            logger.LogInformation(
+                                "Unknown CSI keyboard string: {Seq}",
+                                string.Join('|', bytes[2..])
+                            );
+                            return false;
+                        }
+                        return true;
+                }
                 logger.LogInformation("Unknown CSI sequence: {Seq}", string.Join('|', bytes[2..]));
                 break;
             case [ESC, FE_START, var key, ..]: // An escape sequence for terminal cursor control via Fe escape codes

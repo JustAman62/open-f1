@@ -5,6 +5,7 @@ public enum Screen
     Main,
     Shutdown,
     ManageSession,
+    StartSimulatedSession,
     Logs,
     TimingTower,
     TimingHistory,
