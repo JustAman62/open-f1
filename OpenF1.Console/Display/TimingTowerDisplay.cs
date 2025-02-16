@@ -80,8 +80,12 @@ public class TimingTowerDisplay(
             x.Value.Line == state.CursorOffset
         );
 
-        var fastestLastLap = timingData.Latest.Lines.Values.MinBy(x => x.LastLapTime?.ToTimeSpan())?.LastLapTime;
-        var fastestBestLap = timingData.Latest.Lines.Values.MinBy(x => x.BestLapTime?.ToTimeSpan())?.BestLapTime;
+        var fastestLastLap = timingData
+            .Latest.Lines.Values.MinBy(x => x.LastLapTime?.ToTimeSpan())
+            ?.LastLapTime;
+        var fastestBestLap = timingData
+            .Latest.Lines.Values.MinBy(x => x.BestLapTime?.ToTimeSpan())
+            ?.BestLapTime;
 
         var lapNumber = lapCountProcessor.Latest?.CurrentLap ?? 0;
 
@@ -116,11 +120,20 @@ public class TimingTowerDisplay(
                 position.Status == PositionDataPoint.PositionData.Entry.DriverStatus.OffTrack
                     ? new Text("OFF TRK", new Style(background: Color.Red, foreground: Color.White))
                     : new Text(
-                        $"{(car?.Channels.Drs >= 8 ? "•" : "")}{line.IntervalToPositionAhead?.Value}".ToFixedWidth(7),
+                        $"{(car?.Channels.Drs >= 8 ? "•" : "")}{line.IntervalToPositionAhead?.Value}".ToFixedWidth(
+                            7
+                        ),
                         GetStyle(line.IntervalToPositionAhead, isComparisonLine, car)
                     ),
-                new Text(line.BestLapTime?.Value ?? "NULL", GetStyle(line.BestLapTime, fastestBestLap).Combine(new Style(decoration: Decoration.Dim))),
-                new Text(line.LastLapTime?.Value ?? "NULL", GetStyle(line.LastLapTime, fastestLastLap)),
+                new Text(
+                    line.BestLapTime?.Value ?? "NULL",
+                    GetStyle(line.BestLapTime, fastestBestLap)
+                        .Combine(new Style(decoration: Decoration.Dim))
+                ),
+                new Text(
+                    line.LastLapTime?.Value ?? "NULL",
+                    GetStyle(line.LastLapTime, fastestLastLap)
+                ),
                 new Text(
                     $"{line.Sectors.GetValueOrDefault("0")?.Value}".ToFixedWidth(6),
                     GetStyle(line.Sectors.GetValueOrDefault("0"))
@@ -322,7 +335,8 @@ public class TimingTowerDisplay(
     private Style GetStyle(
         TimingDataPoint.Driver.BestLap? time,
         TimingDataPoint.Driver.BestLap? bestLap = null
-    ) => bestLap?.ToTimeSpan() == time?.ToTimeSpan()
+    ) =>
+        bestLap?.ToTimeSpan() == time?.ToTimeSpan()
             ? DisplayUtils.STYLE_BEST
             : DisplayUtils.STYLE_NORMAL;
 
@@ -562,12 +576,7 @@ public class TimingTowerDisplay(
                 "5" => new Style(foreground: Color.White, background: Color.Red), // Red Flag
                 _ => Style.Plain
             };
-            items.Add(
-                new Text(
-                    $"{trackStatusProcessor.Latest.Message}",
-                    style
-                )
-            );
+            items.Add(new Text($"{trackStatusProcessor.Latest.Message}", style));
         }
 
         items.Add(new Text($@"{dateTimeProvider.Utc:HH\:mm\:ss}"));

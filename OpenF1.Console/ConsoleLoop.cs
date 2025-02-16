@@ -26,7 +26,7 @@ public class ConsoleLoop(
         layout["Footer"].Size = 1;
 
         AnsiConsole.Cursor.Hide();
-        
+
         var stopwatch = Stopwatch.StartNew();
         while (!cancellationToken.IsCancellationRequested)
         {
@@ -60,7 +60,8 @@ public class ConsoleLoop(
             var timeToDelay = TargetFrameTimeMs - stopwatch.ElapsedMilliseconds;
             if (timeToDelay > 0)
             {
-                await Task.Delay(TimeSpan.FromMilliseconds(timeToDelay), cancellationToken).ConfigureAwait(false);
+                await Task.Delay(TimeSpan.FromMilliseconds(timeToDelay), cancellationToken)
+                    .ConfigureAwait(false);
             }
         }
     }
@@ -78,7 +79,9 @@ public class ConsoleLoop(
         var commandDescriptions = inputHandlers
             .Where(x => x.IsEnabled && x.ApplicableScreens.Contains(state.CurrentScreen))
             .OrderBy(x => x.Sort)
-            .Select(x => $"[{string.Join('/', x.Keys.Select(k => k.GetConsoleKeyCharacter()))}] {x.Description}");
+            .Select(x =>
+                $"[{string.Join('/', x.Keys.Select(k => k.GetConsoleKeyCharacter()))}] {x.Description}"
+            );
 
         var columns = new Columns(commandDescriptions.Select(x => new Text(x)));
         columns.Collapse();

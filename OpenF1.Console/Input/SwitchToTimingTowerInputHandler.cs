@@ -3,7 +3,7 @@ namespace OpenF1.Console;
 public class SwitchToTimingTowerInputHandler(State state) : IInputHandler
 {
     public bool IsEnabled => true;
-    
+
     public Screen[] ApplicableScreens => [Screen.Main, Screen.ManageSession];
 
     public ConsoleKey[] Keys => [ConsoleKey.T];

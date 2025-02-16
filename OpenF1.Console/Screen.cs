@@ -1,6 +1,7 @@
 namespace OpenF1.Console;
 
-public enum Screen {
+public enum Screen
+{
     Main,
     Shutdown,
     ManageSession,

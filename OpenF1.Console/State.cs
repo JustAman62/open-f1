@@ -6,9 +6,11 @@ public record State
 {
     private Screen _screen = Screen.Main;
 
-    public Screen CurrentScreen { 
+    public Screen CurrentScreen
+    {
         get => _screen;
-        set {
+        set
+        {
             AnsiConsole.Clear();
             _screen = value;
         }

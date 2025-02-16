@@ -61,8 +61,16 @@ public class TimingHistoryDisplay(
 
             table.AddRow(
                 DisplayUtils.DriverTag(driver, line, selected: false),
-                new Markup($"{line.GapToLeader} {GetMarkedUp(line.GapToLeaderSeconds() - previousLap.GapToLeaderSeconds())}" ?? "", _normal),
-                new Markup($"{line.IntervalToPositionAhead?.Value} {GetMarkedUp(line.IntervalToPositionAhead?.IntervalSeconds() - previousLap.IntervalToPositionAhead?.IntervalSeconds())}" ?? "", _normal),
+                new Markup(
+                    $"{line.GapToLeader} {GetMarkedUp(line.GapToLeaderSeconds() - previousLap.GapToLeaderSeconds())}"
+                        ?? "",
+                    _normal
+                ),
+                new Markup(
+                    $"{line.IntervalToPositionAhead?.Value} {GetMarkedUp(line.IntervalToPositionAhead?.IntervalSeconds() - previousLap.IntervalToPositionAhead?.IntervalSeconds())}"
+                        ?? "",
+                    _normal
+                ),
                 new Text(line.LastLapTime?.Value ?? "NULL", GetStyle(line.LastLapTime)),
                 new Text(
                     line.Sectors.GetValueOrDefault("0")?.Value ?? "",
@@ -83,20 +91,22 @@ public class TimingHistoryDisplay(
         return table;
     }
 
-    private string GetMarkedUp(decimal? time) => time switch
-    {
-        < 0 => $"[green dim italic]({time})[/]",
-        < 0.5m => $"[grey62 dim italic](+{time})[/]",
-        null => "",
-        _ => $"[yellow dim italic](+{time})[/]",
-    };
+    private string GetMarkedUp(decimal? time) =>
+        time switch
+        {
+            < 0 => $"[green dim italic]({time})[/]",
+            < 0.5m => $"[grey62 dim italic](+{time})[/]",
+            null => "",
+            _ => $"[yellow dim italic](+{time})[/]",
+        };
 
-    private string GetPositionChangeMarkup(int? change) => change switch
-    {
-        < 0 => "[green]▲[/]",
-        > 0 => "[yellow]▼[/]",
-        _ => ""
-    };
+    private string GetPositionChangeMarkup(int? change) =>
+        change switch
+        {
+            < 0 => "[green]▲[/]",
+            > 0 => "[yellow]▼[/]",
+            _ => ""
+        };
 
     [System.Diagnostics.CodeAnalysis.SuppressMessage(
         "Style",
