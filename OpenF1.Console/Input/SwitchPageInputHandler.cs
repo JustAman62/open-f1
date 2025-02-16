@@ -22,11 +22,13 @@ public class SwitchPageInputHandler(LapCountProcessor lapCountProcessor, State s
 
     public int Sort => 20;
 
-    public Task ExecuteAsync(
+    public async Task ExecuteAsync(
         ConsoleKeyInfo consoleKeyInfo,
         CancellationToken cancellationToken = default
     )
     {
+        await Terminal.OutAsync(ControlSequences.ClearScreen(ClearMode.Full), cancellationToken);
+
         // Find the index of the current screen, and move to the next one
         var index = GetScreenIndex();
         var newIndex = consoleKeyInfo.Key == ConsoleKey.LeftArrow ? index - 1 : index + 1;
@@ -47,8 +49,6 @@ public class SwitchPageInputHandler(LapCountProcessor lapCountProcessor, State s
                 state.CursorOffset = 0;
                 break;
         }
-
-        return Task.CompletedTask;
     }
 
     private int GetScreenIndex() => ApplicableScreens.ToList().IndexOf(state.CurrentScreen);

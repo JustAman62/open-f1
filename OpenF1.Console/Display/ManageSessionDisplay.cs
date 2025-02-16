@@ -7,15 +7,15 @@ public class ManageSessionDisplay(
     ITimingService timingService,
     IDateTimeProvider dateTimeProvider,
     IJsonTimingClient jsonTimingClient,
-    ILiveTimingClient liveTimingClient
+    ILiveTimingClient liveTimingClient,
+    SessionInfoProcessor sessionInfo
 ) : IDisplay
 {
     public Screen Screen => Screen.ManageSession;
 
     public Task<IRenderable> GetContentAsync()
     {
-        var table = new Table();
-
+        var table = new Table { Title = new TableTitle("Recently Processed Messages") };
         _ = table.AddColumns("Type", "Data", "Timestamp");
         table.Expand();
 
@@ -30,7 +30,7 @@ public class ManageSessionDisplay(
             );
         }
 
-        var rows = new Rows(
+        var status = new Rows(
             new Text(
                 $"Simulation Status: {jsonTimingClient.ExecuteTask?.Status.ToString() ?? "No Simulation Running"}"
             ),
@@ -40,11 +40,28 @@ public class ManageSessionDisplay(
             new Text(
                 $"Delay: {dateTimeProvider.Delay} / Simulation Time: {dateTimeProvider.Utc:s}"
             ),
-            new Text($"Items in Queue: {timingService.GetRemainingWorkItems()}"),
-            new Text($"Queue State:"),
-            table
+            new Text($"Items in Queue: {timingService.GetRemainingWorkItems()}")
         );
 
-        return Task.FromResult<IRenderable>(new Panel(rows).Expand());
+        var session = new Rows(
+            new Text($"Location: {sessionInfo.Latest.Meeting?.Circuit?.ShortName ?? ""}"),
+            new Text($"Type: {sessionInfo.Latest.Name ?? ""}"),
+            new Text($"Local Start: {sessionInfo.Latest.StartDate.ToString() ?? ""}"),
+            new Text($"Key: {sessionInfo.Latest.Key.ToString() ?? ""}")
+        );
+
+        session.Collapse();
+
+        var layout = new Layout().SplitRows(
+            new Layout("Header")
+                .SplitColumns(
+                    new Layout("Status", status).Size(70),
+                    new Layout("SessionInfo", session)
+                )
+                .Size(5),
+            new Layout("Data Queue", table)
+        );
+
+        return Task.FromResult<IRenderable>(layout);
     }
 }

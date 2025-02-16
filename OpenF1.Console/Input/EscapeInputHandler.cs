@@ -29,6 +29,7 @@ public class EscapeInputHandler(State state) : IInputHandler
         state.CurrentScreen = state.CurrentScreen switch
         {
             Screen.Main => Screen.Shutdown,
+            Screen.StartSimulatedSession => Screen.ManageSession,
             _ => Screen.Main
         };
 
