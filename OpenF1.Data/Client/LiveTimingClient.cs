@@ -1,7 +1,6 @@
 ﻿using System.Globalization;
 using System.Net;
 using System.Text;
-using System.Text.Json;
 using System.Text.Json.Nodes;
 using Microsoft.AspNet.SignalR.Client;
 using Microsoft.Extensions.Logging;
@@ -16,7 +15,6 @@ public sealed class LiveTimingClient(
     ILogger<LiveTimingClient> logger
 ) : ILiveTimingClient, IDisposable
 {
-    private readonly JsonSerializerOptions _jsonSerializerOptions = new() { WriteIndented = false };
     private bool _disposedValue;
     private string _sessionKey = "UnknownSession";
 
@@ -68,7 +66,6 @@ public sealed class LiveTimingClient(
         Connection.Reconnecting += () => logger.LogWarning("Live timing client is reconnecting");
 
         var hub = Connection.CreateHubProxy("Streaming");
-        // hub.On<string, JToken, DateTimeOffset>("feed", HandleData);
 
         await Connection.Start();
 
@@ -85,7 +82,8 @@ public sealed class LiveTimingClient(
         var sessionInfo = obj?["SessionInfo"];
         var location = sessionInfo?["Meeting"]?["Location"] ?? "UnknownLocation";
         var sessionName = sessionInfo?["Name"] ?? "UnknownName";
-        _sessionKey = $"{location}_{sessionName}".Replace(' ', '_');
+        var year = sessionInfo?["Path"]?.ToString().Split('/')[0] ?? DateTime.Now.Year.ToString();
+        _sessionKey = $"{year}_{location}_{sessionName}".Replace(' ', '_');
 
         logger.LogInformation(
             "Found session key from subscription data: {SessionKey}",
