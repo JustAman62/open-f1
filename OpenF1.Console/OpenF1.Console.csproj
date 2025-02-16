@@ -26,6 +26,8 @@
     <PackageReference Include="Spectre.Console" />
     <PackageReference Include="Swashbuckle.AspNetCore" />
     <PackageReference Include="system.commandline" />
+    <PackageReference Include="Vezel.Cathode" />
+    <PackageReference Include="Vezel.Cathode.Extensions" />
   </ItemGroup>
 
   <ItemGroup>

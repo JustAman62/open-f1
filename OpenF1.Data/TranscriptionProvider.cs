@@ -17,7 +17,7 @@ public class TranscriptionProvider(
 {
     private string ModelPath => Path.Join(options.Value.DataDirectory, "models/ggml-base.bin");
 
-    public async Task<string> TranscribeFromFileAsync(string filePath)
+    public async Task<string> TranscribeFromFileAsync(string filePath, CancellationToken cancellationToken = default)
     {
         await CheckModelInitialised().ConfigureAwait(false);
         using var whisperFactory = WhisperFactory.FromPath(ModelPath);
@@ -40,7 +40,7 @@ public class TranscriptionProvider(
 
         using var fileStream = File.Open(destFilePath, FileMode.Open);
 
-        await foreach (var result in processor.ProcessAsync(fileStream))
+        await foreach (var result in processor.ProcessAsync(fileStream, cancellationToken))
         {
             text += result.Text + Environment.NewLine + Environment.NewLine;
         }

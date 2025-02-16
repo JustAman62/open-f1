@@ -15,18 +15,22 @@ public sealed class TranscribeTeamRadioInputHandler(
 
     public ConsoleKey[] Keys => [ConsoleKey.T];
 
-    public string Description => _task switch
-    {
-        null or { IsCompletedSuccessfully: true } => "Transcribe",
-        { IsCompleted: false } => "Transcribing...",
-        _ => "Transcribe (Errored)"
-    };
+    public string Description =>
+        _task switch
+        {
+            null or { IsCompletedSuccessfully: true } => "Transcribe",
+            { IsCompleted: false } => "Transcribing...",
+            _ => "Transcribe (Errored)"
+        };
 
     public int Sort => 41;
 
     private Task? _task;
 
-    public Task ExecuteAsync(ConsoleKeyInfo consoleKeyInfo)
+    public Task ExecuteAsync(
+        ConsoleKeyInfo consoleKeyInfo,
+        CancellationToken cancellationToken = default
+    )
     {
         switch (_task)
         {
@@ -50,10 +54,10 @@ public sealed class TranscribeTeamRadioInputHandler(
         catch (InstanceFileNotFoundException ex)
         {
             var text = """
-            Failed to transcribe, likely because ffmpeg could not be found installed on your computer. 
-            We use FFMpegCore to convert audio files from mp3 to wav, and it requires ffmpeg. 
-            Visit https://github.com/rosenbjerg/FFMpegCore?tab=readme-ov-file#binaries to learn how to install.
-            """;
+                Failed to transcribe, likely because ffmpeg could not be found installed on your computer. 
+                We use FFMpegCore to convert audio files from mp3 to wav, and it requires ffmpeg. 
+                Visit https://github.com/rosenbjerg/FFMpegCore?tab=readme-ov-file#binaries to learn how to install.
+                """;
 
             logger.LogError(ex, text);
             radio.Value.Transcription = text;
@@ -61,9 +65,9 @@ public sealed class TranscribeTeamRadioInputHandler(
         catch (Exception ex)
         {
             var text = $"""
-            Failed to transcribe, due to an unknown error.
-            Team Radio File Path: {radio.Value.DownloadedFilePath}
-            """;
+                Failed to transcribe, due to an unknown error.
+                Team Radio File Path: {radio.Value.DownloadedFilePath}
+                """;
             logger.LogError(ex, text);
         }
     }

@@ -7,9 +7,9 @@ public interface IProcessor
 public interface IProcessor<T> : IProcessor
     where T : ILiveTimingDataPoint
 {
-    public Type InputType => typeof(T);
+    Type InputType => typeof(T);
 
-    public T Latest { get; }
+    T Latest { get; }
 
-    public void Process(T data);
+    void Process(T data);
 }

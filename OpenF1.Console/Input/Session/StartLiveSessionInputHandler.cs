@@ -3,7 +3,9 @@ using OpenF1.Data;
 
 public class StartLiveSessionInputHandler(ILiveTimingClient liveTimingClient) : IInputHandler
 {
-    public bool IsEnabled => liveTimingClient.Connection?.State != Microsoft.AspNet.SignalR.Client.ConnectionState.Connected;
+    public bool IsEnabled =>
+        liveTimingClient.Connection?.State
+        != Microsoft.AspNet.SignalR.Client.ConnectionState.Connected;
 
     public Screen[] ApplicableScreens => [Screen.ManageSession];
 
@@ -13,6 +15,8 @@ public class StartLiveSessionInputHandler(ILiveTimingClient liveTimingClient) : 
 
     public int Sort => 40;
 
-    public async Task ExecuteAsync(ConsoleKeyInfo consoleKeyInfo) =>
-        await liveTimingClient.StartAsync();
+    public async Task ExecuteAsync(
+        ConsoleKeyInfo consoleKeyInfo,
+        CancellationToken cancellationToken = default
+    ) => await liveTimingClient.StartAsync();
 }

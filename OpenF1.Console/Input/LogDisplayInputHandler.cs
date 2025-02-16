@@ -12,7 +12,10 @@ public class LogDisplayInputHandler(LogDisplayOptions options) : IInputHandler
 
     public int Sort => 20;
 
-    public Task ExecuteAsync(ConsoleKeyInfo consoleKeyInfo)
+    public Task ExecuteAsync(
+        ConsoleKeyInfo consoleKeyInfo,
+        CancellationToken cancellationToken = default
+    )
     {
         options.MinimumLogLevel = options.MinimumLogLevel switch
         {

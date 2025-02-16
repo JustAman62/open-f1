@@ -5,14 +5,14 @@ public interface IJsonTimingClient
     /// <summary>
     /// The <see cref="Task"/> representing the current state of the simulation data loading process.
     /// </summary>
-    public Task? ExecuteTask { get; }
+    Task? ExecuteTask { get; }
 
     /// <summary>
     /// Fetches the directories which contain suitable files for simulation. 
     /// Suitable directories contain a file named <c>live.txt</c> and <c>subscribe.txt</c>.
     /// </summary>
     /// <returns>A list of suitable directory paths</returns>
-    public IEnumerable<string> GetDirectoryNames();
+    IEnumerable<string> GetDirectoryNames();
     
     /// <summary>
     /// Starts a simulation using the files inside the provided directory.
@@ -22,5 +22,5 @@ public interface IJsonTimingClient
     /// <param name="directory">The directory to load the simulation files from.</param>
     /// <param name="cancellationToken">A <see cref="CancellationToken"/> indicating that execution should be stopped.</param>
     /// <returns>A Task indicating when all simulation data has been sent to the <see cref="ITimingClient"/>.</returns>
-    public Task StartAsync(string directory, CancellationToken cancellationToken = default);
+    Task StartAsync(string directory, CancellationToken cancellationToken = default);
 }

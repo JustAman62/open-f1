@@ -7,7 +7,10 @@ public class EscapeInputHandler(State state) : IInputHandler
     public Screen[] ApplicableScreens => Enum.GetValues<Screen>();
 
     public ConsoleKey[] Keys =>
-        [state.CurrentScreen == Screen.Main ? ConsoleKey.X : ConsoleKey.Escape];
+        [
+            state.CurrentScreen == Screen.Main ? ConsoleKey.X : ConsoleKey.Escape,
+            (ConsoleKey)3 // Key Code for Control+C
+        ];
 
     public int Sort => 1;
 
@@ -18,7 +21,10 @@ public class EscapeInputHandler(State state) : IInputHandler
             _ => "Return"
         };
 
-    public Task ExecuteAsync(ConsoleKeyInfo consoleKeyInfo)
+    public Task ExecuteAsync(
+        ConsoleKeyInfo consoleKeyInfo,
+        CancellationToken cancellationToken = default
+    )
     {
         state.CurrentScreen = state.CurrentScreen switch
         {

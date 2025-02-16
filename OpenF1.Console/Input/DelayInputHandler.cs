@@ -6,7 +6,8 @@ public class IncreaseDelayInputHandler(IDateTimeProvider dateTimeProvider) : IIn
 {
     public bool IsEnabled => true;
 
-    public Screen[] ApplicableScreens => [Screen.ManageSession, Screen.RaceControl, Screen.TimingTower];
+    public Screen[] ApplicableScreens =>
+        [Screen.ManageSession, Screen.RaceControl, Screen.TimingTower];
 
     public ConsoleKey[] Keys => [ConsoleKey.N, ConsoleKey.M];
 
@@ -14,7 +15,10 @@ public class IncreaseDelayInputHandler(IDateTimeProvider dateTimeProvider) : IIn
 
     public int Sort => 22;
 
-    public Task ExecuteAsync(ConsoleKeyInfo consoleKeyInfo)
+    public Task ExecuteAsync(
+        ConsoleKeyInfo consoleKeyInfo,
+        CancellationToken cancellationToken = default
+    )
     {
         var changeBy = consoleKeyInfo.Key == ConsoleKey.M ? 5 : -5;
         if (consoleKeyInfo.Modifiers.HasFlag(ConsoleModifiers.Shift))

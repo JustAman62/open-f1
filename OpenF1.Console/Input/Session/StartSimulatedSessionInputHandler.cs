@@ -19,7 +19,10 @@ public class StartSimulatedSessionInputHandler(
 
     public int Sort => 41;
 
-    public Task ExecuteAsync(ConsoleKeyInfo consoleKeyInfo)
+    public Task ExecuteAsync(
+        ConsoleKeyInfo consoleKeyInfo,
+        CancellationToken cancellationToken = default
+    )
     {
         var directories = jsonTimingClient.GetDirectoryNames();
         var title = $"""

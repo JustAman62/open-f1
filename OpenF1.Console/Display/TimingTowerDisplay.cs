@@ -36,17 +36,14 @@ public class TimingTowerDisplay(
             : GetNonRaceTimingTower();
 
         var layout = new Layout("Root").SplitRows(
-            new Layout("Content").SplitColumns(
-                new Layout("Timing Tower", timingTower).Size(System.Console.WindowWidth)
-            ),
-            new Layout("Info").SplitColumns(
-                new Layout("Status", statusPanel),
-                new Layout("Race Control Messages", raceControlPanel)
-            )
+            new Layout("Timing Tower", timingTower),
+            new Layout("Info")
+                .SplitColumns(
+                    new Layout("Status", statusPanel).Size(STATUS_PANEL_WIDTH),
+                    new Layout("Race Control Messages", raceControlPanel)
+                )
+                .Size(6)
         );
-
-        layout["Info"].Size = 6;
-        layout["Info"]["Status"].Size = STATUS_PANEL_WIDTH;
 
         return Task.FromResult<IRenderable>(layout);
     }

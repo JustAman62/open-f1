@@ -8,7 +8,13 @@ public class SwitchPageInputHandler(LapCountProcessor lapCountProcessor, State s
     public bool IsEnabled => true;
 
     public Screen[] ApplicableScreens =>
-        [Screen.RaceControl, Screen.TeamRadio, Screen.TimingTower, Screen.TimingHistory, Screen.ChampionshipStats];
+        [
+            Screen.RaceControl,
+            Screen.TeamRadio,
+            Screen.TimingTower,
+            Screen.TimingHistory,
+            Screen.ChampionshipStats
+        ];
 
     public ConsoleKey[] Keys => [ConsoleKey.LeftArrow, ConsoleKey.RightArrow];
 
@@ -16,7 +22,10 @@ public class SwitchPageInputHandler(LapCountProcessor lapCountProcessor, State s
 
     public int Sort => 20;
 
-    public Task ExecuteAsync(ConsoleKeyInfo consoleKeyInfo)
+    public Task ExecuteAsync(
+        ConsoleKeyInfo consoleKeyInfo,
+        CancellationToken cancellationToken = default
+    )
     {
         // Find the index of the current screen, and move to the next one
         var index = GetScreenIndex();
