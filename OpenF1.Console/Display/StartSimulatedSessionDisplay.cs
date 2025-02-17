@@ -30,9 +30,13 @@ public class StartSimulatedSessionDisplay(
             return Task.FromResult<IRenderable>(new Text("Unable to load directories"));
         }
 
-        var locationTable = new Table();
+        var tables = new List<Table>();
 
-        _ = locationTable.AddColumns("Date", "Location").Expand();
+        var locationTable = new Table().AddColumns(
+            new TableColumn("Date").Width(10).RightAligned(),
+            new TableColumn("Location").LeftAligned()
+        );
+        tables.Add(locationTable);
 
         var directoryOffset = displayOptions.SelectedLocation.GetValueOrDefault(state.CursorOffset);
 
@@ -42,11 +46,8 @@ public class StartSimulatedSessionDisplay(
             if (i == directoryOffset)
             {
                 locationTable.AddRow(
-                    new Text(
-                        Date.ToShortDateString(),
-                        new Style(background: Color.White, foreground: Color.Black)
-                    ),
-                    new Text(Location, new Style(background: Color.White, foreground: Color.Black))
+                    new Text(Date.ToShortDateString(), DisplayUtils.STYLE_INVERT),
+                    new Text(Location, DisplayUtils.STYLE_INVERT)
                 );
             }
             else
@@ -55,7 +56,7 @@ public class StartSimulatedSessionDisplay(
             }
         }
 
-        var sessionTable = new Table().AddColumns("Session").Expand();
+        var sessionTable = new Table().AddColumns("Session", "Directory").Expand();
 
         if (displayOptions.SelectedLocation.HasValue)
         {
@@ -65,17 +66,19 @@ public class StartSimulatedSessionDisplay(
                 if (i == state.CursorOffset)
                 {
                     sessionTable.AddRow(
-                        new Text(
-                            sessions.ElementAt(i).Session,
-                            new Style(background: Color.White, foreground: Color.Black)
-                        )
+                        new Text(sessions.ElementAt(i).Session, DisplayUtils.STYLE_INVERT),
+                        new Text(sessions.ElementAt(i).Directory, DisplayUtils.STYLE_INVERT)
                     );
                 }
                 else
                 {
-                    sessionTable.AddRow(new Text(sessions.ElementAt(i).Session));
+                    sessionTable.AddRow(
+                        new Text(sessions.ElementAt(i).Session),
+                        new Text(sessions.ElementAt(i).Directory)
+                    );
                 }
             }
+            tables.Add(sessionTable);
         }
 
         var title = $"""
@@ -91,10 +94,7 @@ public class StartSimulatedSessionDisplay(
 
         var layout = new Layout("Root").SplitRows(
             new Layout("Title", helperText).Size(8),
-            new Layout("Tables").SplitColumns(
-                new Layout("Location Table", locationTable),
-                new Layout("Session Table", sessionTable)
-            )
+            new Layout("Tables", new Columns(tables).Collapse())
         );
 
         return Task.FromResult<IRenderable>(layout);

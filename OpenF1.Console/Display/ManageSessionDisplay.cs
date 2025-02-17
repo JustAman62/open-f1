@@ -38,16 +38,18 @@ public class ManageSessionDisplay(
                 $"Real Client Status: {liveTimingClient.Connection?.State.ToString() ?? "No Connection"}"
             ),
             new Text(
-                $"Delay: {dateTimeProvider.Delay} / Simulation Time: {dateTimeProvider.Utc:s}"
+                $"Delay: {dateTimeProvider.Delay} / Simulation Time (UTC): {dateTimeProvider.Utc:s}"
             ),
             new Text($"Items in Queue: {timingService.GetRemainingWorkItems()}")
         );
 
         var session = new Rows(
-            new Text($"Location: {sessionInfo.Latest.Meeting?.Circuit?.ShortName ?? ""}"),
-            new Text($"Type: {sessionInfo.Latest.Name ?? ""}"),
-            new Text($"Local Start: {sessionInfo.Latest.StartDate.ToString() ?? ""}"),
-            new Text($"Key: {sessionInfo.Latest.Key.ToString() ?? ""}")
+            new Text(
+                $"Location: {sessionInfo.Latest.Meeting?.Circuit?.ShortName ?? ""}"
+            ).RightJustified(),
+            new Text($"Type: {sessionInfo.Latest.Name ?? ""}").RightJustified(),
+            new Text($"Start (UTC): {sessionInfo.Latest.GetStartDateTimeUtc():s}").RightJustified(),
+            new Text($"Key: {sessionInfo.Latest.Key.ToString() ?? ""}").RightJustified()
         );
 
         session.Collapse();
@@ -55,7 +57,7 @@ public class ManageSessionDisplay(
         var layout = new Layout().SplitRows(
             new Layout("Header")
                 .SplitColumns(
-                    new Layout("Status", status).Size(70),
+                    new Layout("Status", status).Size(76),
                     new Layout("SessionInfo", session)
                 )
                 .Size(5),

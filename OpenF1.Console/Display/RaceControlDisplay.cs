@@ -11,6 +11,7 @@ public class RaceControlDisplay(
     TrackStatusProcessor trackStatusProcessor,
     LapCountProcessor lapCountProcessor,
     WeatherProcessor weatherProcessor,
+    SessionInfoProcessor sessionInfo,
     IDateTimeProvider dateTimeProvider
 ) : IDisplay
 {
@@ -25,16 +26,14 @@ public class RaceControlDisplay(
 
         var layout = new Layout("Root").SplitColumns(
             new Layout("Race Control Messages", raceControlPanel),
-            new Layout("Info").SplitRows(
-                new Layout("Status", statusPanel),
-                new Layout("Clock", clockPanel),
-                new Layout("Weather", weatherPanel)
-            )
+            new Layout("Info")
+                .SplitRows(
+                    new Layout("Status", statusPanel).Size(6),
+                    new Layout("Clock", clockPanel).Size(13),
+                    new Layout("Weather", weatherPanel)
+                )
+                .Size(23)
         );
-
-        layout["Info"].Size = 23;
-        layout["Info"]["Status"].Size = 4;
-        layout["Info"]["Clock"].Size = 8;
 
         return Task.FromResult<IRenderable>(layout);
     }
@@ -100,6 +99,13 @@ public class RaceControlDisplay(
             );
         }
 
+        items.AddRange(
+            [
+                new Text(sessionInfo.Latest.Meeting?.Circuit?.ShortName ?? string.Empty),
+                new Text(sessionInfo.Latest.Name ?? string.Empty)
+            ]
+        );
+
         var rows = new Rows(items);
         return new Panel(rows)
         {
@@ -118,7 +124,12 @@ public class RaceControlDisplay(
             new Text($@"Delayed By"),
             new Text($@"{dateTimeProvider.Delay:d\.hh\:mm\:ss}"),
             new Text($@"Session Clock"),
-            new Text($@"{extrapolatedClockProcessor.ExtrapolatedRemaining():hh\:mm\:ss}")
+            new Text($@"{extrapolatedClockProcessor.ExtrapolatedRemaining():hh\:mm\:ss}"),
+            new Text(string.Empty),
+            new Text($@"Start (UTC)"),
+            new Text($@"{sessionInfo.Latest.GetStartDateTimeUtc():s}"),
+            new Text($@"Start (Local)"),
+            new Text($@"{sessionInfo.Latest.StartDate:s}"),
         };
 
         var rows = new Rows(items);
