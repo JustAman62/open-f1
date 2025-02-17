@@ -10,6 +10,7 @@ public enum Screen
     TimingTower,
     TimingHistory,
     RaceControl,
+    DriverTracker,
     ChampionshipStats,
     TeamRadio
 }
