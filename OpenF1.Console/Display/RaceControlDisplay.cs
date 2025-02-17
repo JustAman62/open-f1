@@ -146,10 +146,14 @@ public class RaceControlDisplay(
         var weather = weatherProcessor.Latest;
         var items = new List<IRenderable>
         {
-            new Markup($"{Emoji.Known.Thermometer} Air   {weather?.AirTemp}C"),
-            new Markup($"{Emoji.Known.Thermometer} Track {weather?.TrackTemp}C"),
-            new Markup($"{Emoji.Known.DashingAway} {weather?.WindSpeed}kph"),
-            new Markup($"{Emoji.Known.CloudWithRain}  {weather?.Rainfall}mm"),
+            // new Markup($"{Emoji.Known.Thermometer} Air   {weather?.AirTemp}C"),
+            // new Markup($"{Emoji.Known.Thermometer} Track {weather?.TrackTemp}C"),
+            // new Markup($"{Emoji.Known.DashingAway} {weather?.WindSpeed}kph"),
+            // new Markup($"{Emoji.Known.CloudWithRain}  {weather?.Rainfall}mm"),
+            new Markup($"Air   {weather?.AirTemp}C"),
+            new Markup($"Track {weather?.TrackTemp}C"),
+            new Markup($"Wind  {weather?.WindSpeed}kph"),
+            new Markup($"Rain  {weather?.Rainfall}mm"),
         };
 
         var rows = new Rows(items);

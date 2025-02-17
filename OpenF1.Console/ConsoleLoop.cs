@@ -20,6 +20,8 @@ public class ConsoleLoop(
     private const byte ARG_SEP = 59; //0x3B ;
     private const byte FE_START = 79; //0x4F
 
+    private string _previousDraw = string.Empty;
+
     protected override async Task ExecuteAsync(CancellationToken cancellationToken)
     {
         // Immediately yield to ensure all the other hosted services start as expected
@@ -59,10 +61,12 @@ public class ConsoleLoop(
 
                 UpdateInputFooter(layout);
 
-                await Terminal.OutAsync(
-                    AnsiConsole.Console.ToAnsi(layout).Replace("\n", ""),
-                    cancellationToken
-                );
+                var output = AnsiConsole.Console.ToAnsi(layout).Replace("\n", "");
+                if (_previousDraw != output)
+                {
+                    await Terminal.OutAsync(output, cancellationToken);
+                    _previousDraw = output;
+                }
 
                 if (display is not null)
                 {

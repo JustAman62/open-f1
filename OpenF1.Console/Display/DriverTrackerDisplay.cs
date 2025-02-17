@@ -15,9 +15,17 @@ public class DriverTrackerDisplay(
 ) : IDisplay
 {
     private const int IMAGE_SCALE_FACTOR = 20;
-    private const int IMAGE_PADDING = 20;
-    private static readonly SKPaint _whitePaint =
+    private const int IMAGE_PADDING = 25;
+    private static readonly SKPaint _trackLinePaint =
         new() { Color = SKColor.Parse("666666"), StrokeWidth = 4 };
+    private static readonly SKTypeface _boldTypeface = SKTypeface.FromFamilyName(
+        "Consolas",
+        weight: SKFontStyleWeight.Bold,
+        width: SKFontStyleWidth.Normal,
+        slant: SKFontStyleSlant.Upright
+    );
+
+    private string _previousImage = string.Empty;
 
     public Screen Screen => Screen.DriverTracker;
 
@@ -115,7 +123,7 @@ public class DriverTrackerDisplay(
             var b = circuitPoints[i + 1];
             try
             {
-                canvas.DrawLine(a.x, a.y, b.x, b.y, _whitePaint);
+                canvas.DrawLine(a.x, a.y, b.x, b.y, _trackLinePaint);
             }
             catch (Exception ex)
             {
@@ -145,11 +153,12 @@ public class DriverTrackerDisplay(
                             data.Tla,
                             (position.X.Value / IMAGE_SCALE_FACTOR) + minX + 8,
                             maxY - ((position.Y.Value / IMAGE_SCALE_FACTOR) + minY) + 6,
+                            new SKFont { Embolden = true },
                             new SKPaint
                             {
                                 Color = SKColor.Parse(data.TeamColour),
-                                Style = SKPaintStyle.Fill,
-                                TextSize = 12,
+                                TextSize = 14,
+                                Typeface = _boldTypeface
                             }
                         );
                     }
@@ -170,6 +179,11 @@ public class DriverTrackerDisplay(
         var base64 = Convert.ToBase64String(imageData.AsSpan());
 
         var output = TerminalGraphics.ITerm2GraphicsSequence(windowHeight, windowWidth, base64);
-        await Terminal.OutAsync(output);
+        // Only draw the image if it has changed
+        if (_previousImage != output)
+        {
+            await Terminal.OutAsync(output);
+        }
+        _previousImage = output;
     }
 }
