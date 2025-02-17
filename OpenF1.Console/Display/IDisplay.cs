@@ -7,4 +7,6 @@ public interface IDisplay
     Screen Screen { get; }
 
     Task<IRenderable> GetContentAsync();
+
+    Task PostContentDrawAsync() => Task.CompletedTask;
 }

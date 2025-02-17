@@ -2,7 +2,8 @@ using OpenF1.Data;
 
 namespace OpenF1.Console;
 
-public sealed class SelectDriverInputHandler(State state, TimingDataProcessor timingData) : IInputHandler
+public sealed class SelectDriverInputHandler(State state, TimingDataProcessor timingData)
+    : IInputHandler
 {
     public bool IsEnabled => true;
 
@@ -14,9 +15,14 @@ public sealed class SelectDriverInputHandler(State state, TimingDataProcessor ti
 
     public int Sort => 40;
 
-    public Task ExecuteAsync(ConsoleKeyInfo consoleKeyInfo)
+    public Task ExecuteAsync(
+        ConsoleKeyInfo consoleKeyInfo,
+        CancellationToken cancellationToken = default
+    )
     {
-        var selectedDriverNumber = timingData.Latest.Lines.FirstOrDefault(x => x.Value.Line == state.CursorOffset).Key;
+        var selectedDriverNumber = timingData
+            .Latest.Lines.FirstOrDefault(x => x.Value.Line == state.CursorOffset)
+            .Key;
 
         if (!state.SelectedDrivers.Remove(selectedDriverNumber))
         {

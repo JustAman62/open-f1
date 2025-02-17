@@ -16,19 +16,16 @@ public class DriverTrackerDisplay(
 {
     public Screen Screen => Screen.DriverTracker;
 
-    private readonly HashSet<(int x, int y)> _previousCoords = new();
-
-    public Task<IRenderable> GetContentAsync()
+    public async Task<IRenderable> GetContentAsync()
     {
         var driverTower = GetDriverTower();
-        var details = GetDetails();
         var layout = new Layout("Content").SplitColumns(
             new Layout("Driver List", driverTower),
-            new Layout("Details", details)
+            new Layout("Track Map", new Text(string.Empty)) // Empty, drawn in to manually in PostContentDrawAsync()
         );
         layout["Content"]["Driver List"].Size = 13;
 
-        return Task.FromResult<IRenderable>(layout);
+        return layout;
     }
 
     private IRenderable GetDriverTower()
@@ -55,14 +52,39 @@ public class DriverTrackerDisplay(
         return table;
     }
 
-    private IRenderable GetDetails()
+    public async Task PostContentDrawAsync()
     {
+        const int LEFT_OFFSET = 14;
+        const int TOP_OFFSET = 1;
+        const int BOTTOM_OFFSET = 2;
+        var windowHeight = Terminal.Size.Height - TOP_OFFSET - BOTTOM_OFFSET;
+        var windowWidth = Terminal.Size.Width - LEFT_OFFSET;
+
+        await Terminal.OutAsync(ControlSequences.MoveCursorTo(TOP_OFFSET, LEFT_OFFSET));
+
+        if (!TerminalGraphics.IsITerm2ProtocolSupported())
+        {
+            // We don't think the current terminal supports the iTerm2 graphics protocol
+            await Terminal.OutAsync(
+                $"""
+                It seems the current terminal may not support inline graphics, which means we can't this the driver tracker.
+                If you think this is incorrect, please open an issue at https://github.com/JustAman62/open-f1. Include the diagnostic information below:
+
+                LC_TERMINAL: {Environment.GetEnvironmentVariable("LC_TERMINAL")}
+                TERM: {Environment.GetEnvironmentVariable("TERM")}
+                TERM_PROGRAM: {Environment.GetEnvironmentVariable("TERM_PROGRAM")}
+                """
+            );
+            return;
+        }
+
         var circuitPoints = sessionInfo.Latest.CircuitPoints;
         if (circuitPoints.Count == 0)
         {
-            return new Text("Circuit info not available");
+            await Terminal.OutAsync("Circuit info not available");
+            return;
         }
-        
+
         circuitPoints = circuitPoints.Select(x => (x.x / 100, x.y / 100)).ToList();
 
         var minX = Math.Abs(circuitPoints.Min(x => x.x));
@@ -78,15 +100,12 @@ public class DriverTrackerDisplay(
         // Invert the Y coords due to how Y is displayed in a TUI (top=0 instead bottom=0)
         circuitPoints = circuitPoints.Select(x => (x.x, maxY - x.y)).ToList();
 
-        var windowHeight = System.Console.WindowHeight - 2;
-        var windowWidth = windowHeight;
-
-        var img = new SKBitmap(max, max);
+        var img = new SKBitmap(maxX, maxY);
         foreach (var (x, y) in circuitPoints)
         {
             try
             {
-                img.SetPixel(x, y, SKColor.Parse("111111"));
+                img.SetPixel(x, y, SKColor.Parse("666666"));
             }
             catch (Exception ex)
             {
@@ -124,22 +143,10 @@ public class DriverTrackerDisplay(
             }
         }
 
-        var destBitmap = new SKBitmap(windowWidth, windowHeight);
-        img.ScalePixels(destBitmap, SKFilterQuality.Medium);
-        var pixMap = destBitmap.PeekPixels();
+        var imageData = img.Encode(SKEncodedImageFormat.Png, 100);
+        var base64 = Convert.ToBase64String(imageData.AsSpan());
 
-        var canvas = new Canvas(windowWidth, windowHeight);
-
-        foreach (var x in Enumerable.Range(0, windowWidth))
-        {
-            foreach (var y in Enumerable.Range(0, windowHeight))
-            {
-                var color = pixMap.GetPixelColor(x, y);
-                canvas.SetPixel(x, y, new Color(color.Red, color.Green, color.Blue));
-            }
-        }
-
-        canvas.Scale = true;
-        return canvas;
+        var output = TerminalGraphics.ITerm2GraphicsSequence(windowHeight, windowWidth, base64);
+        await Terminal.OutAsync(output);
     }
 }

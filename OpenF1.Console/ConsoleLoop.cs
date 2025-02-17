@@ -63,6 +63,11 @@ public class ConsoleLoop(
                     AnsiConsole.Console.ToAnsi(layout).Replace("\n", ""),
                     cancellationToken
                 );
+
+                if (display is not null)
+                {
+                    await display.PostContentDrawAsync();
+                }
             }
             catch (Exception ex)
             {
