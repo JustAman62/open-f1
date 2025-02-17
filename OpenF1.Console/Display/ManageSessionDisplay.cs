@@ -54,13 +54,10 @@ public class ManageSessionDisplay(
 
         session.Collapse();
 
+        var header = new Columns(status, session).Expand();
+
         var layout = new Layout().SplitRows(
-            new Layout("Header")
-                .SplitColumns(
-                    new Layout("Status", status).Size(76),
-                    new Layout("SessionInfo", session)
-                )
-                .Size(5),
+            new Layout("Header", header).Size(5),
             new Layout("Data Queue", table)
         );
 
