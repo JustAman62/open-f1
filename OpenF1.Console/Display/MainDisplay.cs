@@ -14,8 +14,36 @@ public class MainDisplay() : IDisplay
 
     public Task<IRenderable> GetContentAsync()
     {
-        var text = new FigletText(_font, "OPEN F1").Centered();
-        var panel = new Panel(text).Expand().RoundedBorder();
+        var title = new FigletText(_font, "OPEN F1").Centered();
+
+        var content = new Markup(
+            """
+            Welcome to [bold italic]Open F1 Console[/].
+
+            To start a live timing session, press [bold]S[/] then [bold]L[/].
+            To start a replay an recorded session, press [bold]S[/] then [bold]F[/].
+
+            Once a session is started, navigate to the Timing Tower using [bold]T[/]
+            Then use the Arrow Keys [bold]◄[/]/[bold]►[/] to switch between timing pages.
+
+            You can download old session data from Formula 1 by running:
+            > openf1-console import <year> list
+            """
+        );
+
+        var footer = new Text(
+            $"""
+            GitHub: https://github.com/JustAman62/open-f1
+            Version: {ThisAssembly.AssemblyInformationalVersion}
+            """
+        );
+
+        var layout = new Layout("Content").SplitRows(
+            new Layout("Title", title).Size(8),
+            new Layout("Content", content),
+            new Layout("Footer", footer).Size(2)
+        );
+        var panel = new Panel(layout).Expand().RoundedBorder();
 
         return Task.FromResult<IRenderable>(panel);
     }

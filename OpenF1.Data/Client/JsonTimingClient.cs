@@ -1,3 +1,4 @@
+using System.Security.Cryptography.X509Certificates;
 using System.Text.Json;
 using System.Text.Json.Nodes;
 using Microsoft.Extensions.Logging;
@@ -63,13 +64,13 @@ public class JsonTimingClient(
                     .GetFiles(x)
                     .Any(x => x.EndsWith("subscribe.txt", StringComparison.OrdinalIgnoreCase))
             )
-            .OrderByDescending(Directory.GetCreationTime)
             .Select(ReadSessionInfoFromDirectoryAsync);
 
         var infos = await Task.WhenAll(infoTasks);
         return infos
             .Where(x => x.HasValue)
             .GroupBy(x => (x!.Value.Location, x.Value.Date))
+            .OrderByDescending(x => x.Key.Date)
             .ToDictionary(
                 x => x.Key,
                 x => x.Select(x => (x!.Value.Session, x.Value.Directory)).ToList()
