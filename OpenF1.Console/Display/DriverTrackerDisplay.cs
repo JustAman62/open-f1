@@ -14,9 +14,14 @@ public class DriverTrackerDisplay(
     ILogger<DriverTrackerDisplay> logger
 ) : IDisplay
 {
+    private const int IMAGE_SCALE_FACTOR = 20;
+    private const int IMAGE_PADDING = 20;
+    private static readonly SKPaint _whitePaint =
+        new() { Color = SKColor.Parse("666666"), StrokeWidth = 4 };
+
     public Screen Screen => Screen.DriverTracker;
 
-    public async Task<IRenderable> GetContentAsync()
+    public Task<IRenderable> GetContentAsync()
     {
         var driverTower = GetDriverTower();
         var layout = new Layout("Content").SplitColumns(
@@ -25,7 +30,7 @@ public class DriverTrackerDisplay(
         );
         layout["Content"]["Driver List"].Size = 13;
 
-        return layout;
+        return Task.FromResult<IRenderable>(layout);
     }
 
     private IRenderable GetDriverTower()
@@ -85,31 +90,37 @@ public class DriverTrackerDisplay(
             return;
         }
 
-        circuitPoints = circuitPoints.Select(x => (x.x / 100, x.y / 100)).ToList();
+        circuitPoints = circuitPoints
+            .Select(x => (x.x / IMAGE_SCALE_FACTOR, x.y / IMAGE_SCALE_FACTOR))
+            .ToList();
 
-        var minX = Math.Abs(circuitPoints.Min(x => x.x));
-        var minY = Math.Abs(circuitPoints.Min(x => x.y));
+        var minX = Math.Abs(circuitPoints.Min(x => x.x)) + IMAGE_PADDING;
+        var minY = Math.Abs(circuitPoints.Min(x => x.y)) + IMAGE_PADDING;
 
         // Offset the coords to make them all > 0
         circuitPoints = circuitPoints.Select(x => (x.x + minX, x.y + minY)).ToList();
 
-        var maxX = circuitPoints.Max(x => x.x) + 1;
-        var maxY = circuitPoints.Max(x => x.y) + 1;
+        var maxX = circuitPoints.Max(x => x.x) + IMAGE_PADDING;
+        var maxY = circuitPoints.Max(x => x.y) + IMAGE_PADDING;
         var max = Math.Max(maxX, maxY);
 
         // Invert the Y coords due to how Y is displayed in a TUI (top=0 instead bottom=0)
         circuitPoints = circuitPoints.Select(x => (x.x, maxY - x.y)).ToList();
 
-        var img = new SKBitmap(maxX, maxY);
-        foreach (var (x, y) in circuitPoints)
+        var surface = SKSurface.Create(new SKImageInfo(maxX, maxY));
+        var canvas = surface.Canvas;
+        for (var i = 0; i < circuitPoints.Count - 1; i++)
         {
+            var a = circuitPoints[i];
+            var b = circuitPoints[i + 1];
             try
             {
-                img.SetPixel(x, y, SKColor.Parse("666666"));
+                canvas.DrawLine(a.x, a.y, b.x, b.y, _whitePaint);
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Failed to set pixel {}, {}", x, y);
+                logger.LogError(ex, "Failed to set create line from {a} to {b}", a, b);
+                canvas.DrawCircle(5, 5, 2, new SKPaint { Color = SKColor.Parse("FF0000") });
             }
         }
 
@@ -124,10 +135,22 @@ public class DriverTrackerDisplay(
                 {
                     if (state.SelectedDrivers.Contains(driverNumber))
                     {
-                        img.SetPixel(
-                            (position.X.Value / 100) + minX,
-                            maxY - ((position.Y.Value / 100) + minY),
-                            SKColor.Parse(data.TeamColour)
+                        canvas.DrawCircle(
+                            (position.X.Value / IMAGE_SCALE_FACTOR) + minX,
+                            maxY - ((position.Y.Value / IMAGE_SCALE_FACTOR) + minY),
+                            5,
+                            new SKPaint { Color = SKColor.Parse(data.TeamColour) }
+                        );
+                        canvas.DrawText(
+                            data.Tla,
+                            (position.X.Value / IMAGE_SCALE_FACTOR) + minX + 8,
+                            maxY - ((position.Y.Value / IMAGE_SCALE_FACTOR) + minY) + 6,
+                            new SKPaint
+                            {
+                                Color = SKColor.Parse(data.TeamColour),
+                                Style = SKPaintStyle.Fill,
+                                TextSize = 12,
+                            }
                         );
                     }
                 }
@@ -138,12 +161,12 @@ public class DriverTrackerDisplay(
                         position.X.Value,
                         position.Y.Value
                     );
-                    img.SetPixel(0, 0, SKColor.Parse("FF0000"));
+                    canvas.DrawCircle(5, 10, 2, new SKPaint { Color = SKColor.Parse("FF0000") });
                 }
             }
         }
 
-        var imageData = img.Encode(SKEncodedImageFormat.Png, 100);
+        var imageData = surface.Snapshot().Encode();
         var base64 = Convert.ToBase64String(imageData.AsSpan());
 
         var output = TerminalGraphics.ITerm2GraphicsSequence(windowHeight, windowWidth, base64);

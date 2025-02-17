@@ -29,6 +29,7 @@ public static class TerminalGraphics
     public static string ITerm2GraphicsSequence(int height, int width, string base64EncodedImage)
     {
         var args = new string[] {
+            "name=drivertracker",
             $"width={width}",
             $"height={height}",
             $"preserveAspectRatio=1",

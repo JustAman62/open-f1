@@ -18,5 +18,7 @@ public record State
 
     public int CursorOffset { get; set; } = 0;
 
-    public List<string> SelectedDrivers { get; set; } = [];
+    public List<string> SelectedDrivers { get; set; } =
+        // Initialize with all drivers selected. Driver numbers are always between 0-99, so just naively add all
+        [.. Enumerable.Range(0, 100).Select(x => x.ToString())];
 }
