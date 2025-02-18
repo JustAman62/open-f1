@@ -39,6 +39,20 @@ public class DriverTrackerDisplay(
 
     public Task<IRenderable> GetContentAsync()
     {
+        var trackMapMessage = string.Empty;
+        if (!TerminalGraphics.IsITerm2ProtocolSupported.Value)
+        {
+            // We don't think the current terminal supports the iTerm2 graphics protocol
+            trackMapMessage = $"""
+                It seems the current terminal may not support inline graphics, which means we can't show the driver tracker.
+                If you think this is incorrect, please open an issue at https://github.com/JustAman62/open-f1. 
+                Include the diagnostic information below:
+
+                LC_TERMINAL: {Environment.GetEnvironmentVariable("LC_TERMINAL")}
+                TERM: {Environment.GetEnvironmentVariable("TERM")}
+                TERM_PROGRAM: {Environment.GetEnvironmentVariable("TERM_PROGRAM")}
+                """;
+        }
         var driverTower = GetDriverTower();
         var statusPanel = GetStatusPanel();
         var layout = new Layout("Content").SplitColumns(
@@ -48,7 +62,7 @@ public class DriverTrackerDisplay(
                     new Layout("Status", statusPanel).Size(6)
                 )
                 .Size(LEFT_OFFSET - 1),
-            new Layout("Track Map", new Text(string.Empty)) // Empty, drawn in to manually in PostContentDrawAsync()
+            new Layout("Track Map", new Text(trackMapMessage)) // Drawn over to manually in PostContentDrawAsync()
         );
 
         _base64TrackMap = GetTrackMap();
@@ -134,6 +148,11 @@ public class DriverTrackerDisplay(
 
     private string GetTrackMap()
     {
+        if (!TerminalGraphics.IsITerm2ProtocolSupported.Value)
+        {
+            return string.Empty;
+        }
+
         var windowHeight = Terminal.Size.Height - TOP_OFFSET - BOTTOM_OFFSET;
         var windowWidth = Terminal.Size.Width - LEFT_OFFSET;
 
@@ -225,22 +244,6 @@ public class DriverTrackerDisplay(
     /// <inheritdoc />
     public async Task PostContentDrawAsync()
     {
-        if (!TerminalGraphics.IsITerm2ProtocolSupported.Value)
-        {
-            // We don't think the current terminal supports the iTerm2 graphics protocol
-            await Terminal.OutAsync(
-                $"""
-                It seems the current terminal may not support inline graphics, which means we can't this the driver tracker.
-                If you think this is incorrect, please open an issue at https://github.com/JustAman62/open-f1. Include the diagnostic information below:
-
-                LC_TERMINAL: {Environment.GetEnvironmentVariable("LC_TERMINAL")}
-                TERM: {Environment.GetEnvironmentVariable("TERM")}
-                TERM_PROGRAM: {Environment.GetEnvironmentVariable("TERM_PROGRAM")}
-                """
-            );
-            return;
-        }
-
         await Terminal.OutAsync(ControlSequences.MoveCursorTo(TOP_OFFSET, LEFT_OFFSET));
         await Terminal.OutAsync(_base64TrackMap);
     }
