@@ -89,7 +89,7 @@ public static class DisplayUtils
         if (from?.GapToLeaderSeconds() is not null && to.GapToLeaderSeconds() is not null)
         {
             var gap = to.GapToLeaderSeconds() - from.GapToLeaderSeconds();
-            return new Text($"{(gap > 0 ? "+" : "")}{gap, 3}".ToFixedWidth(7));
+            return new Text($"{(gap > 0 ? "+" : "")}{gap, 3} ".ToFixedWidth(8));
         }
 
         return new Text("");

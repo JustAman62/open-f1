@@ -12,6 +12,9 @@ public class DriverTrackerDisplay(
     PositionDataProcessor positionData,
     CarDataProcessor carData,
     SessionInfoProcessor sessionInfo,
+    TrackStatusProcessor trackStatus,
+    ExtrapolatedClockProcessor extrapolatedClock,
+    IDateTimeProvider dateTimeProvider,
     ILogger<DriverTrackerDisplay> logger
 ) : IDisplay
 {
@@ -37,8 +40,14 @@ public class DriverTrackerDisplay(
     public Task<IRenderable> GetContentAsync()
     {
         var driverTower = GetDriverTower();
+        var statusPanel = GetStatusPanel();
         var layout = new Layout("Content").SplitColumns(
-            new Layout("Driver List", driverTower).Size(LEFT_OFFSET - 1),
+            new Layout("Left Tower")
+                .SplitRows(
+                    new Layout("Driver List", driverTower),
+                    new Layout("Status", statusPanel).Size(6)
+                )
+                .Size(LEFT_OFFSET - 1),
             new Layout("Track Map", new Text(string.Empty)) // Empty, drawn in to manually in PostContentDrawAsync()
         );
 
@@ -91,6 +100,36 @@ public class DriverTrackerDisplay(
         }
 
         return table;
+    }
+
+    private IRenderable GetStatusPanel()
+    {
+        var items = new List<IRenderable>();
+
+        if (trackStatus.Latest is not null)
+        {
+            var style = trackStatus.Latest.Status switch
+            {
+                "1" => DisplayUtils.STYLE_PB, // All Clear
+                "2" => new Style(foreground: Color.Black, background: Color.Yellow), // Yellow Flag
+                "4" => new Style(foreground: Color.Black, background: Color.Yellow), // Safety Car
+                "6" => new Style(foreground: Color.Black, background: Color.Yellow), // VSC Deployed
+                "5" => new Style(foreground: Color.White, background: Color.Red), // Red Flag
+                _ => Style.Plain
+            };
+            items.Add(new Text($"{trackStatus.Latest.Message}", style));
+        }
+
+        items.Add(new Text($@"{dateTimeProvider.Utc:HH\:mm\:ss}"));
+        items.Add(new Text($@"{extrapolatedClock.ExtrapolatedRemaining():hh\:mm\:ss}"));
+
+        var rows = new Rows(items);
+        return new Panel(rows)
+        {
+            Header = new PanelHeader("Status"),
+            Expand = true,
+            Border = BoxBorder.Rounded
+        };
     }
 
     private string GetTrackMap()

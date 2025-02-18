@@ -50,28 +50,31 @@ public class TimingTowerDisplay(
 
     private IRenderable GetRaceTimingTower()
     {
-        var table = new Table();
         var lap = lapCountProcessor.Latest;
+        var table = new Table();
         table
             .AddColumns(
-                new TableColumn($"LAP {lap?.CurrentLap, 2}/{lap?.TotalLaps}"),
-                new TableColumn("Leader") { Width = 6, Alignment = Justify.Right },
-                new TableColumn("Gap") { Width = 6, Alignment = Justify.Right },
-                new TableColumn("Best Lap"),
-                new TableColumn("Last Lap"),
-                new TableColumn("S1") { Width = 6 },
-                new TableColumn("S2") { Width = 6 },
-                new TableColumn("S3") { Width = 6 },
-                new TableColumn("Pit"),
-                new TableColumn("Tyre"),
-                new TableColumn("Compare"),
-                new TableColumn("Driver"),
+                new TableColumn($"LAP {lap?.CurrentLap, 2}/{lap?.TotalLaps}")
+                {
+                    Width = 9,
+                    Alignment = Justify.Left
+                },
+                new TableColumn("Leader") { Width = 8, Alignment = Justify.Right },
+                new TableColumn("Gap") { Width = 8, Alignment = Justify.Right },
+                new TableColumn("Best Lap") { Width = 9, Alignment = Justify.Right },
+                new TableColumn("Last Lap") { Width = 9, Alignment = Justify.Right },
+                new TableColumn("S1") { Width = 7, Alignment = Justify.Right },
+                new TableColumn("S2") { Width = 7, Alignment = Justify.Right },
+                new TableColumn("S3") { Width = 7, Alignment = Justify.Right },
+                new TableColumn("Pit") { Width = 4, Alignment = Justify.Right },
+                new TableColumn("Tyre") { Width = 5, Alignment = Justify.Right },
+                new TableColumn(" Compare ") { Width = 9, Alignment = Justify.Right },
+                new TableColumn("Driver") { Width = 9 },
                 new TableColumn("") { Width = 1 }
             )
+            .NoBorder()
+            .NoSafeBorder()
             .RemoveColumnPadding();
-
-        // Increase padding between lap and sector times to clearly mark them
-        table.Columns[5].Padding = new Padding(left: 1, 0, 0, 0);
 
         var comparisonDataPoint = timingData.Latest.Lines.FirstOrDefault(x =>
             x.Value.Line == state.CursorOffset
@@ -111,14 +114,14 @@ public class TimingTowerDisplay(
             table.AddRow(
                 DisplayUtils.DriverTag(driver, line, isComparisonLine),
                 new Text(
-                    $"{line.GapToLeader}".ToFixedWidth(7),
+                    $"{line.GapToLeader}".ToFixedWidth(8),
                     isComparisonLine ? DisplayUtils.STYLE_INVERT : DisplayUtils.STYLE_NORMAL
                 ),
                 position.Status == PositionDataPoint.PositionData.Entry.DriverStatus.OffTrack
                     ? new Text("OFF TRK", new Style(background: Color.Red, foreground: Color.White))
                     : new Text(
                         $"{(car?.Channels.Drs >= 8 ? "•" : "")}{line.IntervalToPositionAhead?.Value}".ToFixedWidth(
-                            7
+                            8
                         ),
                         DisplayUtils.GetStyle(line.IntervalToPositionAhead, isComparisonLine, car)
                     ),
@@ -162,9 +165,6 @@ public class TimingTowerDisplay(
             );
         }
 
-        table.SimpleBorder();
-        table.Expand();
-
         return table;
     }
 
@@ -173,26 +173,26 @@ public class TimingTowerDisplay(
         if (timingData.Latest is null)
             return new Text("No Timing Available");
 
-        var table = new Table();
-        table
+        var table = new Table()
             .AddColumns(
-                sessionInfoProcessor.Latest.Name?.ToFixedWidth(9) ?? "Unknown ",
-                "Gap",
-                "Best Lap",
-                "BL S1",
-                "BL S2",
-                "BL S3",
-                "S1",
-                "S2",
-                "S3",
-                "Pit",
-                "Tyre"
+                new TableColumn(sessionInfoProcessor.Latest.Name?.ToFixedWidth(9) ?? "Unknown ")
+                {
+                    Width = 10,
+                    Alignment = Justify.Left
+                },
+                new TableColumn("Gap") { Width = 8, Alignment = Justify.Left },
+                new TableColumn("Best Lap") { Width = 9, Alignment = Justify.Left },
+                new TableColumn("BL S1") { Width = 15, Alignment = Justify.Left },
+                new TableColumn("BL S2") { Width = 15, Alignment = Justify.Left },
+                new TableColumn("BL S3") { Width = 15, Alignment = Justify.Left },
+                new TableColumn("S1") { Width = 7, Alignment = Justify.Left },
+                new TableColumn("S2") { Width = 7, Alignment = Justify.Left },
+                new TableColumn("S3") { Width = 7, Alignment = Justify.Left },
+                new TableColumn("Pit") { Width = 4, Alignment = Justify.Left },
+                new TableColumn("Tyre") { Width = 5, Alignment = Justify.Left }
             )
+            .NoBorder()
             .RemoveColumnPadding();
-
-        // Increase padding between sets of sectors to clearly mark them
-        table.Columns[3].Padding = new Padding(left: 1, 0, 0, 0);
-        table.Columns[6].Padding = new Padding(left: 1, 0, 0, 0);
 
         var bestDriver = timingData.Latest.GetOrderedLines().First();
 
@@ -275,9 +275,6 @@ public class TimingTowerDisplay(
                 new Text($"{stint?.Compound?[0] ?? 'X'} {stint?.TotalLaps, 2}", GetStyle(stint))
             );
         }
-
-        table.SimpleBorder();
-        table.Expand();
         return table;
     }
 
