@@ -79,8 +79,8 @@ public class ConsoleLoop(
                     $"Exception whilst rendering screen {state.CurrentScreen}",
                     cancellationToken
                 );
-                await Terminal.ErrorLineAsync(ex, cancellationToken);
-                logger.LogError(ex, "Error rendering screen: {}", state.CurrentScreen);
+                await Terminal.ErrorAsync(ex, cancellationToken);
+                logger.LogError(ex, "Error rendering screen: {CurrentScreen}", state.CurrentScreen);
             }
 
             stopwatch.Stop();

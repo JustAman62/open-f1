@@ -120,7 +120,7 @@ public class TimingTowerDisplay(
                         $"{(car?.Channels.Drs >= 8 ? "•" : "")}{line.IntervalToPositionAhead?.Value}".ToFixedWidth(
                             7
                         ),
-                        GetStyle(line.IntervalToPositionAhead, isComparisonLine, car)
+                        DisplayUtils.GetStyle(line.IntervalToPositionAhead, isComparisonLine, car)
                     ),
                 new Text(
                     line.BestLapTime?.Value ?? "NULL",
@@ -156,7 +156,7 @@ public class TimingTowerDisplay(
                             : Style.Plain
                 ),
                 new Text($"{stint?.Compound?[0]} {stint?.TotalLaps, 2}", GetStyle(stint)),
-                GetGapBetweenLines(comparisonDataPoint.Value, line),
+                DisplayUtils.GetGapBetweenLines(comparisonDataPoint.Value, line),
                 DisplayUtils.DriverTag(driver, line, isComparisonLine),
                 new Markup(GetPositionChangeMarkup(positionChange))
             );
@@ -356,53 +356,6 @@ public class TimingTowerDisplay(
             "WET" => new Style(foreground: Color.Black, background: Color.Blue),
             _ => DisplayUtils.STYLE_NORMAL
         };
-    }
-
-    private Style GetStyle(
-        TimingDataPoint.Driver.Interval? interval,
-        bool isComparisonLine,
-        CarDataPoint.Entry.Car? car = null
-    )
-    {
-        if (interval is null)
-            return DisplayUtils.STYLE_NORMAL;
-
-        var foreground = Color.White;
-        var background = Color.Black;
-
-        if (isComparisonLine)
-        {
-            foreground = Color.Black;
-            background = Color.White;
-        }
-
-        if (interval.IntervalSeconds() < 1 && interval.IntervalSeconds() > 0)
-        {
-            foreground = Color.Green3;
-        }
-
-        if (car is { Channels: { Drs: > 8 } })
-        {
-            foreground = Color.White;
-            background = Color.Green3;
-        }
-        return new Style(foreground: foreground, background: background);
-    }
-
-    private IRenderable GetGapBetweenLines(TimingDataPoint.Driver? from, TimingDataPoint.Driver to)
-    {
-        if (from == to)
-        {
-            return new Text("-------", DisplayUtils.STYLE_INVERT);
-        }
-
-        if (from?.GapToLeaderSeconds() is not null && to.GapToLeaderSeconds() is not null)
-        {
-            var gap = to.GapToLeaderSeconds() - from.GapToLeaderSeconds();
-            return new Text($"{(gap > 0 ? "+" : "")}{gap, 3}".ToFixedWidth(7));
-        }
-
-        return new Text("");
     }
 
     private string GetPositionChangeMarkup(int? change) =>

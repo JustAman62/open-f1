@@ -10,12 +10,17 @@ public class DriverTrackerDisplay(
     TimingDataProcessor timingData,
     DriverListProcessor driverList,
     PositionDataProcessor positionData,
+    CarDataProcessor carData,
     SessionInfoProcessor sessionInfo,
     ILogger<DriverTrackerDisplay> logger
 ) : IDisplay
 {
     private const int IMAGE_SCALE_FACTOR = 20;
     private const int IMAGE_PADDING = 25;
+    private const int LEFT_OFFSET = 17;
+    private const int TOP_OFFSET = 1;
+    private const int BOTTOM_OFFSET = 2;
+
     private static readonly SKPaint _trackLinePaint =
         new() { Color = SKColor.Parse("666666"), StrokeWidth = 4 };
     private static readonly SKTypeface _boldTypeface = SKTypeface.FromFamilyName(
@@ -25,7 +30,7 @@ public class DriverTrackerDisplay(
         slant: SKFontStyleSlant.Upright
     );
 
-    private string _previousImage = string.Empty;
+    private string _base64TrackMap = string.Empty;
 
     public Screen Screen => Screen.DriverTracker;
 
@@ -33,10 +38,11 @@ public class DriverTrackerDisplay(
     {
         var driverTower = GetDriverTower();
         var layout = new Layout("Content").SplitColumns(
-            new Layout("Driver List", driverTower),
+            new Layout("Driver List", driverTower).Size(LEFT_OFFSET - 1),
             new Layout("Track Map", new Text(string.Empty)) // Empty, drawn in to manually in PostContentDrawAsync()
         );
-        layout["Content"]["Driver List"].Size = 13;
+
+        _base64TrackMap = GetTrackMap();
 
         return Task.FromResult<IRenderable>(layout);
     }
@@ -44,62 +50,58 @@ public class DriverTrackerDisplay(
     private IRenderable GetDriverTower()
     {
         var table = new Table();
-        table.AddColumns("Tracker", " ");
-        table.SimpleBorder();
-        table.RemoveColumnPadding();
+        table
+            .AddColumns(
+                new TableColumn("Drivers") { Width = 8 },
+                new TableColumn("Gap") { Width = 7, Alignment = Justify.Right }
+            )
+            .NoBorder()
+            .NoSafeBorder()
+            .RemoveColumnPadding();
+
+        var comparisonDataPoint = timingData.Latest.Lines.FirstOrDefault(x =>
+            x.Value.Line == state.CursorOffset
+        );
 
         foreach (var (driverNumber, line) in timingData.Latest.GetOrderedLines())
         {
             var driver = driverList.Latest?.GetValueOrDefault(driverNumber) ?? new();
+            var car = carData.Latest.Entries.FirstOrDefault()?.Cars.GetValueOrDefault(driverNumber);
+            var isComparisonLine = line == comparisonDataPoint.Value;
+
+            var driverTag = DisplayUtils.MarkedUpDriverNumber(driver);
+            if (!state.SelectedDrivers.Contains(driverNumber))
+            {
+                driverTag = $"[dim]{driverTag}[/]";
+            }
+
+            driverTag = state.CursorOffset == line.Line ? $">{driverTag}<" : $" {driverTag} ";
+
             table.AddRow(
-                DisplayUtils.DriverTag(driver, line, state.SelectedDrivers.Contains(driverNumber)),
-                new Text(
-                    " ",
-                    state.CursorOffset == line.Line
-                        ? DisplayUtils.STYLE_INVERT
-                        : DisplayUtils.STYLE_NORMAL
-                )
+                new Markup(driverTag),
+                state.CursorOffset > 0
+                    ? DisplayUtils.GetGapBetweenLines(comparisonDataPoint.Value, line)
+                    : new Text(
+                        $"{(car?.Channels.Drs >= 8 ? "•" : "")}{line.IntervalToPositionAhead?.Value}".ToFixedWidth(
+                            7
+                        ),
+                        DisplayUtils.GetStyle(line.IntervalToPositionAhead, false, car)
+                    )
             );
         }
 
         return table;
     }
 
-    public async Task PostContentDrawAsync()
+    private string GetTrackMap()
     {
-        const int LEFT_OFFSET = 14;
-        const int TOP_OFFSET = 1;
-        const int BOTTOM_OFFSET = 2;
         var windowHeight = Terminal.Size.Height - TOP_OFFSET - BOTTOM_OFFSET;
         var windowWidth = Terminal.Size.Width - LEFT_OFFSET;
 
-        await Terminal.OutAsync(ControlSequences.MoveCursorTo(TOP_OFFSET, LEFT_OFFSET));
-
-        if (!TerminalGraphics.IsITerm2ProtocolSupported())
-        {
-            // We don't think the current terminal supports the iTerm2 graphics protocol
-            await Terminal.OutAsync(
-                $"""
-                It seems the current terminal may not support inline graphics, which means we can't this the driver tracker.
-                If you think this is incorrect, please open an issue at https://github.com/JustAman62/open-f1. Include the diagnostic information below:
-
-                LC_TERMINAL: {Environment.GetEnvironmentVariable("LC_TERMINAL")}
-                TERM: {Environment.GetEnvironmentVariable("TERM")}
-                TERM_PROGRAM: {Environment.GetEnvironmentVariable("TERM_PROGRAM")}
-                """
-            );
-            return;
-        }
-
-        var circuitPoints = sessionInfo.Latest.CircuitPoints;
-        if (circuitPoints.Count == 0)
-        {
-            await Terminal.OutAsync("Circuit info not available");
-            return;
-        }
-
-        circuitPoints = circuitPoints
-            .Select(x => (x.x / IMAGE_SCALE_FACTOR, x.y / IMAGE_SCALE_FACTOR))
+        var circuitPoints = sessionInfo
+            .Latest.CircuitPoints.Select(x =>
+                (x: x.x / IMAGE_SCALE_FACTOR, y: x.y / IMAGE_SCALE_FACTOR)
+            )
             .ToList();
 
         var minX = Math.Abs(circuitPoints.Min(x => x.x)) + IMAGE_PADDING;
@@ -178,12 +180,29 @@ public class DriverTrackerDisplay(
         var imageData = surface.Snapshot().Encode();
         var base64 = Convert.ToBase64String(imageData.AsSpan());
 
-        var output = TerminalGraphics.ITerm2GraphicsSequence(windowHeight, windowWidth, base64);
-        // Only draw the image if it has changed
-        if (_previousImage != output)
+        return TerminalGraphics.ITerm2GraphicsSequence(windowHeight, windowWidth, base64);
+    }
+
+    /// <inheritdoc />
+    public async Task PostContentDrawAsync()
+    {
+        if (!TerminalGraphics.IsITerm2ProtocolSupported.Value)
         {
-            await Terminal.OutAsync(output);
+            // We don't think the current terminal supports the iTerm2 graphics protocol
+            await Terminal.OutAsync(
+                $"""
+                It seems the current terminal may not support inline graphics, which means we can't this the driver tracker.
+                If you think this is incorrect, please open an issue at https://github.com/JustAman62/open-f1. Include the diagnostic information below:
+
+                LC_TERMINAL: {Environment.GetEnvironmentVariable("LC_TERMINAL")}
+                TERM: {Environment.GetEnvironmentVariable("TERM")}
+                TERM_PROGRAM: {Environment.GetEnvironmentVariable("TERM_PROGRAM")}
+                """
+            );
+            return;
         }
-        _previousImage = output;
+
+        await Terminal.OutAsync(ControlSequences.MoveCursorTo(TOP_OFFSET, LEFT_OFFSET));
+        await Terminal.OutAsync(_base64TrackMap);
     }
 }

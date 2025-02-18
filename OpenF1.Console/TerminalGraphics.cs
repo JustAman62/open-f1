@@ -12,7 +12,9 @@ public static class TerminalGraphics
     /// This is done in a very rudimentary way, and is by no means comprehensive.
     /// </summary>
     /// <returns><see langword="true" /> if the current terminal supports the iTerm 2 Graphics Protocol.</returns>
-    public static bool IsITerm2ProtocolSupported()
+    public static Lazy<bool> IsITerm2ProtocolSupported { get; } = new Lazy<bool>(GetIsITerm2ProtocolSupported);
+
+    private static bool GetIsITerm2ProtocolSupported()
     {
         var lcTerminal = Environment.GetEnvironmentVariable("LC_TERMINAL") ?? string.Empty;
         return ITERM_PROTOCOL_SUPPORTED_TERMINALS.Contains(
