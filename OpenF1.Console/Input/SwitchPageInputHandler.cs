@@ -10,8 +10,8 @@ public class SwitchPageInputHandler(LapCountProcessor lapCountProcessor, State s
     public Screen[] ApplicableScreens =>
         [
             Screen.RaceControl,
-            Screen.DriverTracker,
             Screen.TeamRadio,
+            Screen.DriverTracker,
             Screen.TimingTower,
             Screen.TimingHistory,
             Screen.ChampionshipStats
