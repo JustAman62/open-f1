@@ -3,7 +3,7 @@ namespace OpenF1.Data;
 /// <summary>
 /// Sample: {"Messages": {"2": {"Utc": "2021-03-27T12:00:00", "Category": "Flag", "Flag": "GREEN", "Scope": "Track", "Message": "GREEN LIGHT - PIT EXIT OPEN"}}}
 /// </summary>
-public sealed record SessionInfoDataPoint: ILiveTimingDataPoint
+public sealed record SessionInfoDataPoint : ILiveTimingDataPoint
 {
     /// <inheritdoc />
     public LiveTimingDataType LiveTimingDataType => LiveTimingDataType.SessionInfo;
@@ -23,6 +23,7 @@ public sealed record SessionInfoDataPoint: ILiveTimingDataPoint
     /// Not provided by F1.
     /// </summary>
     public List<(int x, int y)> CircuitPoints { get; set; } = [];
+    public List<(int number, float x, float y)> CircuitCorners { get; set; } = [];
 
     public sealed record MeetingDetail
     {

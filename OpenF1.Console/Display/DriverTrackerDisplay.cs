@@ -1,3 +1,4 @@
+using System.Runtime.CompilerServices;
 using OpenF1.Data;
 using SkiaSharp;
 using Spectre.Console;
@@ -25,10 +26,23 @@ public class DriverTrackerDisplay(
     private const int BOTTOM_OFFSET = 2;
 
     private static readonly SKPaint _trackLinePaint =
-        new() { Color = SKColor.Parse("666666"), StrokeWidth = 4 };
+        new() { Color = SKColor.Parse("666666"), StrokeWidth = 4, };
+    private static readonly SKPaint _cornerTextPaint =
+        new()
+        {
+            Color = SKColor.Parse("DDDDDD"),
+            TextSize = 14,
+            Typeface = SKTypeface.FromFamilyName(
+                "Consolas",
+                weight: SKFontStyleWeight.SemiBold,
+                width: SKFontStyleWidth.Normal,
+                slant: SKFontStyleSlant.Upright
+            ),
+        };
+    private static readonly SKPaint _errorPaint = new() { Color = SKColor.Parse("FF0000") };
     private static readonly SKTypeface _boldTypeface = SKTypeface.FromFamilyName(
         "Consolas",
-        weight: SKFontStyleWeight.Bold,
+        weight: SKFontStyleWeight.ExtraBold,
         width: SKFontStyleWidth.Normal,
         slant: SKFontStyleSlant.Upright
     );
@@ -148,7 +162,10 @@ public class DriverTrackerDisplay(
 
     private string GetTrackMap()
     {
-        if (!TerminalGraphics.IsITerm2ProtocolSupported.Value)
+        if (
+            !TerminalGraphics.IsITerm2ProtocolSupported.Value
+            || sessionInfo.Latest.CircuitPoints.Count == 0
+        )
         {
             return string.Empty;
         }
@@ -177,6 +194,8 @@ public class DriverTrackerDisplay(
 
         var surface = SKSurface.Create(new SKImageInfo(maxX, maxY));
         var canvas = surface.Canvas;
+
+        // Draw lines between all the points of the track to create the track map
         for (var i = 0; i < circuitPoints.Count - 1; i++)
         {
             var a = circuitPoints[i];
@@ -188,10 +207,38 @@ public class DriverTrackerDisplay(
             catch (Exception ex)
             {
                 logger.LogError(ex, "Failed to set create line from {a} to {b}", a, b);
-                canvas.DrawCircle(5, 5, 2, new SKPaint { Color = SKColor.Parse("FF0000") });
+                canvas.DrawCircle(5, 5, 2, _errorPaint);
             }
         }
 
+        var circuitCorners = sessionInfo
+            .Latest.CircuitCorners.Select(x =>
+                (x.number, x: x.x / IMAGE_SCALE_FACTOR, y: x.y / IMAGE_SCALE_FACTOR)
+            )
+            .Select(x => (x.number, x: x.x + minX, y: maxY - (x.y + minY)))
+            .ToList();
+
+        foreach (var (number, x, y) in circuitCorners)
+        {
+            try
+            {
+                // Draw the text to the right of the corner
+                canvas.DrawText(number.ToString(), x + 10, y, _cornerTextPaint);
+            }
+            catch (Exception ex)
+            {
+                logger.LogError(
+                    ex,
+                    "Failed to add corner number {corner} at {x},{y}",
+                    number,
+                    x,
+                    y
+                );
+                canvas.DrawCircle(5, 5, 2, _errorPaint);
+            }
+        }
+
+        // Add all the selected drivers positions to the map
         foreach (var (driverNumber, data) in driverList.Latest)
         {
             var position = positionData
@@ -203,23 +250,28 @@ public class DriverTrackerDisplay(
                 {
                     if (state.SelectedDrivers.Contains(driverNumber))
                     {
-                        canvas.DrawCircle(
-                            (position.X.Value / IMAGE_SCALE_FACTOR) + minX,
-                            maxY - ((position.Y.Value / IMAGE_SCALE_FACTOR) + minY),
-                            5,
-                            new SKPaint { Color = SKColor.Parse(data.TeamColour) }
-                        );
+                        var x = (position.X.Value / IMAGE_SCALE_FACTOR) + minX;
+                        var y = maxY - ((position.Y.Value / IMAGE_SCALE_FACTOR) + minY);
+                        var paint = new SKPaint
+                        {
+                            Color = SKColor.Parse(data.TeamColour),
+                            TextSize = 14,
+                            Typeface = _boldTypeface
+                        };
+
+                        // Draw a white box around the driver currently selected by the cursor
+                        if (timingData.Latest.Lines[driverNumber].Line == state.CursorOffset)
+                        {
+                            var rectPaint = new SKPaint { Color = SKColor.Parse("FFFFFF"), };
+                            canvas.DrawRoundRect(x - 6, y - 8, 46, 16, 4, 4, rectPaint);
+                        }
+
+                        canvas.DrawCircle(x, y, 5, paint);
                         canvas.DrawText(
                             data.Tla,
                             (position.X.Value / IMAGE_SCALE_FACTOR) + minX + 8,
                             maxY - ((position.Y.Value / IMAGE_SCALE_FACTOR) + minY) + 6,
-                            new SKFont { Embolden = true },
-                            new SKPaint
-                            {
-                                Color = SKColor.Parse(data.TeamColour),
-                                TextSize = 14,
-                                Typeface = _boldTypeface
-                            }
+                            paint
                         );
                     }
                 }
@@ -230,7 +282,7 @@ public class DriverTrackerDisplay(
                         position.X.Value,
                         position.Y.Value
                     );
-                    canvas.DrawCircle(5, 10, 2, new SKPaint { Color = SKColor.Parse("FF0000") });
+                    canvas.DrawCircle(5, 10, 2, _errorPaint);
                 }
             }
         }
