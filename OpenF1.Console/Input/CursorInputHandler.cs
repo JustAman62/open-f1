@@ -12,7 +12,10 @@ public sealed class CursorInputHandler(State state) : IInputHandler
 
     public int Sort => 21;
 
-    public Task ExecuteAsync(ConsoleKeyInfo consoleKeyInfo)
+    public Task ExecuteAsync(
+        ConsoleKeyInfo consoleKeyInfo,
+        CancellationToken cancellationToken = default
+    )
     {
         var changeBy = consoleKeyInfo.Key == ConsoleKey.DownArrow ? 1 : -1;
         if (consoleKeyInfo.Modifiers.HasFlag(ConsoleModifiers.Shift))

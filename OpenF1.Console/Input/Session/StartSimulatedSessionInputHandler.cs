@@ -1,48 +1,75 @@
-using Microsoft.Extensions.Options;
 using OpenF1.Data;
-using Spectre.Console;
 
 namespace OpenF1.Console;
 
 public class StartSimulatedSessionInputHandler(
     IJsonTimingClient jsonTimingClient,
-    IOptions<LiveTimingOptions> options
+    StartSimulatedSessionOptions displayOptions,
+    State state
 ) : IInputHandler
 {
     public bool IsEnabled => true;
 
-    public Screen[] ApplicableScreens => [Screen.ManageSession];
+    public Screen[] ApplicableScreens => [Screen.StartSimulatedSession];
 
-    public ConsoleKey[] Keys => [ConsoleKey.F];
+    public ConsoleKey[] Keys => [ConsoleKey.Enter, ConsoleKey.RightArrow];
 
-    public string Description => "Start Simulation";
+    public string Description => "Select";
 
     public int Sort => 41;
 
-    public Task ExecuteAsync(ConsoleKeyInfo consoleKeyInfo)
+    public async Task ExecuteAsync(
+        ConsoleKeyInfo consoleKeyInfo,
+        CancellationToken cancellationToken = default
+    )
     {
-        var directories = jsonTimingClient.GetDirectoryNames();
-        var title = $"""
-            Select the data directory to run the simulation from. 
-            If you cannot see your directory here, ensure that it contains both a file named subscribe.txt and live.txt.
-            To change this directory, set the OPENF1_DATADIRECTORY environment variable.
-            Configured Directory: {options.Value.DataDirectory}
-            """;
-
-        var prompt = new SelectionPrompt<string>()
-            .Title(title)
-            .AddChoices("Cancel")
-            .AddChoices(directories);
-
-        AnsiConsole.Clear();
-
-        var result = AnsiConsole.Prompt(prompt);
-        if (result == "Cancel")
+        var directories = await jsonTimingClient.GetDirectoryNamesAsync();
+        if (
+            displayOptions.SelectedLocation is null
+            && state.CursorOffset >= 0
+            && state.CursorOffset < directories.Count
+        )
         {
-            return Task.CompletedTask;
+            displayOptions.SelectedLocation = state.CursorOffset;
+            state.CursorOffset = 0;
+            return;
         }
 
-        _ = jsonTimingClient.StartAsync(result);
+        if (displayOptions.SelectedLocation.HasValue)
+        {
+            var selected = directories.ElementAt(displayOptions.SelectedLocation.Value).Value;
+            if (state.CursorOffset >= 0 && state.CursorOffset < selected.Count)
+            {
+                _ = jsonTimingClient.StartAsync(selected.ElementAt(state.CursorOffset).Directory);
+                state.CurrentScreen = Screen.ManageSession;
+            }
+        }
+    }
+}
+
+public class StartSimulatedSessionDeselectInputHandler(
+    StartSimulatedSessionOptions displayOptions,
+    State state
+) : IInputHandler
+{
+    public bool IsEnabled => displayOptions.SelectedLocation.HasValue;
+
+    public Screen[] ApplicableScreens => [Screen.StartSimulatedSession];
+
+    public ConsoleKey[] Keys => [ConsoleKey.LeftArrow];
+
+    public string Description => "Deselect";
+
+    public int Sort => 42;
+
+    public Task ExecuteAsync(
+        ConsoleKeyInfo consoleKeyInfo,
+        CancellationToken cancellationToken = default
+    )
+    {
+        state.CursorOffset = displayOptions.SelectedLocation.GetValueOrDefault();
+        displayOptions.SelectedLocation = null;
+
         return Task.CompletedTask;
     }
 }

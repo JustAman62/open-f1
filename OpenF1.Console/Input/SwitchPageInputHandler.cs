@@ -8,7 +8,14 @@ public class SwitchPageInputHandler(LapCountProcessor lapCountProcessor, State s
     public bool IsEnabled => true;
 
     public Screen[] ApplicableScreens =>
-        [Screen.RaceControl, Screen.TeamRadio, Screen.TimingTower, Screen.TimingHistory, Screen.ChampionshipStats];
+        [
+            Screen.RaceControl,
+            Screen.TeamRadio,
+            Screen.DriverTracker,
+            Screen.TimingTower,
+            Screen.TimingHistory,
+            Screen.ChampionshipStats
+        ];
 
     public ConsoleKey[] Keys => [ConsoleKey.LeftArrow, ConsoleKey.RightArrow];
 
@@ -16,8 +23,13 @@ public class SwitchPageInputHandler(LapCountProcessor lapCountProcessor, State s
 
     public int Sort => 20;
 
-    public Task ExecuteAsync(ConsoleKeyInfo consoleKeyInfo)
+    public async Task ExecuteAsync(
+        ConsoleKeyInfo consoleKeyInfo,
+        CancellationToken cancellationToken = default
+    )
     {
+        await Terminal.OutAsync(ControlSequences.ClearScreen(ClearMode.Full), cancellationToken);
+
         // Find the index of the current screen, and move to the next one
         var index = GetScreenIndex();
         var newIndex = consoleKeyInfo.Key == ConsoleKey.LeftArrow ? index - 1 : index + 1;
@@ -33,13 +45,12 @@ public class SwitchPageInputHandler(LapCountProcessor lapCountProcessor, State s
                 break;
             case Screen.TimingTower:
             case Screen.RaceControl:
+            case Screen.DriverTracker:
             case Screen.ChampionshipStats:
             case Screen.TeamRadio:
                 state.CursorOffset = 0;
                 break;
         }
-
-        return Task.CompletedTask;
     }
 
     private int GetScreenIndex() => ApplicableScreens.ToList().IndexOf(state.CurrentScreen);

@@ -2,15 +2,15 @@ namespace OpenF1.Console;
 
 public interface IInputHandler
 {
-    public bool IsEnabled { get; }
+    bool IsEnabled { get; }
 
-    public Screen[] ApplicableScreens { get; }
+    Screen[] ApplicableScreens { get; }
 
-    public ConsoleKey[] Keys { get; }
+    ConsoleKey[] Keys { get; }
 
-    public string Description { get; }
+    string Description { get; }
 
-    /// <summary> 
+    /// <summary>
     /// <list type="bullet">
     /// <item>00-09 = Foundational Input (e.g. Exit/Escape)</item>
     /// <item>20-29 = Common Screen Inputs (e.g cursor, page etc)</item>
@@ -18,7 +18,7 @@ public interface IInputHandler
     /// <item>60-69 = Switch Screen Inputs</item>
     /// </list>
     /// </summary>
-    public int Sort { get; }
+    int Sort { get; }
 
-    public Task ExecuteAsync(ConsoleKeyInfo consoleKeyInfo);
+    Task ExecuteAsync(ConsoleKeyInfo consoleKeyInfo, CancellationToken cancellationToken = default);
 }

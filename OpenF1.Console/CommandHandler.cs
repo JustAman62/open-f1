@@ -1,5 +1,4 @@
 using InMemLogger;
-using Microsoft.Extensions.Options;
 using OpenF1.Data;
 using Serilog;
 using Serilog.Events;
@@ -60,10 +59,11 @@ public static partial class CommandHandler
                         .ClearProviders()
                         .SetMinimumLevel(inMemoryLogLevel)
                         .AddSerilog()
-                        .AddSimpleConsole(opt =>
+                        .AddTerminal(opt =>
                         {
                             opt.SingleLine = true;
-                            opt.IncludeScopes = false;
+                            opt.UseColors = true;
+                            opt.UseUtcTimestamp = true;
                         });
                 }
                 else

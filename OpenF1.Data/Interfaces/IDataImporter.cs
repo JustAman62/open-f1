@@ -7,7 +7,7 @@ public interface IDataImporter
     /// </summary>
     /// <param name="year">The year to find meetings for.</param>
     /// <returns>The <see cref="ListMeetingsApiResponse"/> returned by the F1 API.</returns>
-    public Task<ListMeetingsApiResponse> GetMeetingsAsync(int year);
+    Task<ListMeetingsApiResponse> GetMeetingsAsync(int year);
 
     /// <summary>
     /// Imports all the live timing data for the session in the given <paramref name="year"/>
@@ -17,7 +17,7 @@ public interface IDataImporter
     /// <param name="meetingKey">The <see cref="ListMeetingsApiResponse.Meeting.Key"/> key for the meeting.</param>
     /// <param name="sessionKey">The <see cref="ListMeetingsApiResponse.Meeting.Session.Key"/> key for the session.</param>
     /// <returns>A <see cref="Task"/> representing the status of the import.</returns>
-    public Task ImportSessionAsync(int year, int meetingKey, int sessionKey);
+    Task ImportSessionAsync(int year, int meetingKey, int sessionKey);
 
     /// <summary>
     /// Imports all the live timing data for the provided <paramref name="session"/>,
@@ -26,5 +26,5 @@ public interface IDataImporter
     /// <param name="meeting">The <see cref="ListMeetingsApiResponse.Meeting"/> which contains the session to import data for.</param>
     /// <param name="session">The key of the session inside the meeting to import data for.</param>
     /// <returns>A <see cref="Task"/> representing the status of the import.</returns>
-    public Task ImportSessionAsync(ListMeetingsApiResponse.Meeting meeting, int sessionKey);
+    Task ImportSessionAsync(int year, ListMeetingsApiResponse.Meeting meeting, int sessionKey);
 }

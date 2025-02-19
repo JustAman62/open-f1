@@ -1,5 +1,7 @@
+using System.Buffers;
 using System.Diagnostics;
 using Spectre.Console;
+using Spectre.Console.Advanced;
 using Spectre.Console.Rendering;
 
 namespace OpenF1.Console;
@@ -8,15 +10,24 @@ public class ConsoleLoop(
     State state,
     IEnumerable<IDisplay> displays,
     IEnumerable<IInputHandler> inputHandlers,
-    IHostApplicationLifetime hostApplicationLifetime
+    IHostApplicationLifetime hostApplicationLifetime,
+    ILogger<ConsoleLoop> logger
 ) : BackgroundService
 {
     private const long TargetFrameTimeMs = 100;
+    private const byte ESC = 27; //0x1B
+    private const byte CSI = 91; //0x5B [
+    private const byte ARG_SEP = 59; //0x3B ;
+    private const byte FE_START = 79; //0x4F
+
+    private string _previousDraw = string.Empty;
 
     protected override async Task ExecuteAsync(CancellationToken cancellationToken)
     {
         // Immediately yield to ensure all the other hosted services start as expected
         await Task.Yield();
+
+        await SetupTerminalAsync(cancellationToken);
 
         var contentPanel = new Panel("Open F1").Expand().RoundedBorder() as IRenderable;
         var layout = new Layout("Root").SplitRows(
@@ -25,78 +36,222 @@ public class ConsoleLoop(
         );
         layout["Footer"].Size = 1;
 
-        AnsiConsole.Cursor.Hide();
-        
         var stopwatch = Stopwatch.StartNew();
         while (!cancellationToken.IsCancellationRequested)
         {
             stopwatch.Restart();
-            await ShowAndHandleInputs(layout).ConfigureAwait(false);
+
+            await SetupBufferAsync(cancellationToken);
+            await HandleInputsAsync(cancellationToken);
 
             if (state.CurrentScreen == Screen.Shutdown)
             {
-                await StopAsync(cancellationToken).ConfigureAwait(false);
+                await StopAsync(cancellationToken);
                 return;
             }
 
             var display = displays.SingleOrDefault(x => x.Screen == state.CurrentScreen);
 
-            AnsiConsole.Cursor.SetPosition(0, 0);
-            AnsiConsole.Cursor.Hide();
             try
             {
                 contentPanel = display is not null
-                    ? await display.GetContentAsync().ConfigureAwait(false)
+                    ? await display.GetContentAsync()
                     : new Panel($"Unknown Display Selected: {state.CurrentScreen}").Expand();
                 layout["Content"].Update(contentPanel);
-                AnsiConsole.Write(layout);
+
+                UpdateInputFooter(layout);
+
+                var output = AnsiConsole.Console.ToAnsi(layout).Replace("\n", "");
+                if (_previousDraw != output)
+                {
+                    await Terminal.OutAsync(output, cancellationToken);
+                    _previousDraw = output;
+                }
+
+                if (display is not null)
+                {
+                    await display.PostContentDrawAsync();
+                }
             }
             catch (Exception ex)
             {
-                AnsiConsole.Write(new Panel($"Exception: {ex.ToString().EscapeMarkup()}").Expand());
+                await Terminal.ErrorLineAsync(
+                    $"Exception whilst rendering screen {state.CurrentScreen}",
+                    cancellationToken
+                );
+                await Terminal.ErrorAsync(ex, cancellationToken);
+                logger.LogError(ex, "Error rendering screen: {CurrentScreen}", state.CurrentScreen);
             }
 
             stopwatch.Stop();
             var timeToDelay = TargetFrameTimeMs - stopwatch.ElapsedMilliseconds;
             if (timeToDelay > 0)
             {
-                await Task.Delay(TimeSpan.FromMilliseconds(timeToDelay), cancellationToken).ConfigureAwait(false);
+                await Task.Delay(TimeSpan.FromMilliseconds(timeToDelay), cancellationToken);
             }
         }
     }
 
     public override async Task StopAsync(CancellationToken cancellationToken)
     {
+        if (!ExecuteTask?.IsCompleted ?? false)
+        {
+            // Don't log if the token has already been cancelled, as that means we've already stopped.
+            await Terminal.OutLineAsync("Exiting openf1-console...", CancellationToken.None);
+            logger.LogInformation("ConsoleLoop Stopping.");
+        }
+        await Terminal.OutAsync(ControlSequences.SetCursorVisibility(true), CancellationToken.None);
+        Terminal.DisableRawMode();
         await base.StopAsync(cancellationToken);
-        System.Console.WriteLine("Exiting openf1-console...");
-        AnsiConsole.Cursor.Show();
         hostApplicationLifetime.StopApplication();
     }
 
-    private async Task ShowAndHandleInputs(Layout layout)
+    private static async Task SetupTerminalAsync(CancellationToken cancellationToken)
+    {
+        Terminal.EnableRawMode();
+        await Terminal.OutAsync(ControlSequences.SetCursorVisibility(false), cancellationToken);
+        await Terminal.OutAsync(ControlSequences.MoveCursorTo(0, 0), cancellationToken);
+        await Terminal.OutAsync(ControlSequences.ClearScreen(ClearMode.Full), cancellationToken);
+    }
+
+    private static async Task SetupBufferAsync(CancellationToken cancellationToken) =>
+        await Terminal.OutAsync(ControlSequences.MoveCursorTo(0, 0), cancellationToken);
+
+    private void UpdateInputFooter(Layout layout)
     {
         var commandDescriptions = inputHandlers
             .Where(x => x.IsEnabled && x.ApplicableScreens.Contains(state.CurrentScreen))
             .OrderBy(x => x.Sort)
-            .Select(x => $"[{string.Join('/', x.Keys.Select(k => k.GetConsoleKeyCharacter()))}] {x.Description}");
+            .Select(x => $"[{x.Keys.ToDisplayCharacters()}] {x.Description}");
 
         var columns = new Columns(commandDescriptions.Select(x => new Text(x)));
         columns.Collapse();
         layout["Footer"].Update(columns);
+    }
 
-        if (System.Console.KeyAvailable)
+    private async Task HandleInputsAsync(CancellationToken cancellationToken = default)
+    {
+        var inputBuffer = ArrayPool<byte>.Shared.Rent(8);
+        Array.Fill<byte>(inputBuffer, 0);
+        try
         {
-            var key = System.Console.ReadKey();
-            var tasks = inputHandlers
-                .Where(x =>
-                    x.Keys.Contains(key.Key)
-                    && (
-                        x.ApplicableScreens is null
-                        || x.ApplicableScreens.Contains(state.CurrentScreen)
+            // wait for a very short amount of time to read input
+            var cts = new CancellationTokenSource(millisecondsDelay: 5);
+
+            await Terminal.ReadAsync(inputBuffer, cts.Token);
+
+            if (TryParseRawInput(inputBuffer, out var keyChar, out var consoleKey))
+            {
+                var tasks = inputHandlers
+                    .Where(x =>
+                        x.Keys.Contains(consoleKey)
+                        && (
+                            x.ApplicableScreens is null
+                            || x.ApplicableScreens.Contains(state.CurrentScreen)
+                        )
                     )
-                )
-                .Select(x => x.ExecuteAsync(key));
-            await Task.WhenAll(tasks);
+                    .Select(x =>
+                        x.ExecuteAsync(
+                            new ConsoleKeyInfo(
+                                keyChar,
+                                consoleKey,
+                                shift: char.IsUpper(keyChar),
+                                alt: false,
+                                control: false
+                            ),
+                            cancellationToken
+                        )
+                    );
+                await Task.WhenAll(tasks);
+            }
         }
+        catch (OperationCanceledException)
+        {
+            // No input to read, so skip
+            return;
+        }
+        finally
+        {
+            ArrayPool<byte>.Shared.Return(inputBuffer);
+        }
+    }
+
+    /// <summary>
+    /// Parses raw input from the console in to the appropriate console character.
+    /// Intended to parse control sequences (like those for arrow keys) in to the relevant console character.
+    /// </summary>
+    /// <remarks>
+    /// See https://gist.github.com/fnky/458719343aabd01cfb17a3a4f7296797 for escape code reference.
+    /// </remarks>
+    /// <param name="bytes">The bytes from the input to parse</param>
+    /// <returns>
+    /// A tuple of (keyChar, consoleKey) if the input can be parsed.
+    /// <c>null</c> if the input is not a simple character,
+    /// and should be treated as an actual escape sequence.
+    /// </returns>
+    private bool TryParseRawInput(byte[] bytes, out char keyChar, out ConsoleKey consoleKey)
+    {
+        switch (bytes)
+        {
+            case [_, 0, ..]: // Just a normal key press
+                keyChar = (char)bytes[0];
+                consoleKey = (ConsoleKey)char.ToUpperInvariant(keyChar);
+                return true;
+            case [ESC, CSI, ..]: // An ANSI escape sequence starting with a CSI (Control Sequence Introducer)
+                switch (bytes[2..])
+                {
+                    // Keyboard strings
+                    // these are mappings from keyboard presses (like shift+arrow_)
+                    case [49, ARG_SEP, 50, var key, ..]:
+                        keyChar = (char)key;
+                        consoleKey = key switch
+                        {
+                            68 => ConsoleKey.LeftArrow,
+                            65 => ConsoleKey.UpArrow,
+                            66 => ConsoleKey.DownArrow,
+                            67 => ConsoleKey.RightArrow,
+                            _ => default
+                        };
+                        if (consoleKey == default)
+                        {
+                            logger.LogInformation(
+                                "Unknown CSI keyboard string: {Seq}",
+                                string.Join('|', bytes[2..])
+                            );
+                            return false;
+                        }
+                        return true;
+                }
+                logger.LogInformation("Unknown CSI sequence: {Seq}", string.Join('|', bytes[2..]));
+                break;
+            case [ESC, FE_START, var key, ..]: // An escape sequence for terminal cursor control via Fe escape codes
+                keyChar = default;
+                consoleKey = key switch
+                {
+                    68 => ConsoleKey.LeftArrow,
+                    65 => ConsoleKey.UpArrow,
+                    66 => ConsoleKey.DownArrow,
+                    67 => ConsoleKey.RightArrow,
+                    _ => default
+                };
+                if (consoleKey == default)
+                {
+                    logger.LogInformation(
+                        "Unknown FE escape sequence: {Seq}",
+                        string.Join('|', bytes[2..])
+                    );
+                    return false;
+                }
+                return true;
+            case [ESC, ..]:
+                logger.LogInformation("Unknown esc sequence: {Seq}", string.Join('|', bytes[1..]));
+                break;
+            default:
+                logger.LogInformation("Unknown input: {Input}", string.Join('|', bytes));
+                break;
+        }
+        keyChar = default;
+        consoleKey = default;
+        return false;
     }
 }

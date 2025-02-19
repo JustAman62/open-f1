@@ -48,21 +48,22 @@ public sealed class TeamRadioDisplay(
                     : new Text(string.Empty)
             );
         }
-        return new Panel(table) { Header = new PanelHeader("Select Team Radio"), Expand = true, Padding = new Padding(0) };
+        return new Panel(table)
+        {
+            Header = new PanelHeader("Select Team Radio"),
+            Expand = true,
+            Padding = new Padding(0)
+        };
     }
 
     private IRenderable GetSelectedTranscription()
     {
         var selected = teamRadio.Ordered.ElementAtOrDefault(state.CursorOffset);
-        
+
         var text = string.IsNullOrWhiteSpace(selected.Value?.Transcription)
             ? new Text("No transcription loaded. Press [T] to load.")
             : new Text(selected.Value.Transcription);
 
-        return new Panel(text) 
-        {
-            Expand = true,
-            Header = new PanelHeader("Transcription")
-        };
+        return new Panel(text) { Expand = true, Header = new PanelHeader("Transcription") };
     }
 }

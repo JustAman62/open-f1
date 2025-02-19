@@ -1,3 +1,4 @@
+using System.Security.Cryptography.X509Certificates;
 using System.Text.Json;
 using System.Text.Json.Nodes;
 using Microsoft.Extensions.Logging;
@@ -14,11 +15,46 @@ public class JsonTimingClient(
 {
     public Task? ExecuteTask { get; private set; }
 
+    private async Task<(
+        string Location,
+        DateOnly Date,
+        string Session,
+        string Directory
+    )?> ReadSessionInfoFromDirectoryAsync(string directory)
+    {
+        try
+        {
+            var subscriptionData = await File.ReadAllTextAsync(
+                    Path.Join(directory, "/subscribe.txt")
+                )
+                .ConfigureAwait(false);
+            var sessionInfo = JsonNode
+                .Parse(subscriptionData)
+                ?["SessionInfo"]?.Deserialize<SessionInfoDataPoint>();
+
+            var dateString = sessionInfo!.Path!.Split('/')[1].Split('_')[0];
+
+            return (
+                sessionInfo!.Meeting!.Circuit!.ShortName!,
+                DateOnly.Parse(dateString),
+                sessionInfo!.Name!,
+                directory
+            );
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex, "Failed to read session info from {Directory}", directory);
+            return null;
+        }
+    }
+
     /// <inheritdoc />
-    public IEnumerable<string> GetDirectoryNames()
+    public async Task<
+        Dictionary<(string Location, DateOnly Date), List<(string Session, string Directory)>>
+    > GetDirectoryNamesAsync()
     {
         Directory.CreateDirectory(options.Value.DataDirectory);
-        return Directory
+        var infoTasks = Directory
             .GetDirectories(options.Value.DataDirectory)
             .Where(x =>
                 Directory
@@ -28,7 +64,17 @@ public class JsonTimingClient(
                     .GetFiles(x)
                     .Any(x => x.EndsWith("subscribe.txt", StringComparison.OrdinalIgnoreCase))
             )
-            .OrderByDescending(x => Directory.GetCreationTime(x));
+            .Select(ReadSessionInfoFromDirectoryAsync);
+
+        var infos = await Task.WhenAll(infoTasks);
+        return infos
+            .Where(x => x.HasValue)
+            .GroupBy(x => (x!.Value.Location, x.Value.Date))
+            .OrderByDescending(x => x.Key.Date)
+            .ToDictionary(
+                x => x.Key,
+                x => x.Select(x => (x!.Value.Session, x.Value.Directory)).ToList()
+            );
     }
 
     /// <inheritdoc />
@@ -38,7 +84,10 @@ public class JsonTimingClient(
         return ExecuteTask;
     }
 
-    private async Task LoadSimulationDataAsync(string directory, CancellationToken cancellationToken)
+    private async Task LoadSimulationDataAsync(
+        string directory,
+        CancellationToken cancellationToken
+    )
     {
         try
         {
@@ -102,7 +151,8 @@ public class JsonTimingClient(
                     : parts[1]!.ToString();
             return (parts[0]!.ToString(), data, DateTimeOffset.Parse(parts[2]!.ToString()));
         }
-        else {
+        else
+        {
             var parts = json.Deserialize<RawTimingDataPoint>();
             return (parts.Type, parts.Json.ToString(), parts.DateTime);
         }
