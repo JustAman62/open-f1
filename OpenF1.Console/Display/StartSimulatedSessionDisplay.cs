@@ -32,10 +32,16 @@ public class StartSimulatedSessionDisplay(
 
         var tables = new List<Table>();
 
-        var locationTable = new Table().AddColumns(
-            new TableColumn("Date").Width(10).RightAligned(),
-            new TableColumn("Location").LeftAligned()
-        );
+        var locationTable = new Table()
+            .AddColumns(
+                new TableColumn("Date").Width(10).RightAligned(),
+                new TableColumn(" Location").LeftAligned()
+            )
+            .NoBorder()
+            .NoSafeBorder()
+            .RemoveColumnPadding()
+            .Expand();
+
         tables.Add(locationTable);
 
         var directoryOffset = displayOptions.SelectedLocation.GetValueOrDefault(state.CursorOffset);
@@ -47,16 +53,21 @@ public class StartSimulatedSessionDisplay(
             {
                 locationTable.AddRow(
                     new Text(Date.ToShortDateString(), DisplayUtils.STYLE_INVERT),
-                    new Text(Location, DisplayUtils.STYLE_INVERT)
+                    new Text(" " + Location, DisplayUtils.STYLE_INVERT)
                 );
             }
             else
             {
-                locationTable.AddRow(new Text(Date.ToShortDateString()), new Text(Location));
+                locationTable.AddRow(new Text(Date.ToShortDateString()), new Text(" " + Location));
             }
         }
 
-        var sessionTable = new Table().AddColumns("Session", "Directory").Expand();
+        var sessionTable = new Table()
+            .AddColumns(new TableColumn("Session"), new TableColumn(" Directory"))
+            .NoBorder()
+            .NoSafeBorder()
+            .RemoveColumnPadding()
+            .Expand();
 
         if (displayOptions.SelectedLocation.HasValue)
         {
@@ -67,14 +78,17 @@ public class StartSimulatedSessionDisplay(
                 {
                     sessionTable.AddRow(
                         new Text(sessions.ElementAt(i).Session, DisplayUtils.STYLE_INVERT),
-                        new Text(sessions.ElementAt(i).Directory, DisplayUtils.STYLE_INVERT)
+                        new Text(
+                            " " + sessions.ElementAt(i).Directory,
+                            DisplayUtils.STYLE_INVERT
+                        ).Overflow(Overflow.Crop)
                     );
                 }
                 else
                 {
                     sessionTable.AddRow(
                         new Text(sessions.ElementAt(i).Session),
-                        new Text(sessions.ElementAt(i).Directory)
+                        new Text(" " + sessions.ElementAt(i).Directory).Overflow(Overflow.Crop)
                     );
                 }
             }
