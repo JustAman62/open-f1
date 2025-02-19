@@ -19,13 +19,22 @@ Feature Highlights:
   - Interval to driver in front
   - Gap to leader
   - Gap [between a selected driver](#using-a-cursor-to-display-relative-gap-for-a-specific-driver) and all other drivers (useful for monitoring pit windows)
-- [Race Control](#race-control-screen) messages including investigations, penalties, lap deletions, and weather
+- [Race Control](#race-control-page) messages including investigations, penalties, lap deletions, and weather
+- [Driver Tracker](#driver-tracker-screen) shows the position of selected drivers on a track map
 - Lap-by-lap [Timing History](#using-a-cursor-to-view-timing-history-by-lap) to observe gaps over time
 
 <!-- omit in toc -->
 ## Table of Contents
 
 - [Inspiration](#inspiration)
+- [OpenF1 Console in Action](#openf1-console-in-action)
+  - [Timing Tower during a Race](#timing-tower-during-a-race)
+  - [Using a Cursor to Display Relative Gap for a Specific Driver](#using-a-cursor-to-display-relative-gap-for-a-specific-driver)
+  - [Timing Tower during Practice/Qualifying](#timing-tower-during-practicequalifying)
+  - [Race Control Page](#race-control-page)
+  - [Driver Tracker](#driver-tracker)
+  - [Using a Cursor to View Timing History by Lap](#using-a-cursor-to-view-timing-history-by-lap)
+  - [Listen to and Transcribe Team Radio](#listen-to-and-transcribe-team-radio)
 - [Getting Started with `openf1-console`](#getting-started-with-openf1-console)
   - [Installation](#installation)
     - [Install and run as a dotnet tool](#install-and-run-as-a-dotnet-tool)
@@ -41,19 +50,60 @@ Feature Highlights:
 - [Logging](#logging)
 - [Live Timing Data Source](#live-timing-data-source)
 - [Data Recording and Replay](#data-recording-and-replay)
-- [OpenF1 Console in Action](#openf1-console-in-action)
-  - [Timing Tower during a Race](#timing-tower-during-a-race)
-  - [Using a Cursor to Display Relative Gap for a Specific Driver](#using-a-cursor-to-display-relative-gap-for-a-specific-driver)
-  - [Timing Tower during Practice/Qualifying](#timing-tower-during-practicequalifying)
-  - [Race Control Page](#race-control-page)
-  - [Using a Cursor to View Timing History by Lap](#using-a-cursor-to-view-timing-history-by-lap)
-  - [Listen to and Transcribe Team Radio](#listen-to-and-transcribe-team-radio)
 - [Notice](#notice)
 
 
 ## Inspiration
 
 This project is heavily inspired by the [FastF1 project by theOehrly](https://github.com/theOehrly/Fast-F1). They did a lot of the work understanding the SignalR stream coming from the F1 Live Timing service. Visit their project if you'd like to do any sort of data analysis on past F1 events, or gather live timing data using their module.
+
+## OpenF1 Console in Action
+
+### Timing Tower during a Race
+
+Monitor sector times and gaps, see recent race control messages, capture position changes, observe pit strategies, and more with the standard Timing Tower view.
+
+![Timing Tower during a Race](docs/screenshots/race-timing-screen.png)
+
+### Using a Cursor to Display Relative Gap for a Specific Driver
+
+Use the cursor controlled by the <kbd>▼</kbd>/<kbd>▲</kbd> `Cursor` actions in the <kbd>O</kbd> `Timing Tower` screen to select a specific driver (in this case Norris) to see the relative interval between that driver and all other. This is useful for determining where a driver will fall to after a pit stop, or looking at pit windows during under cuts.
+
+Additionally, the gap between the selected drivers and those around them over the last four laps will be displayed at the bottom of the screen. This allows you to easily see evolving gaps over time and evaluate how soon a driver may catch up or pull away.
+
+![Relative gaps for a specific driver](docs/screenshots/relative-gap-race.png)
+
+### Timing Tower during Practice/Qualifying
+
+Monitor live/best sector times, gaps, tyres, and lap deletions easily with the specialized timing tower for non-race sessions.
+
+![Timing Tower during Practice/Qualifying](docs/screenshots/quali-timing-screen.png)
+
+### Race Control Page
+
+The `Race Control` page shows all Race Control Messages for the session, along with other session data such as the Weather.
+
+![Race Control Page](docs/screenshots/race-control-screen.png)
+
+### Driver Tracker
+
+The `Driver Tracker` page shows a track map overlayed with selected drivers. Use the <kbd>▼</kbd>/<kbd>▲</kbd> `Cursor` actions to choose drivers, then use the <kbd>⏎</kbd> `Toggle Select` action to toggle the inclusion of the driver on the track map. The driver under the current cursor position will also be highlighted on the map, and timing gaps will switch to interval between that driver and all other drivers.
+
+![Driver Tracker Page](docs/screenshots//driver-tracker.png)
+
+NOTE: Currently the track map is only supported in the iTerm2 terminal. This is because it uses [iTerm2's Inline Image Protocol](https://iterm2.com/documentation-images.html). Other protocols (such as Kitty's, and maybe Sixel) will be supported in the future. If the track map doesn't work in your terminal, please raise an issue and I will try and implement support.
+
+### Using a Cursor to View Timing History by Lap
+
+In the `Timing by Lap` page, you can use the cursor controlled by the <kbd>▼</kbd>/<kbd>▲</kbd> `Cursor` actions to view historical snapshots of the timing tower at the end of every lap. This view will show position changes during that lap, and relative changes in Gap and Interval. Scrolling through laps allows you to build a picture of how the race is unfolding.
+
+![Using a Cursor to View Timing History by Lap](docs/screenshots/timing-history-screen.png)
+
+### Listen to and Transcribe Team Radio
+
+Listen to team radio clips from anytime in the session, and use a local ML model (Whisper) to transcribe the audio on demand. Transcription accuracy is fairly low, depending on the that days audio quality and driver. Suggestions welcome for improving this!
+
+![Listen to and Transcribe Team Radio](docs/screenshots/team-radio.png)
 
 ## Getting Started with `openf1-console`
 
@@ -185,46 +235,6 @@ All events received by the live timing client will be written to the configured 
 * `live.txt` contains an append-log of every message received in the stream
 
 Both of these files are required for future simulations/replays. The `IJsonTimingClient` supports loading these files and processing them in the same way live data would be. Data points will be replayed in real time, using a calculated delay.
-
-## OpenF1 Console in Action
-
-### Timing Tower during a Race
-
-Monitor sector times and gaps, see recent race control messages, capture position changes, observe pit strategies, and more with the standard Timing Tower view.
-
-![Timing Tower during a Race](docs/screenshots/race-timing-screen.png)
-
-### Using a Cursor to Display Relative Gap for a Specific Driver
-
-Use the cursor controlled by the <kbd>▼</kbd>/<kbd>▲</kbd> `Cursor` actions in the <kbd>O</kbd> `Timing Tower` screen to select a specific driver (in this case Norris) to see the relative interval between that driver and all other. This is useful for determining where a driver will fall to after a pit stop, or looking at pit windows during under cuts.
-
-Additionally, the gap between the selected drivers and those around them over the last four laps will be displayed at the bottom of the screen. This allows you to easily see evolving gaps over time and evaluate how soon a driver may catch up or pull away.
-
-![Relative gaps for a specific driver](docs/screenshots/relative-gap-race.png)
-
-### Timing Tower during Practice/Qualifying
-
-Monitor live/best sector times, gaps, tyres, and lap deletions easily with the specialized timing tower for non-race sessions.
-
-![Timing Tower during Practice/Qualifying](docs/screenshots/quali-timing-screen.png)
-
-### Race Control Page
-
-The `Race Control` page shows all Race Control Messages for the session, along with other session data such as the Weather.
-
-![Race Control Page](docs/screenshots/race-control-screen.png)
-
-### Using a Cursor to View Timing History by Lap
-
-In the `Timing by Lap` page, you can use the cursor controlled by the <kbd>▼</kbd>/<kbd>▲</kbd> `Cursor` actions to view historical snapshots of the timing tower at the end of every lap. This view will show position changes during that lap, and relative changes in Gap and Interval. Scrolling through laps allows you to build a picture of how the race is unfolding.
-
-![Using a Cursor to View Timing History by Lap](docs/screenshots/timing-history-screen.png)
-
-### Listen to and Transcribe Team Radio
-
-Listen to team radio clips from anytime in the session, and use a local ML model (Whisper) to transcribe the audio on demand.
-
-![Listen to and Transcribe Team Radio](docs/screenshots/team-radio.png)
 
 ## Notice
 
