@@ -91,7 +91,7 @@ The `Driver Tracker` page shows a track map overlayed with selected drivers. Use
 
 ![Driver Tracker Page](docs/screenshots//driver-tracker.png)
 
-NOTE: Currently the track map is only supported in the iTerm2 terminal. This is because it uses [iTerm2's Inline Image Protocol](https://iterm2.com/documentation-images.html). Other protocols (such as Kitty's, and maybe Sixel) will be supported in the future. If the track map doesn't work in your terminal, please raise an issue and I will try and implement support.
+NOTE: Currently the track map is only supported in the iTerm2 terminal (by implementing the [iTerm2's Inline Image Protocol](https://iterm2.com/documentation-images.html)), and terminals which implement the [Kitty Graphics Protocol](https://sw.kovidgoyal.net/kitty/graphics-protocol/). Other protocols (such as Sixel) may be supported in the future. If the track map doesn't work in your terminal, please raise an issue and I will try and fix/implement support.
 
 ### Using a Cursor to View Timing History by Lap
 

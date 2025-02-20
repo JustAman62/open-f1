@@ -1,5 +1,13 @@
 namespace OpenF1.Console;
 
+/// <summary>
+/// Provide control sequences for displaying images in terminals.
+/// See the following for documentation on the protocols:
+/// <list type="bullet">
+/// <item>iTerm2: https://iterm2.com/documentation-images.html</item>
+/// <item>Kitty: https://sw.kovidgoyal.net/kitty/graphics-protocol/</item>
+/// </list>
+/// </summary>
 public static class TerminalGraphics
 {
     private const string ESCAPE_OSC = "\u001B]"; // Begins an Operating System Command
