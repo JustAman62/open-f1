@@ -16,6 +16,7 @@ public class DriverTrackerDisplay(
     TrackStatusProcessor trackStatus,
     ExtrapolatedClockProcessor extrapolatedClock,
     IDateTimeProvider dateTimeProvider,
+    TerminalInfoProvider terminalInfo,
     ILogger<DriverTrackerDisplay> logger
 ) : IDisplay
 {
@@ -25,20 +26,22 @@ public class DriverTrackerDisplay(
     private const int TOP_OFFSET = 1;
     private const int BOTTOM_OFFSET = 2;
 
-    private static readonly SKPaint _trackLinePaint =
-        new() { Color = SKColor.Parse("666666"), StrokeWidth = 4, };
-    private static readonly SKPaint _cornerTextPaint =
-        new()
-        {
-            Color = SKColor.Parse("DDDDDD"),
-            TextSize = 14,
-            Typeface = SKTypeface.FromFamilyName(
-                "Consolas",
-                weight: SKFontStyleWeight.SemiBold,
-                width: SKFontStyleWidth.Normal,
-                slant: SKFontStyleSlant.Upright
-            ),
-        };
+    private static readonly SKPaint _trackLinePaint = new()
+    {
+        Color = SKColor.Parse("666666"),
+        StrokeWidth = 4,
+    };
+    private static readonly SKPaint _cornerTextPaint = new()
+    {
+        Color = SKColor.Parse("DDDDDD"),
+        TextSize = 14,
+        Typeface = SKTypeface.FromFamilyName(
+            "Consolas",
+            weight: SKFontStyleWeight.SemiBold,
+            width: SKFontStyleWidth.Normal,
+            slant: SKFontStyleSlant.Upright
+        ),
+    };
     private static readonly SKPaint _errorPaint = new() { Color = SKColor.Parse("FF0000") };
     private static readonly SKTypeface _boldTypeface = SKTypeface.FromFamilyName(
         "Consolas",
@@ -54,7 +57,10 @@ public class DriverTrackerDisplay(
     public Task<IRenderable> GetContentAsync()
     {
         var trackMapMessage = string.Empty;
-        if (!TerminalGraphics.IsITerm2ProtocolSupported.Value)
+        if (
+            !terminalInfo.IsITerm2ProtocolSupported.Value
+            && !terminalInfo.IsKittyProtocolSupported.Value
+        )
         {
             // We don't think the current terminal supports the iTerm2 graphics protocol
             trackMapMessage = $"""
@@ -143,7 +149,7 @@ public class DriverTrackerDisplay(
                 "4" => new Style(foreground: Color.Black, background: Color.Yellow), // Safety Car
                 "6" => new Style(foreground: Color.Black, background: Color.Yellow), // VSC Deployed
                 "5" => new Style(foreground: Color.White, background: Color.Red), // Red Flag
-                _ => Style.Plain
+                _ => Style.Plain,
             };
             items.Add(new Text($"{trackStatus.Latest.Message}", style));
         }
@@ -156,14 +162,17 @@ public class DriverTrackerDisplay(
         {
             Header = new PanelHeader("Status"),
             Expand = true,
-            Border = BoxBorder.Rounded
+            Border = BoxBorder.Rounded,
         };
     }
 
     private string GetTrackMap()
     {
         if (
-            !TerminalGraphics.IsITerm2ProtocolSupported.Value
+            !(
+                terminalInfo.IsITerm2ProtocolSupported.Value
+                || terminalInfo.IsKittyProtocolSupported.Value
+            )
             || sessionInfo.Latest.CircuitPoints.Count == 0
         )
         {
@@ -256,13 +265,13 @@ public class DriverTrackerDisplay(
                         {
                             Color = SKColor.Parse(data.TeamColour),
                             TextSize = 14,
-                            Typeface = _boldTypeface
+                            Typeface = _boldTypeface,
                         };
 
                         // Draw a white box around the driver currently selected by the cursor
                         if (timingData.Latest.Lines[driverNumber].Line == state.CursorOffset)
                         {
-                            var rectPaint = new SKPaint { Color = SKColor.Parse("FFFFFF"), };
+                            var rectPaint = new SKPaint { Color = SKColor.Parse("FFFFFF") };
                             canvas.DrawRoundRect(x - 6, y - 8, 46, 16, 4, 4, rectPaint);
                         }
 
@@ -287,10 +296,23 @@ public class DriverTrackerDisplay(
             }
         }
 
-        var imageData = surface.Snapshot().Encode();
-        var base64 = Convert.ToBase64String(imageData.AsSpan());
-
-        return TerminalGraphics.ITerm2GraphicsSequence(windowHeight, windowWidth, base64);
+        if (terminalInfo.IsITerm2ProtocolSupported.Value)
+        {
+            var imageData = surface.Snapshot().Encode();
+            var base64 = Convert.ToBase64String(imageData.AsSpan());
+            return TerminalGraphics.ITerm2GraphicsSequence(windowHeight, windowWidth, base64);
+        }
+        else if (terminalInfo.IsKittyProtocolSupported.Value)
+        {
+            var imageData = surface.Snapshot().Encode();
+            var base64 = Convert.ToBase64String(imageData.AsSpan());
+            return TerminalGraphics.KittyGraphicsSequenceDelete()
+                + TerminalGraphics.KittyGraphicsSequence(windowHeight, base64);
+        }
+        else
+        {
+            return string.Empty;
+        }
     }
 
     /// <inheritdoc />

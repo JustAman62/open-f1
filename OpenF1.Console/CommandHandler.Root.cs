@@ -18,7 +18,7 @@ public static partial class CommandHandler
             .AddInputHandlers()
             .AddDisplays()
             .AddSingleton<INotifyHandler, NotifyHandler>()
-            .AddSingleton<ConsoleLoop>()
+            .AddSingleton<TerminalInfoProvider>()
             .AddHostedService(sp => sp.GetRequiredService<ConsoleLoop>());
 
         var options = builder.Configuration.Get<LiveTimingOptions>() ?? new();

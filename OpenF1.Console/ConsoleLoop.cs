@@ -106,7 +106,7 @@ public class ConsoleLoop(
         hostApplicationLifetime.StopApplication();
     }
 
-    private static async Task SetupTerminalAsync(CancellationToken cancellationToken)
+    private async Task SetupTerminalAsync(CancellationToken cancellationToken)
     {
         Terminal.EnableRawMode();
         await Terminal.OutAsync(ControlSequences.SetCursorVisibility(false), cancellationToken);
