@@ -34,8 +34,8 @@ public class StartSimulatedSessionDisplay(
 
         var locationTable = new Table()
             .AddColumns(
-                new TableColumn("Date").Width(10).RightAligned(),
-                new TableColumn(" Location").LeftAligned()
+                new TableColumn("Date ").Width(11).RightAligned(),
+                new TableColumn("Location").LeftAligned()
             )
             .NoBorder()
             .NoSafeBorder()
@@ -44,21 +44,25 @@ public class StartSimulatedSessionDisplay(
 
         tables.Add(locationTable);
 
-        var directoryOffset = displayOptions.SelectedLocation.GetValueOrDefault(state.CursorOffset);
+        var selected = displayOptions.SelectedLocation.GetValueOrDefault(state.CursorOffset);
+        var maxLocationLength = directories.Select(x => x.Key.Location.Length).Max();
 
-        for (var i = Math.Max(directoryOffset - 3, 0); i < directories.Count; i++)
+        for (var i = Math.Max(selected - 3, 0); i < directories.Count; i++)
         {
             var (Location, Date) = directories.ElementAt(i).Key;
-            if (i == directoryOffset)
+            if (i == selected)
             {
                 locationTable.AddRow(
-                    new Text(Date.ToShortDateString(), DisplayUtils.STYLE_INVERT),
-                    new Text(" " + Location, DisplayUtils.STYLE_INVERT)
+                    new Text(Date.ToShortDateString() + " ", DisplayUtils.STYLE_INVERT),
+                    new Text(
+                        Location.ToFixedWidth(maxLocationLength, padRight: true),
+                        DisplayUtils.STYLE_INVERT
+                    )
                 );
             }
             else
             {
-                locationTable.AddRow(new Text(Date.ToShortDateString()), new Text(" " + Location));
+                locationTable.AddRow(new Text(Date.ToShortDateString() + " "), new Text(Location));
             }
         }
 
@@ -72,23 +76,51 @@ public class StartSimulatedSessionDisplay(
         if (displayOptions.SelectedLocation.HasValue)
         {
             var sessions = directories.ElementAt(displayOptions.SelectedLocation.Value).Value;
+
+            // Figure out the space available for the Directory column
+            const int dateColumnLength = 11;
+            var maxSessionTypeLength = sessions.Select(x => x.Session.Length).Max();
+
+            // Gives space taken up by everything except the directory column
+            var directoryAvailableWidth =
+                Terminal.Size.Width
+                - dateColumnLength
+                - maxLocationLength
+                - maxSessionTypeLength
+                - 4;
+
             for (var i = 0; i < sessions.Count; i++)
             {
                 if (i == state.CursorOffset)
                 {
                     sessionTable.AddRow(
-                        new Text(sessions.ElementAt(i).Session, DisplayUtils.STYLE_INVERT),
                         new Text(
-                            " " + sessions.ElementAt(i).Directory,
+                            sessions
+                                .ElementAt(i)
+                                .Session.ToFixedWidth(maxSessionTypeLength + 1, padRight: true),
                             DisplayUtils.STYLE_INVERT
-                        ).Overflow(Overflow.Crop)
+                        ),
+                        new Text(
+                            sessions
+                                .ElementAt(i)
+                                .Directory.ToFixedWidth(directoryAvailableWidth, padRight: true),
+                            DisplayUtils.STYLE_INVERT
+                        )
                     );
                 }
                 else
                 {
                     sessionTable.AddRow(
-                        new Text(sessions.ElementAt(i).Session),
-                        new Text(" " + sessions.ElementAt(i).Directory).Overflow(Overflow.Crop)
+                        new Text(
+                            sessions
+                                .ElementAt(i)
+                                .Session.ToFixedWidth(maxSessionTypeLength + 1, padRight: true)
+                        ),
+                        new Text(
+                            sessions
+                                .ElementAt(i)
+                                .Directory.ToFixedWidth(directoryAvailableWidth, padRight: true)
+                        )
                     );
                 }
             }
