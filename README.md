@@ -1,9 +1,10 @@
 <!-- omit in toc -->
 # open-f1
 
-open-f1 is a open source F1 Live Timing client.
+open-f1 is an open source F1 Live Timing client.
 
-`openf1-console` is a TUI application which uses `OpenF1.Data` to show a Live Timing screen during sessions, and records the data for future session replays.
+`openf1-console` is a TUI application which uses `OpenF1.Data` to show a Live Timing screen during sessions, and records the data for future session replays. 
+F1 live broadcasts are usually delayed by some undeterminable amount (usually 30-60 seconds), so the TUI allows you to delay the data being displayed so that you can match up what you see on your screen to what you see on your TV.
 
 The `OpenF1.Data` library is provided to facilitate connectivity with the F1 Live Timing data stream, and handle all the processing of the incoming data. It also allows for "simulated" streams, where previously recorded data streams can be played back to allow for easy development/testing.
 
@@ -20,7 +21,7 @@ Feature Highlights:
   - Gap to leader
   - Gap [between a selected driver](#using-a-cursor-to-display-relative-gap-for-a-specific-driver) and all other drivers (useful for monitoring pit windows)
 - [Race Control](#race-control-page) messages including investigations, penalties, lap deletions, and weather
-- [Driver Tracker](#driver-tracker-screen) shows the position of selected drivers on a track map
+- [Driver Tracker](#driver-tracker) shows the position of selected drivers on a live track map
 - Lap-by-lap [Timing History](#using-a-cursor-to-view-timing-history-by-lap) to observe gaps over time
 
 <!-- omit in toc -->
@@ -38,8 +39,8 @@ Feature Highlights:
 - [Getting Started with `openf1-console`](#getting-started-with-openf1-console)
   - [Installation](#installation)
     - [Install and run as a dotnet tool](#install-and-run-as-a-dotnet-tool)
-  - [Install and run the standalone executable](#install-and-run-the-standalone-executable)
-  - [Run directly from Source](#run-directly-from-source)
+    - [Install and run the standalone executable](#install-and-run-the-standalone-executable)
+    - [Run directly from Source](#run-directly-from-source)
   - [Start Timing for a Live Session](#start-timing-for-a-live-session)
   - [Start Timing for a Pre-recorded Session](#start-timing-for-a-pre-recorded-session)
   - [Download a previous session data for replay](#download-a-previous-session-data-for-replay)
@@ -89,7 +90,7 @@ The `Race Control` page shows all Race Control Messages for the session, along w
 
 The `Driver Tracker` page shows a track map overlayed with selected drivers. Use the <kbd>▼</kbd>/<kbd>▲</kbd> `Cursor` actions to choose drivers, then use the <kbd>⏎</kbd> `Toggle Select` action to toggle the inclusion of the driver on the track map. The driver under the current cursor position will also be highlighted on the map, and timing gaps will switch to interval between that driver and all other drivers.
 
-![Driver Tracker Page](docs/screenshots//driver-tracker.png)
+![Driver Tracker Page](docs/screenshots/driver-tracker.png)
 
 NOTE: Currently the track map is only supported in the iTerm2 terminal (by implementing the [iTerm2's Inline Image Protocol](https://iterm2.com/documentation-images.html)), and terminals which implement the [Kitty Graphics Protocol](https://sw.kovidgoyal.net/kitty/graphics-protocol/). Other protocols (such as Sixel) may be supported in the future. If the track map doesn't work in your terminal, please raise an issue and I will try and fix/implement support.
 
@@ -123,7 +124,7 @@ openf1-console
 
 This method is recommended as it is easy to keep the app updated using `dotnet tool update -g openf1-console`.
 
-### Install and run the standalone executable
+#### Install and run the standalone executable
 
 Standalone executables are attached to each GitHub release. Download the executable for your system OS/architecture and simply run it directly. The list of artifacts are available on the [release page for the latest release](https://github.com/JustAman62/open-f1/releases/latest).
 
@@ -135,7 +136,7 @@ curl https://github.com/JustAman62/open-f1/releases/latest/download/openf1-conso
 ./openf1-console
 ```
 
-### Run directly from Source
+#### Run directly from Source
 
 ```sh
 # Checkout the git repository
