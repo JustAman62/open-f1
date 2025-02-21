@@ -43,9 +43,10 @@ public static class TerminalGraphics
     /// displaying that image in the terminal, using the Kitty Graphics Protocol.
     /// </summary>
     /// <param name="height">Height of the image in cells</param>
+    /// <param name="width">Width of the image in cells</param>
     /// <param name="base64EncodedImage">Base 64 encoded PNG image data</param>
     /// <returns>The control sequence as a string.</returns>
-    public static string KittyGraphicsSequence(int height, string base64EncodedImage)
+    public static string KittyGraphicsSequence(int height, int width, string base64EncodedImage)
     {
         var args = new string[]
         {
@@ -53,6 +54,7 @@ public static class TerminalGraphics
             "d=C", // Delete images intersecting with the current cursor (i.e. refresh)
             "q=1", // Suppress success responses back from the terminal
             $"r={height}", // Num rows
+            $"c={width}", // Num rows
             $"f=100" // We'll be sendingPNG encoded base64 data
         };
         return $"{ESCAPE_APC}{string.Join(',', args)};{base64EncodedImage}{ESCAPE_ST}";

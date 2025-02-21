@@ -55,7 +55,7 @@ public static class DisplayUtils
             return STYLE_NORMAL;
 
         var foreground = Color.White;
-        var background = Color.Black;
+        var background = default(Color?);
 
         if (isComparisonLine)
         {

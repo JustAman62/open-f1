@@ -57,7 +57,7 @@ public class TimingTowerDisplay(
                 new TableColumn($"LAP {lap?.CurrentLap, 2}/{lap?.TotalLaps}")
                 {
                     Width = 9,
-                    Alignment = Justify.Left
+                    Alignment = Justify.Left,
                 },
                 new TableColumn("Leader") { Width = 8, Alignment = Justify.Right },
                 new TableColumn("Gap") { Width = 8, Alignment = Justify.Right },
@@ -147,16 +147,14 @@ public class TimingTowerDisplay(
                     GetStyle(line.Sectors.GetValueOrDefault("2"))
                 ),
                 new Text(
+                    line.InPit.GetValueOrDefault() ? "IN "
+                        : line.PitOut.GetValueOrDefault() ? "OUT"
+                        : $"{line.NumberOfPitStops, 2}",
                     line.InPit.GetValueOrDefault()
-                        ? "IN "
-                        : line.PitOut.GetValueOrDefault()
-                            ? "OUT"
-                            : $"{line.NumberOfPitStops, 2}",
-                    line.InPit.GetValueOrDefault()
-                        ? new Style(foreground: Color.Black, background: Color.Yellow)
+                            ? new Style(foreground: Color.Black, background: Color.Yellow)
                         : line.PitOut.GetValueOrDefault()
                             ? new Style(foreground: Color.Black, background: Color.Green)
-                            : Style.Plain
+                        : Style.Plain
                 ),
                 new Text($"{stint?.Compound?[0]} {stint?.TotalLaps, 2}", GetStyle(stint)),
                 DisplayUtils.GetGapBetweenLines(comparisonDataPoint.Value, line),
@@ -178,7 +176,7 @@ public class TimingTowerDisplay(
                 new TableColumn(sessionInfoProcessor.Latest.Name?.ToFixedWidth(9) ?? "Unknown ")
                 {
                     Width = 10,
-                    Alignment = Justify.Left
+                    Alignment = Justify.Left,
                 },
                 new TableColumn("Gap") { Width = 8, Alignment = Justify.Left },
                 new TableColumn("Best Lap") { Width = 9, Alignment = Justify.Left },
@@ -261,16 +259,13 @@ public class TimingTowerDisplay(
                 GetSectorMarkup(line.Sectors.GetValueOrDefault("1"), bestSector2),
                 GetSectorMarkup(line.Sectors.GetValueOrDefault("2"), bestSector3),
                 new Text(
+                    line.InPit.GetValueOrDefault() ? "IN "
+                        : line.PitOut.GetValueOrDefault() ? "OUT"
+                        : $"{line.NumberOfPitStops, 2}",
                     line.InPit.GetValueOrDefault()
-                        ? "IN "
-                        : line.PitOut.GetValueOrDefault()
-                            ? "OUT"
-                            : $"{line.NumberOfPitStops, 2}",
-                    line.InPit.GetValueOrDefault()
-                        ? new Style(foreground: Color.Black, background: Color.Yellow)
-                        : line.PitOut.GetValueOrDefault()
-                            ? DisplayUtils.STYLE_PB
-                            : Style.Plain
+                            ? new Style(foreground: Color.Black, background: Color.Yellow)
+                        : line.PitOut.GetValueOrDefault() ? DisplayUtils.STYLE_PB
+                        : Style.Plain
                 ),
                 new Text($"{stint?.Compound?[0] ?? 'X'} {stint?.TotalLaps, 2}", GetStyle(stint))
             );
@@ -351,7 +346,7 @@ public class TimingTowerDisplay(
             "SOFT" => new Style(foreground: Color.White, background: Color.Red),
             "INTERMEDIATE" => new Style(foreground: Color.Black, background: Color.Green),
             "WET" => new Style(foreground: Color.Black, background: Color.Blue),
-            _ => DisplayUtils.STYLE_NORMAL
+            _ => DisplayUtils.STYLE_NORMAL,
         };
     }
 
@@ -360,7 +355,7 @@ public class TimingTowerDisplay(
         {
             < 0 => "[green]▲[/]",
             > 0 => "[yellow]▼[/]",
-            _ => ""
+            _ => "",
         };
 
     private IRenderable GetRaceControlPanel()
@@ -384,7 +379,7 @@ public class TimingTowerDisplay(
         {
             Header = new PanelHeader("Race Control Messages"),
             Expand = true,
-            Border = BoxBorder.Rounded
+            Border = BoxBorder.Rounded,
         };
     }
 
@@ -486,7 +481,7 @@ public class TimingTowerDisplay(
         {
             _ when gap > gapOnPreviousLap => Color.Red,
             _ when gap < gapOnPreviousLap => Color.Green,
-            _ => Color.Silver
+            _ => Color.Silver,
         };
         chart.AddItem($"LAP {lapNumber}", (double)gap, color);
     }
@@ -521,7 +516,7 @@ public class TimingTowerDisplay(
                 "4" => new Style(foreground: Color.Black, background: Color.Yellow), // Safety Car
                 "6" => new Style(foreground: Color.Black, background: Color.Yellow), // VSC Deployed
                 "5" => new Style(foreground: Color.White, background: Color.Red), // Red Flag
-                _ => Style.Plain
+                _ => Style.Plain,
             };
             items.Add(new Text($"{trackStatusProcessor.Latest.Message}", style));
         }
@@ -534,7 +529,7 @@ public class TimingTowerDisplay(
         {
             Header = new PanelHeader("Status"),
             Expand = true,
-            Border = BoxBorder.Rounded
+            Border = BoxBorder.Rounded,
         };
     }
 }

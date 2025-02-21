@@ -1,4 +1,4 @@
-using System.Runtime.CompilerServices;
+using Microsoft.Extensions.Options;
 using OpenF1.Data;
 using SkiaSharp;
 using Spectre.Console;
@@ -17,14 +17,15 @@ public class DriverTrackerDisplay(
     ExtrapolatedClockProcessor extrapolatedClock,
     IDateTimeProvider dateTimeProvider,
     TerminalInfoProvider terminalInfo,
+    IOptions<LiveTimingOptions> options,
     ILogger<DriverTrackerDisplay> logger
 ) : IDisplay
 {
     private const int IMAGE_SCALE_FACTOR = 20;
     private const int IMAGE_PADDING = 25;
     private const int LEFT_OFFSET = 17;
-    private const int TOP_OFFSET = 1;
-    private const int BOTTOM_OFFSET = 2;
+    private const int TOP_OFFSET = 0;
+    private const int BOTTOM_OFFSET = 1;
 
     private static readonly SKPaint _trackLinePaint = new()
     {
@@ -42,7 +43,12 @@ public class DriverTrackerDisplay(
             slant: SKFontStyleSlant.Upright
         ),
     };
-    private static readonly SKPaint _errorPaint = new() { Color = SKColor.Parse("FF0000") };
+    private static readonly SKPaint _errorPaint = new()
+    {
+        Color = SKColor.Parse("FF0000"),
+        IsStroke = true,
+        Typeface = _boldTypeface,
+    };
     private static readonly SKTypeface _boldTypeface = SKTypeface.FromFamilyName(
         "Consolas",
         weight: SKFontStyleWeight.ExtraBold,
@@ -179,9 +185,6 @@ public class DriverTrackerDisplay(
             return string.Empty;
         }
 
-        var windowHeight = Terminal.Size.Height - TOP_OFFSET - BOTTOM_OFFSET;
-        var windowWidth = Terminal.Size.Width - LEFT_OFFSET;
-
         var circuitPoints = sessionInfo
             .Latest.CircuitPoints.Select(x =>
                 (x: x.x / IMAGE_SCALE_FACTOR, y: x.y / IMAGE_SCALE_FACTOR)
@@ -196,12 +199,13 @@ public class DriverTrackerDisplay(
 
         var maxX = circuitPoints.Max(x => x.x) + IMAGE_PADDING;
         var maxY = circuitPoints.Max(x => x.y) + IMAGE_PADDING;
-        var max = Math.Max(maxX, maxY);
 
         // Invert the Y coords due to how Y is displayed in a TUI (top=0 instead bottom=0)
         circuitPoints = circuitPoints.Select(x => (x.x, maxY - x.y)).ToList();
 
-        var surface = SKSurface.Create(new SKImageInfo(maxX, maxY));
+        // Draw the image as a square that fits the actual track map in
+        var longestEdgeLength = Math.Max(maxX, maxY);
+        var surface = SKSurface.Create(new SKImageInfo(longestEdgeLength, longestEdgeLength));
         var canvas = surface.Canvas;
 
         // Draw lines between all the points of the track to create the track map
@@ -296,18 +300,48 @@ public class DriverTrackerDisplay(
             }
         }
 
+        if (options.Value.Verbose)
+        {
+            // Add some debug information when verbose mode is on
+            canvas.DrawRect(0, 0, longestEdgeLength - 1, longestEdgeLength - 1, _errorPaint);
+            canvas.DrawText(
+                $"iTerm2 Support: {terminalInfo.IsITerm2ProtocolSupported.Value}",
+                5,
+                20,
+                _errorPaint
+            );
+            canvas.DrawText(
+                $"Kitty Support: {terminalInfo.IsKittyProtocolSupported.Value}",
+                5,
+                40,
+                _errorPaint
+            );
+        }
+
+        var windowHeight = Terminal.Size.Height - TOP_OFFSET - BOTTOM_OFFSET;
+        var windowWidth = Terminal.Size.Width - LEFT_OFFSET;
+
         if (terminalInfo.IsITerm2ProtocolSupported.Value)
         {
             var imageData = surface.Snapshot().Encode();
             var base64 = Convert.ToBase64String(imageData.AsSpan());
+            // Give iTerm the available width and height, it will fit the provided image inside that box without distortion
             return TerminalGraphics.ITerm2GraphicsSequence(windowHeight, windowWidth, base64);
         }
         else if (terminalInfo.IsKittyProtocolSupported.Value)
         {
+            // Kitty protocol will distort the image, so provide height/width as the biggest square that will definitely fit
+            // Terminal cells are twice as high as they are wide, so take that in to consideration
+            var shortestWindowEdgeLength = Math.Min(windowWidth, windowHeight * 2);
+
             var imageData = surface.Snapshot().Encode();
             var base64 = Convert.ToBase64String(imageData.AsSpan());
             return TerminalGraphics.KittyGraphicsSequenceDelete()
-                + TerminalGraphics.KittyGraphicsSequence(windowHeight, base64);
+                + TerminalGraphics.KittyGraphicsSequence(
+                    shortestWindowEdgeLength / 2,
+                    shortestWindowEdgeLength,
+                    base64
+                );
         }
         else
         {
