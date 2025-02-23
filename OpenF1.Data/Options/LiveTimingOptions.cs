@@ -11,20 +11,20 @@ public record LiveTimingOptions
     /// <summary>
     /// The directory to read and store live timing data for simulations.
     /// When live sessions are being listened to, all data received will be recorded in this directory.
-    /// Defaults to <c>~/open-f1/data</c>
+    /// This is also the directory that imported data is saved to.
+    /// Defaults to <c>~/open-f1/data</c>.
     /// </summary>
-    public string DataDirectory { get; set; } =
-        Path.Join(BaseDirectory, "data");
+    public string DataDirectory { get; set; } = Path.Join(BaseDirectory, "data");
 
     /// <summary>
     /// Whether the app should expose an API at http://localhost:61937.
-    /// Defaults to <c>false</c>
+    /// Defaults to <c>false</c>.
     /// </summary>
     public bool ApiEnabled { get; set; } = false;
 
     /// <summary>
     /// Whether verbose logging should be enabled.
-    /// Defaults to <c>false</c>
+    /// Defaults to <c>false</c>.
     /// </summary>
     public bool Verbose { get; set; } = false;
 }

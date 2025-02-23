@@ -170,9 +170,10 @@ Data for pre-recorded sessions should be stored in the `~/open-f1/data/<session-
 
 F1 provides static timing data files for already completed sessions. This data can be downloaded and converted into the same format `openf1-console` uses to save live recorded data. You can then replay the old session using the steps above.
 
-1. List the available meetings for the chosen year with `openf1-console import <year> list`
-2. Review the list of meetings returned from the command, and view the session inside the chosen meeting with `openf1-console import <year> list --meeting-key <meeting-key>`
-3. Review the list of session, and select one to import: `openf1-console import <year> --meeting-key <meeting-key> --session-key <session-key>`
+1. List the meetings that have data available to import with `openf1-console import <year>`
+2. Review the list of meetings returned from the command, and list the available sessions inside the chosen meeting with `openf1-console import <year> --meeting-key <meeting-key>`
+3. Review the list of sessions, and select one to import: `openf1-console import <year> --meeting-key <meeting-key> --session-key <session-key>`
+4. Data that is imported will be saved to the configured `DATA_DIRECTORY`. See [Configuration](#configuration) for information on how to change this.
 
 ### During the Session
 
@@ -180,7 +181,7 @@ F1 provides static timing data files for already completed sessions. This data c
 
 All session data, whether live or pre-recorded, is sent to a `Channel` that acts as a delayed-queue. After a short delay, data points are pulled from the queue and processed, leading to updates on the timing screens. The amount of this delay can be changed with the <kbd>M</kbd>/<kbd>N</kbd> `Delay` actions whilst on the timing screens. Hold <kbd>⇧ Shift</kbd> to change the delay by 30 seconds instead of 5. When using `openf1-console` during a live session, you may wish to increase this delay to around ~50 seconds (actual number may vary) to match with the broadcast delay and avoid being spoiled about upcoming action.
 
-Simulated session start with a calculated delay equal to the amount of time between the start of the actual session and now. This means you can decrease the delay with the <kbd>N</kbd> `Delay` action to fast-forward through the session.
+Simulated sessions start with a calculated delay equal to the amount of time between the start of the actual session and now. This means you can decrease the delay with the <kbd>N</kbd> `Delay` action to fast-forward through the session.
 
 #### Using the Cursor
 
@@ -188,7 +189,7 @@ There is a global cursor that is controlled with the <kbd>▼</kbd>/<kbd>▲</kb
 
 ## Configuration
 
-OpenF1 can be configured using a simple `config.json` file, through the command line at startup, or using environment variables. JSON configuration will be loaded from `~/open-f1/config.json`.
+OpenF1 can be configured using either a simple `config.json` file, through the command line at startup, or using environment variables. JSON configuration will be loaded from `~/open-f1/config.json`, if it exists.
 
 | JSON Path       | Command Line       | Environment Variable   | Description                                                                                                  |
 | --------------- | ------------------ | ---------------------- | ------------------------------------------------------------------------------------------------------------ |
@@ -208,7 +209,7 @@ Default log level is set to `Information`. More verbose logging can be enabled w
 
 ## Live Timing Data Source
 
-F1 live timing is streamed using `SignalR 2`. The `OpenF1.Data` simply connects to this endpoint, subscribes to the data feed, and listens for messages. It subscribes to the following "topics":
+F1 live timing is streamed using `SignalR`. The `OpenF1.Data` simply connects to this endpoint, subscribes to the data feed, and listens for messages. It subscribes to the following "topics":
 
 * `Heartbeat`
 * `ExtrapolatedClock`
@@ -235,7 +236,7 @@ All events received by the live timing client will be written to the configured 
 * `subscribe.txt` contains the data received at subscription time (i.e. when the live timing client connected to the stream)
 * `live.txt` contains an append-log of every message received in the stream
 
-Both of these files are required for future simulations/replays. The `IJsonTimingClient` supports loading these files and processing them in the same way live data would be. Data points will be replayed in real time, using a calculated delay.
+Both of these files are required for future simulations/replays. The `IJsonTimingClient` supports loading these files and processing them in the same way live data would be. Data points will be replayed in real time, using an adjustable delay.
 
 ## Notice
 

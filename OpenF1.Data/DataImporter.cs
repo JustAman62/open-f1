@@ -27,7 +27,7 @@ public sealed class DataImporter(IOptions<LiveTimingOptions> options, ILogger<Da
         "LapCount",
         "TimingData",
         "ChampionshipPrediction",
-        "TeamRadio"
+        "TeamRadio",
     ];
 
     private static readonly string[] _nonRaceTopics =
@@ -45,7 +45,7 @@ public sealed class DataImporter(IOptions<LiveTimingOptions> options, ILogger<Da
         "RaceControlMessages",
         "SessionData",
         "TimingData",
-        "TeamRadio"
+        "TeamRadio",
     ];
 
     /// <inheritdoc />
@@ -144,14 +144,14 @@ public sealed class DataImporter(IOptions<LiveTimingOptions> options, ILogger<Da
 
         await File.WriteAllLinesAsync(liveFilePath, lines, Encoding.UTF8).ConfigureAwait(false);
 
-        logger.LogInformation("Saving session data to {FilePath}", subscribeFilePath);
+        logger.LogInformation("Saving initial session data to {FilePath}", subscribeFilePath);
         var subscribeJson = new JsonObject
         {
             ["SessionInfo"] = sessionDataPoint.First().Json,
             ["Heartbeat"] = new JsonObject
             {
-                ["Utc"] = startDate.ToString(@"yyyy-MM-dd\THH:mm:ss.ffffff\Z")
-            }
+                ["Utc"] = startDate.ToString(@"yyyy-MM-dd\THH:mm:ss.ffffff\Z"),
+            },
         };
         await File.WriteAllTextAsync(subscribeFilePath, subscribeJson.ToString(), Encoding.UTF8)
             .ConfigureAwait(false);
@@ -166,7 +166,7 @@ public sealed class DataImporter(IOptions<LiveTimingOptions> options, ILogger<Da
     )
     {
         var url = $"{urlPrefix}{type}.jsonStream";
-        logger.LogInformation("Downloading {Type} data from {Url}", type, url);
+        logger.LogDebug("Downloading {Type} data from {Url}", type, url);
 
         try
         {

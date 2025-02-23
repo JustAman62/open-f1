@@ -18,20 +18,27 @@ public static partial class CommandHandler
             new() { ApplicationName = "openf1-console" }
         );
 
+        var commandLineOpts = new Dictionary<string, string?>();
+        if (isVerbose)
+        {
+            commandLineOpts.Add(nameof(LiveTimingOptions.Verbose), isVerbose.ToString());
+        }
+        if (isApiEnabled)
+        {
+            commandLineOpts.Add(nameof(LiveTimingOptions.ApiEnabled), isApiEnabled.ToString());
+        }
+        if (dataDirectory is not null)
+        {
+            commandLineOpts.Add(nameof(LiveTimingOptions.DataDirectory), dataDirectory?.FullName);
+        }
+
         builder
             .Configuration.AddJsonFile(
                 Path.Join(LiveTimingOptions.BaseDirectory, "config.json"),
                 optional: true
             )
             .AddEnvironmentVariables("OPENF1_")
-            .AddInMemoryCollection(
-                new Dictionary<string, string?>
-                {
-                    [nameof(LiveTimingOptions.Verbose)] = isVerbose.ToString(),
-                    [nameof(LiveTimingOptions.ApiEnabled)] = isApiEnabled.ToString(),
-                    [nameof(LiveTimingOptions.DataDirectory)] = dataDirectory?.FullName
-                }
-            );
+            .AddInMemoryCollection(commandLineOpts);
 
         var options = builder.Configuration.Get<LiveTimingOptions>() ?? new();
 

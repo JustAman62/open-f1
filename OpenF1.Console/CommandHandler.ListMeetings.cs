@@ -25,7 +25,7 @@ public static partial class CommandHandler
             {
                 AnsiConsole.Write(
                     new Text(
-                        $"Failed to find a meeting with the key {meetingKey}{Environment.NewLine}",
+                        $"Failed to find a meeting with the provided key {meetingKey}{Environment.NewLine}",
                         Color.Red
                     )
                 );
@@ -64,14 +64,19 @@ public static partial class CommandHandler
             new TableColumn("Key"),
             new("Meeting Name"),
             new("Session Name"),
-            new("Session Start")
+            new("Session Start (UTC)")
         );
 
         table.Title = new TableTitle("Available Sessions");
 
         foreach (var session in meeting.Sessions)
         {
-            table.AddRow(session.Key.ToString(), meeting.Name, session.Name, $"{session.StartDate - session.GmtOffset:u}");
+            table.AddRow(
+                session.Key.ToString(),
+                meeting.Name,
+                session.Name,
+                $"{session.StartDate - session.GmtOffset:u}"
+            );
         }
 
         AnsiConsole.Write(table);
