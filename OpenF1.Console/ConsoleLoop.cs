@@ -11,6 +11,7 @@ public class ConsoleLoop(
     IEnumerable<IDisplay> displays,
     IEnumerable<IInputHandler> inputHandlers,
     IHostApplicationLifetime hostApplicationLifetime,
+    TerminalInfoProvider terminalInfo,
     ILogger<ConsoleLoop> logger
 ) : BackgroundService
 {
@@ -54,6 +55,14 @@ public class ConsoleLoop(
 
             try
             {
+                if (terminalInfo.IsSynchronizedOutputSupported.Value)
+                {
+                    await Terminal.OutAsync(
+                        TerminalGraphics.BeginSynchronizedUpdate(),
+                        cancellationToken
+                    );
+                }
+
                 contentPanel = display is not null
                     ? await display.GetContentAsync()
                     : new Panel($"Unknown Display Selected: {state.CurrentScreen}").Expand();
@@ -81,6 +90,14 @@ public class ConsoleLoop(
                 );
                 await Terminal.ErrorAsync(ex, cancellationToken);
                 logger.LogError(ex, "Error rendering screen: {CurrentScreen}", state.CurrentScreen);
+            }
+
+            if (terminalInfo.IsSynchronizedOutputSupported.Value)
+            {
+                await Terminal.OutAsync(
+                    TerminalGraphics.EndSynchronizedUpdate(),
+                    cancellationToken
+                );
             }
 
             stopwatch.Stop();

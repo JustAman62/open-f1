@@ -10,6 +10,7 @@ namespace OpenF1.Console;
 /// </summary>
 public static class TerminalGraphics
 {
+    private const string ESCAPE_CSI = "\u001B["; // Begins an Control Sequence Introducer
     private const string ESCAPE_OSC = "\u001B]"; // Begins an Operating System Command
     private const string ESCAPE_APC = "\u001B_G"; // Begins an Application Programming Command
     private const string ESCAPE_ST = "\u001B\\"; // String Terminator
@@ -73,4 +74,16 @@ public static class TerminalGraphics
         };
         return $"{ESCAPE_APC}{string.Join(',', args)};{ESCAPE_ST}";
     }
+
+    /// <summary>
+    /// Begins a Synchronized Update using the Synchronized Output feature.
+    /// </summary>
+    /// <returns>The control sequence as a string.</returns>
+    public static string BeginSynchronizedUpdate() => $"{ESCAPE_CSI}?2026h";
+
+    /// <summary>
+    /// Ends a previously started Synchronized Update using the Synchronized Output feature.
+    /// </summary>
+    /// <returns>The control sequence as a string.</returns>
+    public static string EndSynchronizedUpdate() => $"{ESCAPE_CSI}?2026l";
 }

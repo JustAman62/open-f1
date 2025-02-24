@@ -332,6 +332,12 @@ public class DriverTrackerDisplay(
                 60,
                 _errorPaint
             );
+            canvas.DrawText(
+                $"Synchronized Output Support: {terminalInfo.IsSynchronizedOutputSupported}",
+                5,
+                80,
+                _errorPaint
+            );
         }
 
         var imageData = surface.Snapshot().Encode();
