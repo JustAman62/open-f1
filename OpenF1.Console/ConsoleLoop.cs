@@ -101,14 +101,22 @@ public class ConsoleLoop(
             logger.LogInformation("ConsoleLoop Stopping.");
         }
         await Terminal.OutAsync(ControlSequences.SetCursorVisibility(true), CancellationToken.None);
+        await Terminal.OutAsync(
+            ControlSequences.SetScreenBuffer(ScreenBuffer.Main),
+            CancellationToken.None
+        );
         Terminal.DisableRawMode();
         await base.StopAsync(cancellationToken);
         hostApplicationLifetime.StopApplication();
     }
 
-    private async Task SetupTerminalAsync(CancellationToken cancellationToken)
+    private static async Task SetupTerminalAsync(CancellationToken cancellationToken)
     {
         Terminal.EnableRawMode();
+        await Terminal.OutAsync(
+            ControlSequences.SetScreenBuffer(ScreenBuffer.Alternate),
+            cancellationToken
+        );
         await Terminal.OutAsync(ControlSequences.SetCursorVisibility(false), cancellationToken);
         await Terminal.OutAsync(ControlSequences.MoveCursorTo(0, 0), cancellationToken);
         await Terminal.OutAsync(ControlSequences.ClearScreen(ClearMode.Full), cancellationToken);
@@ -210,7 +218,7 @@ public class ConsoleLoop(
                             65 => ConsoleKey.UpArrow,
                             66 => ConsoleKey.DownArrow,
                             67 => ConsoleKey.RightArrow,
-                            _ => default
+                            _ => default,
                         };
                         if (consoleKey == default)
                         {
@@ -232,7 +240,7 @@ public class ConsoleLoop(
                     65 => ConsoleKey.UpArrow,
                     66 => ConsoleKey.DownArrow,
                     67 => ConsoleKey.RightArrow,
-                    _ => default
+                    _ => default,
                 };
                 if (consoleKey == default)
                 {
