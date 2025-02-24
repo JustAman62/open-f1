@@ -31,8 +31,8 @@ public static class TerminalGraphics
             "name=drivertracker",
             $"width={width}",
             $"height={height}",
-            $"preserveAspectRatio=1",
-            "inline=1"
+            "preserveAspectRatio=0",
+            "inline=1",
         };
 
         return $"{ESCAPE_OSC}1337;File={string.Join(';', args)}:{base64EncodedImage}{ESCAPE_ST}";

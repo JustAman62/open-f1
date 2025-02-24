@@ -7,12 +7,18 @@ namespace OpenF1.Console;
 public static class DisplayUtils
 {
     public static readonly Style STYLE_NORMAL = new(foreground: Color.White);
-    public static readonly Style STYLE_INVERT =
-        new(foreground: Color.Black, background: Color.White);
-    public static readonly Style STYLE_PB =
-        new(foreground: Color.White, background: new Color(0, 118, 0));
-    public static readonly Style STYLE_BEST =
-        new(foreground: Color.White, background: new Color(118, 0, 118));
+    public static readonly Style STYLE_INVERT = new(
+        foreground: Color.Black,
+        background: Color.White
+    );
+    public static readonly Style STYLE_PB = new(
+        foreground: Color.White,
+        background: new Color(0, 118, 0)
+    );
+    public static readonly Style STYLE_BEST = new(
+        foreground: Color.White,
+        background: new Color(118, 0, 118)
+    );
 
     public static IRenderable DriverTag(
         DriverListDataPoint.Driver driver,
@@ -48,7 +54,8 @@ public static class DisplayUtils
     public static Style GetStyle(
         TimingDataPoint.Driver.Interval? interval,
         bool isComparisonLine,
-        CarDataPoint.Entry.Car? car = null
+        CarDataPoint.Entry.Car? car = null,
+        Decoration decoration = Decoration.None
     )
     {
         if (interval is null)
@@ -73,23 +80,25 @@ public static class DisplayUtils
             foreground = Color.White;
             background = Color.Green3;
         }
-        return new Style(foreground: foreground, background: background);
+        return new Style(foreground: foreground, background: background, decoration: decoration);
     }
 
     public static IRenderable GetGapBetweenLines(
         TimingDataPoint.Driver? from,
-        TimingDataPoint.Driver to
+        TimingDataPoint.Driver to,
+        Decoration decoration = Decoration.None
     )
     {
         if (from == to)
         {
-            return new Text("-------", DisplayUtils.STYLE_INVERT);
+            return new Text("-------", STYLE_INVERT);
         }
 
         if (from?.GapToLeaderSeconds() is not null && to.GapToLeaderSeconds() is not null)
         {
+            var style = STYLE_NORMAL.Combine(new(decoration: decoration));
             var gap = to.GapToLeaderSeconds() - from.GapToLeaderSeconds();
-            return new Text($"{(gap > 0 ? "+" : "")}{gap, 3} ".ToFixedWidth(8));
+            return new Text($"{(gap > 0 ? "+" : "")}{gap, 3} ".ToFixedWidth(8), style);
         }
 
         return new Text("");

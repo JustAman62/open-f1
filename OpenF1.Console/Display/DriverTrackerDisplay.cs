@@ -21,7 +21,7 @@ public class DriverTrackerDisplay(
     ILogger<DriverTrackerDisplay> logger
 ) : IDisplay
 {
-    private const int IMAGE_SCALE_FACTOR = 20;
+    private const int IMAGE_SCALE_FACTOR = 30;
     private const int IMAGE_PADDING = 25;
     private const int LEFT_OFFSET = 17;
     private const int TOP_OFFSET = 0;
@@ -56,7 +56,7 @@ public class DriverTrackerDisplay(
         slant: SKFontStyleSlant.Upright
     );
 
-    private string _base64TrackMap = string.Empty;
+    private string _trackMapControlSequence = string.Empty;
 
     public Screen Screen => Screen.DriverTracker;
 
@@ -88,15 +88,15 @@ public class DriverTrackerDisplay(
                     new Layout("Status", statusPanel).Size(6)
                 )
                 .Size(LEFT_OFFSET - 1),
-            new Layout("Track Map", new Text(trackMapMessage)) // Drawn over to manually in PostContentDrawAsync()
+            new Layout("Track Map", new Text(trackMapMessage)) // Drawn over manually in PostContentDrawAsync()
         );
 
-        _base64TrackMap = GetTrackMap();
+        _trackMapControlSequence = GetTrackMap();
 
         return Task.FromResult<IRenderable>(layout);
     }
 
-    private IRenderable GetDriverTower()
+    private Table GetDriverTower()
     {
         var table = new Table();
         table
@@ -119,9 +119,11 @@ public class DriverTrackerDisplay(
             var isComparisonLine = line == comparisonDataPoint.Value;
 
             var driverTag = DisplayUtils.MarkedUpDriverNumber(driver);
+            var decoration = Decoration.None;
             if (!state.SelectedDrivers.Contains(driverNumber))
             {
                 driverTag = $"[dim]{driverTag}[/]";
+                decoration |= Decoration.Dim;
             }
 
             driverTag = state.CursorOffset == line.Line ? $">{driverTag}<" : $" {driverTag} ";
@@ -129,12 +131,12 @@ public class DriverTrackerDisplay(
             table.AddRow(
                 new Markup(driverTag),
                 state.CursorOffset > 0
-                    ? DisplayUtils.GetGapBetweenLines(comparisonDataPoint.Value, line)
+                    ? DisplayUtils.GetGapBetweenLines(comparisonDataPoint.Value, line, decoration)
                     : new Text(
                         $"{(car?.Channels.Drs >= 8 ? "•" : "")}{line.IntervalToPositionAhead?.Value}".ToFixedWidth(
                             7
                         ),
-                        DisplayUtils.GetStyle(line.IntervalToPositionAhead, false, car)
+                        DisplayUtils.GetStyle(line.IntervalToPositionAhead, false, car, decoration)
                     )
             );
         }
@@ -142,7 +144,7 @@ public class DriverTrackerDisplay(
         return table;
     }
 
-    private IRenderable GetStatusPanel()
+    private Panel GetStatusPanel()
     {
         var items = new List<IRenderable>();
 
@@ -300,6 +302,14 @@ public class DriverTrackerDisplay(
             }
         }
 
+        var windowHeight = Terminal.Size.Height - TOP_OFFSET - BOTTOM_OFFSET;
+        var windowWidth = Terminal.Size.Width - LEFT_OFFSET;
+        // Terminal protocols will distort the image, so provide height/width as the biggest square that will definitely fit
+        // Terminal cells are twice as high as they are wide, so take that in to consideration
+        var shortestWindowEdgeLength = Math.Min(windowWidth, windowHeight * 2);
+        windowHeight = shortestWindowEdgeLength / 2;
+        windowWidth = shortestWindowEdgeLength;
+
         if (options.Value.Verbose)
         {
             // Add some debug information when verbose mode is on
@@ -316,43 +326,34 @@ public class DriverTrackerDisplay(
                 40,
                 _errorPaint
             );
+            canvas.DrawText(
+                $"Window H/W: {windowHeight}/{windowWidth} Shortest: {shortestWindowEdgeLength}",
+                5,
+                60,
+                _errorPaint
+            );
         }
 
-        var windowHeight = Terminal.Size.Height - TOP_OFFSET - BOTTOM_OFFSET;
-        var windowWidth = Terminal.Size.Width - LEFT_OFFSET;
+        var imageData = surface.Snapshot().Encode();
+        var base64 = Convert.ToBase64String(imageData.AsSpan());
 
         if (terminalInfo.IsITerm2ProtocolSupported.Value)
         {
-            var imageData = surface.Snapshot().Encode();
-            var base64 = Convert.ToBase64String(imageData.AsSpan());
-            // Give iTerm the available width and height, it will fit the provided image inside that box without distortion
             return TerminalGraphics.ITerm2GraphicsSequence(windowHeight, windowWidth, base64);
         }
         else if (terminalInfo.IsKittyProtocolSupported.Value)
         {
-            // Kitty protocol will distort the image, so provide height/width as the biggest square that will definitely fit
-            // Terminal cells are twice as high as they are wide, so take that in to consideration
-            var shortestWindowEdgeLength = Math.Min(windowWidth, windowHeight * 2);
-
-            var imageData = surface.Snapshot().Encode();
-            var base64 = Convert.ToBase64String(imageData.AsSpan());
             return TerminalGraphics.KittyGraphicsSequenceDelete()
-                + TerminalGraphics.KittyGraphicsSequence(
-                    shortestWindowEdgeLength / 2,
-                    shortestWindowEdgeLength,
-                    base64
-                );
+                + TerminalGraphics.KittyGraphicsSequence(windowHeight, windowWidth, base64);
         }
-        else
-        {
-            return string.Empty;
-        }
+
+        return "Unexpected error, shouldn't have got here. Please report!";
     }
 
     /// <inheritdoc />
     public async Task PostContentDrawAsync()
     {
         await Terminal.OutAsync(ControlSequences.MoveCursorTo(TOP_OFFSET, LEFT_OFFSET));
-        await Terminal.OutAsync(_base64TrackMap);
+        await Terminal.OutAsync(_trackMapControlSequence);
     }
 }
