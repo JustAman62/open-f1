@@ -17,14 +17,15 @@ public class TimingService(
     private Channel<(string type, string? data, DateTimeOffset timestamp)> _workItems =
         Channel.CreateUnbounded<(string type, string? data, DateTimeOffset timestamp)>();
 
-    private static readonly JsonSerializerOptions _jsonSerializerOptions =
-        new(JsonSerializerDefaults.Web)
-        {
-            UnmappedMemberHandling = JsonUnmappedMemberHandling.Skip,
-            AllowTrailingCommas = true,
-            WriteIndented = false,
-            Converters = { new JsonStringEnumConverter() },
-        };
+    private static readonly JsonSerializerOptions _jsonSerializerOptions = new(
+        JsonSerializerDefaults.Web
+    )
+    {
+        UnmappedMemberHandling = JsonUnmappedMemberHandling.Skip,
+        AllowTrailingCommas = true,
+        WriteIndented = false,
+        Converters = { new JsonStringEnumConverter() },
+    };
 
     public ILogger Logger { get; } = logger;
 
@@ -55,15 +56,20 @@ public class TimingService(
                     {
                         if (timeToWait > TimeSpan.FromSeconds(1))
                         {
-                            // If we have to wait for more than a second, then wait for just a second and repeat the loop.
+                            // If we have to wait for more than a second, then wait for just a second and repeat the loop,
+                            // without dequeueing the data.
                             // This way if the Delay is reduced by the user, we can react to it after at most a second.
-                            Logger.LogDebug("Delaying for 1 second. Current: {CurrentTime}, Target: {TargetTime}", dateTimeProvider.Utc, res.timestamp);
+                            Logger.LogDebug(
+                                "Delaying for more than 1 second: {TimeToWait}. Current: {CurrentTime}, Target: {TargetTime}",
+                                timeToWait,
+                                dateTimeProvider.Utc,
+                                res.timestamp
+                            );
                             await Task.Delay(TimeSpan.FromSeconds(1), cancellationToken)
                                 .ConfigureAwait(false);
                             continue;
                         }
 
-                        Logger.LogDebug("Delaying for {TimeToWait}. Current: {CurrentTime}, Target: {TargetTime}", timeToWait, dateTimeProvider.Utc, res.timestamp);
                         await Task.Delay(timeToWait, cancellationToken).ConfigureAwait(false);
                     }
 
@@ -76,7 +82,7 @@ public class TimingService(
                 }
                 catch (Exception ex)
                 {
-                    Logger.LogError(ex, $"Failed to process data {res}");
+                    Logger.LogError(ex, "Failed to process data {Data}", res);
                 }
             }
         }
