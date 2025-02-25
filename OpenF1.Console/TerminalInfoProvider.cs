@@ -8,7 +8,7 @@ public sealed partial class TerminalInfoProvider
 {
     private readonly ILogger<TerminalInfoProvider> _logger;
 
-    private static readonly string[] ITERM_PROTOCOL_SUPPORTED_TERMINALS = ["iterm2"];
+    private static readonly string[] ITERM_PROTOCOL_SUPPORTED_TERMINALS = ["iterm2", "wezterm"];
 
     [GeneratedRegex(@"\u001B_Gi=31;(.+)\u001B\\")]
     private static partial Regex TerminalKittyGraphicsResponseRegex();
@@ -47,9 +47,9 @@ public sealed partial class TerminalInfoProvider
 
     private bool GetIsITerm2ProtocolSupported()
     {
-        var lcTerminal = Environment.GetEnvironmentVariable("LC_TERMINAL") ?? string.Empty;
+        var termProgram = Environment.GetEnvironmentVariable("TERM_PROGRAM") ?? string.Empty;
         var supported = ITERM_PROTOCOL_SUPPORTED_TERMINALS.Contains(
-            lcTerminal,
+            termProgram,
             StringComparer.InvariantCultureIgnoreCase
         );
         _logger.LogDebug("iTerm2 Graphics Protocol Supported: {Supported}", supported);
@@ -78,7 +78,11 @@ public sealed partial class TerminalInfoProvider
                     .Groups[1]
                     .Captures[0]
                     .Value.Equals("OK", StringComparison.InvariantCultureIgnoreCase);
-            _logger.LogDebug("Kitty Protocol Supported: {Supported}", supported);
+            _logger.LogDebug(
+                "Kitty Protocol Supported: {Supported}, Response: {Response}",
+                supported,
+                SanitizeResponse(str)
+            );
             return supported;
         }
         catch (Exception e)

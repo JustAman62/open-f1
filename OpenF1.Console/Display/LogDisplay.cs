@@ -20,7 +20,7 @@ public class LogDisplay(State state, InMemoryLogger inMemoryLogger, LogDisplayOp
             .Reverse()
             .Select(x => $"{x.Level} {x.Message} {x.Exception}")
             .Skip(state.CursorOffset)
-            .Take(5);
+            .Take(10);
 
         var rowTexts = new List<IRenderable>()
         {

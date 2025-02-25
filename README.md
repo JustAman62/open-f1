@@ -122,7 +122,7 @@ dotnet tool install -g openf1-console
 openf1-console
 ```
 
-This method is recommended as it is easy to keep the app updated using `dotnet tool update -g openf1-console`.
+This method is recommended as it is easy to keep the app updated using `dotnet tool update -g openf1-console`. You'll need the .NET 9 SDK installed to use this installation method. If you'd rather not install the SDK, try the [standalone installation option below](#install-and-run-the-standalone-executable).
 
 #### Install and run the standalone executable
 
