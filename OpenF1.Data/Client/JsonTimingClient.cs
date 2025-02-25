@@ -100,20 +100,7 @@ public class JsonTimingClient(
 
             timingService.ProcessSubscriptionData(subscriptionData);
 
-            var subscriptionHeartbeat = JsonNode
-                .Parse(subscriptionData)
-                ?["Heartbeat"]?.Deserialize<HeartbeatDataPoint>();
-            if (subscriptionHeartbeat is not null)
-            {
-                dateTimeProvider.Delay = DateTimeOffset.UtcNow - subscriptionHeartbeat.Utc;
-                logger.LogInformation(
-                    $"Calculated a delay of {dateTimeProvider.Delay} between now and {subscriptionHeartbeat.Utc:s}"
-                );
-            }
-            else
-            {
-                logger.LogError($"Unable to calculate a delay for this simulation data");
-            }
+            dateTimeProvider.Delay = CalculateDelay(subscriptionData);
 
             // Handle the real-time data
             var lines = File.ReadLinesAsync(Path.Join(directory, "/live.txt"), cancellationToken);
@@ -135,6 +122,44 @@ public class JsonTimingClient(
         {
             logger.LogError(ex, "Failed to handle subscription or live data");
         }
+    }
+
+    private TimeSpan CalculateDelay(string? subscriptionData)
+    {
+        // Try to start at the session start, if available. Otherwise, start at the first heartbeat.
+        var sessionInfo = JsonNode
+            .Parse(subscriptionData ?? string.Empty)
+            ?["SessionInfo"]?.Deserialize<SessionInfoDataPoint>();
+
+        if (sessionInfo is not null)
+        {
+            var sessionStart = sessionInfo.GetStartDateTimeUtc().GetValueOrDefault();
+            var delay = DateTimeOffset.UtcNow - sessionStart;
+            logger.LogInformation(
+                "Calculated a delay of {Delay} between now and {SessionStart:s} using session info",
+                delay,
+                sessionStart
+            );
+            return delay;
+        }
+
+        var heartbeat = JsonNode
+            .Parse(subscriptionData ?? string.Empty)
+            ?["Heartbeat"]?.Deserialize<HeartbeatDataPoint>();
+
+        if (heartbeat is not null)
+        {
+            var delay = DateTimeOffset.UtcNow - heartbeat.Utc;
+            logger.LogInformation(
+                "Calculated a delay of {Delay} between now and {HeartbeatDateTime:s} using heartbeat",
+                delay,
+                heartbeat.Utc
+            );
+            return delay;
+        }
+
+        logger.LogError($"Unable to calculate a delay for this simulation data");
+        return TimeSpan.Zero;
     }
 
     private (string type, string? data, DateTimeOffset timestamp) ProcessLine(string line)

@@ -59,7 +59,7 @@ public class TimingService(
                             // If we have to wait for more than a second, then wait for just a second and repeat the loop,
                             // without dequeueing the data.
                             // This way if the Delay is reduced by the user, we can react to it after at most a second.
-                            Logger.LogDebug(
+                            Logger.LogTrace(
                                 "Delaying for more than 1 second: {TimeToWait}. Current: {CurrentTime}, Target: {TargetTime}",
                                 timeToWait,
                                 dateTimeProvider.Utc,
@@ -142,7 +142,7 @@ public class TimingService(
             data = DecompressUtilities.InflateBase64Data(data);
         }
 
-        Logger.LogDebug($"Processing {type} data point for timestamp {timestamp:s} :: {data}");
+        Logger.LogTrace($"Processing {type} data point for timestamp {timestamp:s} :: {data}");
         if (data is null || !Enum.TryParse<LiveTimingDataType>(type, out var liveTimingDataType))
             return;
 
