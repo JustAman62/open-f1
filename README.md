@@ -141,10 +141,13 @@ curl https://github.com/JustAman62/open-f1/releases/latest/download/openf1-conso
 ```sh
 # Checkout the git repository
 git clone git@github.com:JustAman62/open-f1.git
+cd open-f1
 
 # Run the console project with `dotnet run`
 dotnet run --project OpenF1.Console/OpenF1.Console.csproj
 ```
+
+By default, data will be saved and read from the `~/open-f1` directory. See [Configuration](#configuration) for information on how to configure this.
 
 ### Start Timing for a Live Session
 
@@ -159,12 +162,22 @@ During the session, streamed timing data will be written to `~/open-f1/data/<ses
 
 Data for pre-recorded sessions should be stored in the `~/open-f1/data/<session-name>` directory. Sample data can be found in this repos [Sample Data](/Sample%20Data/) folder. To use this sample data, copy one of the folders to `~/open-f1/data` and then it will be visible in step 4 below.
 
-1. Start `openf1-console` as described above
-2. Navigate to the <kbd>S</kbd> `Session` Screen
-3. Start a Simulated Session with the <kbd>F</kbd> `Start Simulation` action.
-4. Select the session to start using the Up/Down arrows, then pressing <kbd>Enter</kbd>
-5. Switch to the Timing Tower screen with the <kbd>T</kbd> `Timing Tower` action
-6. Optionally skip forward in time a bit by decreasing the delay with <kbd>N</kbd> (or <kbd>⇧ Shift</kbd> + <kbd>N</kbd> to decrease by 30 seconds).
+1. OPTIONAL: Download sample data to ~/open-f1/data. If you already have data, or have checked out the repository, skip to the next step.
+    ```sh
+    # Create the directory for the data if it doesn't exist
+    mkdir -p ~/open-f1/2024_Silverstone_Race
+
+    # Download the live and subscribe data files
+    curl https://raw.githubusercontent.com/JustAman62/open-f1/refs/heads/master/Sample%20Data/2024_Silverstone_Race/live.txt -o ~/open-f1/2024_Silverstone_Race/live.txt
+
+    curl https://raw.githubusercontent.com/JustAman62/open-f1/refs/heads/master/Sample%20Data/2024_Silverstone_Race/subscribe.txt -o ~/open-f1/2024_Silverstone_Race/subscribe.txt
+    ```
+2. Start `openf1-console` as described [above](#installation)
+3. Navigate to the <kbd>S</kbd> `Session` Screen
+4. Start a Simulated Session with the <kbd>F</kbd> `Start Simulation` action.
+5. Select the session to start using the Up/Down arrows, then pressing <kbd>Enter</kbd>
+6. Switch to the Timing Tower screen with the <kbd>T</kbd> `Timing Tower` action
+7. Optionally skip forward in time a bit by decreasing the delay with <kbd>N</kbd> (or <kbd>⇧ Shift</kbd> + <kbd>N</kbd> to decrease by 30 seconds).
 
 ### Download a previous session data for replay
 
