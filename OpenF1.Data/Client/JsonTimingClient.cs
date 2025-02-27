@@ -1,3 +1,4 @@
+using System.Reflection;
 using System.Security.Cryptography.X509Certificates;
 using System.Text.Json;
 using System.Text.Json.Nodes;
@@ -131,35 +132,27 @@ public class JsonTimingClient(
             .Parse(subscriptionData ?? string.Empty)
             ?["SessionInfo"]?.Deserialize<SessionInfoDataPoint>();
 
-        if (sessionInfo is not null)
-        {
-            var sessionStart = sessionInfo.GetStartDateTimeUtc().GetValueOrDefault();
-            var delay = DateTimeOffset.UtcNow - sessionStart;
-            logger.LogInformation(
-                "Calculated a delay of {Delay} between now and {SessionStart:s} using session info",
-                delay,
-                sessionStart
-            );
-            return delay;
-        }
+        var sessionStart =
+            sessionInfo?.GetStartDateTimeUtc().GetValueOrDefault() ?? DateTime.MinValue;
 
         var heartbeat = JsonNode
             .Parse(subscriptionData ?? string.Empty)
             ?["Heartbeat"]?.Deserialize<HeartbeatDataPoint>();
+        var firstHeartbeatDateTime = heartbeat?.Utc.DateTime ?? DateTime.MinValue;
 
-        if (heartbeat is not null)
-        {
-            var delay = DateTimeOffset.UtcNow - heartbeat.Utc;
-            logger.LogInformation(
-                "Calculated a delay of {Delay} between now and {HeartbeatDateTime:s} using heartbeat",
-                delay,
-                heartbeat.Utc
-            );
-            return delay;
-        }
+        var delay =
+            sessionStart > firstHeartbeatDateTime
+                ? DateTimeOffset.UtcNow - sessionStart
+                : DateTimeOffset.UtcNow - firstHeartbeatDateTime;
 
-        logger.LogError($"Unable to calculate a delay for this simulation data");
-        return TimeSpan.Zero;
+        logger.LogInformation(
+            "Calculated a delay of {Delay} from the highest of (SessionStart: {SessionStart:s}, FirstHeartbeat: {FirstHeartbeat:s})",
+            delay,
+            sessionStart,
+            firstHeartbeatDateTime
+        );
+
+        return delay;
     }
 
     private (string type, string? data, DateTimeOffset timestamp) ProcessLine(string line)
