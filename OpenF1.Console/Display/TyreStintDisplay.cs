@@ -9,11 +9,12 @@ public class TyreStintDisplay(
     TyreStintSeriesProcessor tyreStintSeries,
     DriverListProcessor driverList,
     TimingDataProcessor timingData,
-    LapCountProcessor lapCountProcessor
+    LapCountProcessor lapCount,
+    TrackStatusProcessor trackStatus,
+    ExtrapolatedClockProcessor extrapolatedClock,
+    IDateTimeProvider dateTimeProvider
 ) : IDisplay
 {
-    private const int DRIVER_COLUMN_LENGTH = 10;
-
     public Screen Screen => Screen.TyreStints;
 
     public Task<IRenderable> GetContentAsync()
@@ -22,7 +23,12 @@ public class TyreStintDisplay(
 
         var layout = new Layout("Root").SplitRows(
             new Layout("Pit Stints", pitStintList),
-            new Layout("Stint Detail").Size(6)
+            new Layout("Footer")
+                .SplitColumns(
+                    new Layout("Status Panel", GetStatusPanel()).Size(15),
+                    new Layout("Selected Stint Detail", GetStintDetail())
+                )
+                .Size(6)
         );
 
         return Task.FromResult<IRenderable>(layout);
@@ -30,12 +36,15 @@ public class TyreStintDisplay(
 
     private Rows GetPitStintList()
     {
-        var rows = new List<IRenderable> { new Text("Driver    Pit Stops") };
-        var totalLapCount = lapCountProcessor.Latest.TotalLaps.GetValueOrDefault();
+        var rows = new List<IRenderable>
+        {
+            new Text($"LAP {lapCount.Latest.CurrentLap, 2}/{lapCount.Latest.TotalLaps} Pit Stops"),
+        };
+        var totalLapCount = lapCount.Latest.TotalLaps.GetValueOrDefault();
 
         foreach (var (driverNumber, line) in timingData.Latest.GetOrderedLines())
         {
-            var driver = driverList.Latest?.GetValueOrDefault(driverNumber) ?? new();
+            var driver = driverList.Latest.GetValueOrDefault(driverNumber) ?? new();
             var stints = tyreStintSeries.Latest.Stints.GetValueOrDefault(driverNumber) ?? [];
             var rowMarkup = DisplayUtils.MarkedUpDriverNumber(driver);
             rowMarkup = $"{line.Line.ToString()?.ToFixedWidth(2)} {rowMarkup} ";
@@ -77,5 +86,74 @@ public class TyreStintDisplay(
         }
 
         return new Rows(rows);
+    }
+
+    private Columns GetStintDetail()
+    {
+        var (selectedDriverNumber, _) = timingData.Latest.Lines.FirstOrDefault(x =>
+            x.Value.Line == state.CursorOffset
+        );
+        if (selectedDriverNumber is null)
+        {
+            return new Columns();
+        }
+
+        var stints = tyreStintSeries.Latest.Stints.GetValueOrDefault(selectedDriverNumber) ?? [];
+
+        var columns = new List<Rows>();
+        foreach (var (stintNumber, stint) in stints)
+        {
+            var compoundMarkup = DisplayUtils.GetStyleForTyreCompound(stint.Compound).ToMarkup();
+            // Use a consistent tyre compound header to centre it nicely
+            var header = stint.Compound switch
+            {
+                "HARD" => "     HARD     ",
+                "MEDIUM" => "    MEDIUM    ",
+                "SOFT" => "     SOFT     ",
+                "INTERMEDIATE" => " INTERMEDIATE ",
+                "WET" => "      WET     ",
+                _ => "    UNKNOWN   ",
+            };
+            var rows = new List<Markup>
+            {
+                new(" "),
+                new($"[{compoundMarkup}]{header}[/]"),
+                new($"New        {(stint.New.GetValueOrDefault() ? "[green]YES[/]" : " NO")}"),
+                new($"Start Age   {stint.StartLaps:D2}"),
+                new($"Total Laps  {stint.TotalLaps:D2}"),
+            };
+            columns.Add(new Rows(rows).Collapse());
+        }
+        return new Columns(columns).Collapse();
+    }
+
+    private Panel GetStatusPanel()
+    {
+        var items = new List<IRenderable>();
+
+        if (trackStatus.Latest is not null)
+        {
+            var style = trackStatus.Latest.Status switch
+            {
+                "1" => DisplayUtils.STYLE_PB, // All Clear
+                "2" => new Style(foreground: Color.Black, background: Color.Yellow), // Yellow Flag
+                "4" => new Style(foreground: Color.Black, background: Color.Yellow), // Safety Car
+                "6" => new Style(foreground: Color.Black, background: Color.Yellow), // VSC Deployed
+                "5" => new Style(foreground: Color.White, background: Color.Red), // Red Flag
+                _ => Style.Plain,
+            };
+            items.Add(new Text($"{trackStatus.Latest.Message}", style));
+        }
+
+        items.Add(new Text($@"{dateTimeProvider.Utc:HH\:mm\:ss}"));
+        items.Add(new Text($@"{extrapolatedClock.ExtrapolatedRemaining():hh\:mm\:ss}"));
+
+        var rows = new Rows(items);
+        return new Panel(rows)
+        {
+            Header = new PanelHeader("Status"),
+            Expand = true,
+            Border = BoxBorder.Rounded,
+        };
     }
 }
