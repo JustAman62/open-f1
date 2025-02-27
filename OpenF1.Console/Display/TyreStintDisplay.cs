@@ -77,10 +77,12 @@ public class TyreStintDisplay(
                 rowMarkup += $"[{markup}]{stint.Compound?[0] ?? ' '}{text}[/]";
             }
 
-            // Add a white cell for the final lap
-            var emptyCellsToAdd = totalLapCount - lineTotalPadLength;
-            var emptyCells = string.Empty.ToFixedWidth(emptyCellsToAdd);
-            rowMarkup = rowMarkup + emptyCells + "[white on white] [/]";
+            if (totalLapCount > 0) {
+                // Add a white cell for the final lap
+                var emptyCellsToAdd = Math.Max(0, totalLapCount - lineTotalPadLength);
+                var emptyCells = string.Empty.ToFixedWidth(emptyCellsToAdd);
+                rowMarkup = rowMarkup + emptyCells + "[white on white] [/]";
+            }
 
             rows.Add(new Markup(rowMarkup));
         }

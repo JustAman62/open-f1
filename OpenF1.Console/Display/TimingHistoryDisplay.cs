@@ -13,10 +13,14 @@ public class TimingHistoryDisplay(
 {
     public Screen Screen => Screen.TimingHistory;
 
-    private readonly Style _personalBest =
-        new(foreground: Color.White, background: new Color(0, 118, 0));
-    private readonly Style _overallBest =
-        new(foreground: Color.White, background: new Color(118, 0, 118));
+    private readonly Style _personalBest = new(
+        foreground: Color.White,
+        background: new Color(0, 118, 0)
+    );
+    private readonly Style _overallBest = new(
+        foreground: Color.White,
+        background: new Color(118, 0, 118)
+    );
     private Style _normal = new(foreground: Color.White);
 
     public Task<IRenderable> GetContentAsync()
@@ -38,18 +42,18 @@ public class TimingHistoryDisplay(
             return new Text($"No Data for Lap {selectedLapNumber}");
 
         var table = new Table();
-        table.AddColumns(
-            $"LAP {selectedLapNumber, 2}/{lapCountProcessor.Latest?.TotalLaps}",
-            "Gap",
-            "Interval",
-            "Last Lap",
-            "S1",
-            "S2",
-            "S3",
-            " "
-        );
-        table.SimpleBorder();
-        table.RemoveColumnPadding();
+        table
+            .AddColumns(
+                $"LAP {selectedLapNumber, 2}/{lapCountProcessor.Latest?.TotalLaps}",
+                "Gap",
+                "Interval",
+                "Last Lap",
+                "S1",
+                "S2",
+                "S3",
+                " "
+            )
+            .NoBorder();
 
         foreach (var (driverNumber, line) in selectedLapDrivers.OrderBy(x => x.Value.Line))
         {
@@ -105,7 +109,7 @@ public class TimingHistoryDisplay(
         {
             < 0 => "[green]▲[/]",
             > 0 => "[yellow]▼[/]",
-            _ => ""
+            _ => "",
         };
 
     [System.Diagnostics.CodeAnalysis.SuppressMessage(

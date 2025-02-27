@@ -20,6 +20,7 @@ Feature Highlights:
   - Interval to driver in front
   - Gap to leader
   - Gap [between a selected driver](#using-a-cursor-to-display-relative-gap-for-a-specific-driver) and all other drivers (useful for monitoring pit windows)
+- [Pit Stop Strategy](#tyre-stint--strategy) gives you at-a-glance information about all the drivers strategies
 - [Race Control](#race-control-page) messages including investigations, penalties, lap deletions, and weather
 - [Driver Tracker](#driver-tracker) shows the position of selected drivers on a live track map
 - Lap-by-lap [Timing History](#using-a-cursor-to-view-timing-history-by-lap) to observe gaps over time
@@ -34,6 +35,7 @@ Feature Highlights:
   - [Timing Tower during Practice/Qualifying](#timing-tower-during-practicequalifying)
   - [Race Control Page](#race-control-page)
   - [Driver Tracker](#driver-tracker)
+  - [Tyre Stint / Strategy](#tyre-stint--strategy)
   - [Using a Cursor to View Timing History by Lap](#using-a-cursor-to-view-timing-history-by-lap)
   - [Listen to and Transcribe Team Radio](#listen-to-and-transcribe-team-radio)
 - [Getting Started with `openf1-console`](#getting-started-with-openf1-console)
@@ -93,6 +95,14 @@ The `Driver Tracker` page shows a track map overlayed with selected drivers. Use
 ![Driver Tracker Page](docs/screenshots/driver-tracker.png)
 
 NOTE: Currently the track map is only supported in the iTerm2 terminal (by implementing the [iTerm2's Inline Image Protocol](https://iterm2.com/documentation-images.html)), and terminals which implement the [Kitty Graphics Protocol](https://sw.kovidgoyal.net/kitty/graphics-protocol/). Other protocols (such as Sixel) may be supported in the future. If the track map doesn't work in your terminal, please raise an issue and I will try and fix/implement support.
+
+### Tyre Stint / Strategy
+
+The `Tyre Stint` page shows the tyre strategy for all the drivers. At a glance, see what tyres the drivers have used, how old they are, and if they are on an offset strategy to any other drivers.
+
+Use the <kbd>▼</kbd>/<kbd>▲</kbd> `Cursor` actions to view more information for a particular drivers strategy.
+
+![Tyre Stint](docs/screenshots//tyre-stint-screen.png)
 
 ### Using a Cursor to View Timing History by Lap
 
