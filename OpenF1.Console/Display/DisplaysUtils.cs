@@ -83,6 +83,30 @@ public static class DisplayUtils
         return new Style(foreground: foreground, background: background, decoration: decoration);
     }
 
+    [System.Diagnostics.CodeAnalysis.SuppressMessage(
+        "Style",
+        "IDE0046:Convert to conditional expression",
+        Justification = "Harder to read"
+    )]
+    public static Style GetStyle(TimingAppDataPoint.Driver.Stint? stint)
+    {
+        if (stint is null)
+            return STYLE_NORMAL;
+
+        return GetStyleForTyreCompound(stint.Compound);
+    }
+
+    public static Style GetStyleForTyreCompound(string? compound) =>
+        compound switch
+        {
+            "HARD" => new Style(foreground: Color.White, background: Color.Grey),
+            "MEDIUM" => new Style(foreground: Color.Black, background: Color.Yellow),
+            "SOFT" => new Style(foreground: Color.White, background: Color.Red),
+            "INTERMEDIATE" => new Style(foreground: Color.Black, background: Color.Green),
+            "WET" => new Style(foreground: Color.Black, background: Color.Blue),
+            _ => STYLE_NORMAL,
+        };
+
     public static IRenderable GetGapBetweenLines(
         TimingDataPoint.Driver? from,
         TimingDataPoint.Driver to,

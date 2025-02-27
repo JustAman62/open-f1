@@ -1,6 +1,6 @@
 namespace OpenF1.Data;
 
-public sealed record TimingStatsDataPoint: ILiveTimingDataPoint
+public sealed record TimingStatsDataPoint : ILiveTimingDataPoint
 {
     /// <inheritdoc />
     public LiveTimingDataType LiveTimingDataType => LiveTimingDataType.TimingStats;

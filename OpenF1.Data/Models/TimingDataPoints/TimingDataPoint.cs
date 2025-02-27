@@ -1,6 +1,6 @@
 namespace OpenF1.Data;
 
-public sealed record TimingDataPoint: ILiveTimingDataPoint
+public sealed record TimingDataPoint : ILiveTimingDataPoint
 {
     /// <inheritdoc />
     public LiveTimingDataType LiveTimingDataType => LiveTimingDataType.TimingData;
@@ -81,7 +81,8 @@ public sealed record TimingDataPoint: ILiveTimingDataPoint
         public enum StatusFlags
         {
             Unknown16 = 16,
-            Unknown64 = 64, 
+            Unknown64 = 64,
+
             /// <summary>
             /// Set when the driver passes the chequered flag in quali or race sessions
             /// </summary>

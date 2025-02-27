@@ -12,5 +12,6 @@ public enum Screen
     RaceControl,
     DriverTracker,
     ChampionshipStats,
-    TeamRadio
+    TeamRadio,
+    TyreStints,
 }

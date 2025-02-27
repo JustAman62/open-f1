@@ -169,7 +169,8 @@ public class ConsoleLoop(
             {
                 var tasks = inputHandlers
                     .Where(x =>
-                        x.Keys.Contains(consoleKey)
+                        x.IsEnabled
+                        && x.Keys.Contains(consoleKey)
                         && (
                             x.ApplicableScreens is null
                             || x.ApplicableScreens.Contains(state.CurrentScreen)

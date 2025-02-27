@@ -16,11 +16,17 @@ public static partial class ServiceCollectionExtensions
     /// <param name="collection">The <see cref="IServiceCollection"/> to add services to.</param>
     /// <param name="configuration">The <see cref="IConfiguration"/> to bind <see cref="LiveTimingOptions"/></param>
     /// <returns>The same <paramref name="collection"/> to support chaining.</returns>
-    public static IServiceCollection AddLiveTiming(this IServiceCollection collection, IConfiguration configuration)
+    public static IServiceCollection AddLiveTiming(
+        this IServiceCollection collection,
+        IConfiguration configuration
+    )
     {
         collection
             .Configure<LiveTimingOptions>(configuration)
-            .AddAutoMapper(cfg => cfg.AddCollectionMappers(), typeof(TimingDataPointConfiguration).Assembly)
+            .AddAutoMapper(
+                cfg => cfg.AddCollectionMappers(),
+                typeof(TimingDataPointConfiguration).Assembly
+            )
             .AddLiveTimingClient()
             .AddLiveTimingProcessors()
             .AddSingleton<INotifyService, NotifyService>()

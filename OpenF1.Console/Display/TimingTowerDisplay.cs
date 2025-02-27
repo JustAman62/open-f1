@@ -156,7 +156,10 @@ public class TimingTowerDisplay(
                             ? new Style(foreground: Color.Black, background: Color.Green)
                         : Style.Plain
                 ),
-                new Text($"{stint?.Compound?[0]} {stint?.TotalLaps, 2}", GetStyle(stint)),
+                new Text(
+                    $"{stint?.Compound?[0]} {stint?.TotalLaps, 2}",
+                    DisplayUtils.GetStyle(stint)
+                ),
                 DisplayUtils.GetGapBetweenLines(comparisonDataPoint.Value, line),
                 DisplayUtils.DriverTag(driver, line, isComparisonLine),
                 new Markup(GetPositionChangeMarkup(positionChange))
@@ -267,7 +270,10 @@ public class TimingTowerDisplay(
                         : line.PitOut.GetValueOrDefault() ? DisplayUtils.STYLE_PB
                         : Style.Plain
                 ),
-                new Text($"{stint?.Compound?[0] ?? 'X'} {stint?.TotalLaps, 2}", GetStyle(stint))
+                new Text(
+                    $"{stint?.Compound?[0] ?? 'X'} {stint?.TotalLaps, 2}",
+                    DisplayUtils.GetStyle(stint)
+                )
             );
         }
         return table;
@@ -328,27 +334,6 @@ public class TimingTowerDisplay(
         bestLap?.ToTimeSpan() == time?.ToTimeSpan()
             ? DisplayUtils.STYLE_BEST
             : DisplayUtils.STYLE_NORMAL;
-
-    [System.Diagnostics.CodeAnalysis.SuppressMessage(
-        "Style",
-        "IDE0046:Convert to conditional expression",
-        Justification = "Harder to read"
-    )]
-    private Style GetStyle(TimingAppDataPoint.Driver.Stint? stint)
-    {
-        if (stint is null)
-            return DisplayUtils.STYLE_NORMAL;
-
-        return stint.Compound switch
-        {
-            "HARD" => new Style(foreground: Color.White, background: Color.Grey),
-            "MEDIUM" => new Style(foreground: Color.Black, background: Color.Yellow),
-            "SOFT" => new Style(foreground: Color.White, background: Color.Red),
-            "INTERMEDIATE" => new Style(foreground: Color.Black, background: Color.Green),
-            "WET" => new Style(foreground: Color.Black, background: Color.Blue),
-            _ => DisplayUtils.STYLE_NORMAL,
-        };
-    }
 
     private string GetPositionChangeMarkup(int? change) =>
         change switch

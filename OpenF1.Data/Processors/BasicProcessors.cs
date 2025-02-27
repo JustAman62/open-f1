@@ -1,4 +1,6 @@
+using System.Text.Json;
 using AutoMapper;
+using Microsoft.Extensions.Logging;
 
 namespace OpenF1.Data;
 
@@ -14,6 +16,9 @@ public class TrackStatusProcessor(IMapper mapper) : ProcessorBase<TrackStatusDat
 
 public class WeatherProcessor(IMapper mapper) : ProcessorBase<WeatherDataPoint>(mapper);
 
-public class ChampionshipPredictionProcessor(IMapper mapper) : ProcessorBase<ChampionshipPredictionDataPoint>(mapper);
+public class ChampionshipPredictionProcessor(IMapper mapper)
+    : ProcessorBase<ChampionshipPredictionDataPoint>(mapper);
 
 public class TimingStatsProcessor(IMapper mapper) : ProcessorBase<TimingStatsDataPoint>(mapper);
+
+public class TyreStintSeriesProcessor(IMapper mapper) : ProcessorBase<TyreStintSeriesDataPoint>(mapper);

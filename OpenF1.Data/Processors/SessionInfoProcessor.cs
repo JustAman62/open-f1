@@ -7,14 +7,22 @@ namespace OpenF1.Data;
 public class SessionInfoProcessor(IMapper mapper, ILogger<SessionInfoProcessor> logger)
     : ProcessorBase<SessionInfoDataPoint>(mapper)
 {
+    private Task? _loadCircuitTask = null;
+
     public override void Process(SessionInfoDataPoint data)
     {
         base.Process(data);
 
-        if (data.CircuitPoints.Count == 0 && data.Meeting?.Circuit?.Key is not null)
+        if (
+            data.CircuitPoints.Count == 0
+            && data.Meeting?.Circuit?.Key is not null
+            && _loadCircuitTask is not null
+        )
         {
             // Load circuit points from the external API as it hasn't been loaded yet
-            _ = Task.Run(() => LoadCircuitPoints(data.Meeting!.Circuit!.Key.Value, data.StartDate));
+            _loadCircuitTask = Task.Run(
+                () => LoadCircuitPoints(data.Meeting!.Circuit!.Key.Value, data.StartDate)
+            );
         }
     }
 

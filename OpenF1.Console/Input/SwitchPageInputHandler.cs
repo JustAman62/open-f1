@@ -14,6 +14,7 @@ public class SwitchPageInputHandler(LapCountProcessor lapCountProcessor, State s
             Screen.DriverTracker,
             Screen.TimingTower,
             Screen.TimingHistory,
+            Screen.TyreStints,
             Screen.ChampionshipStats
         ];
 
@@ -48,6 +49,7 @@ public class SwitchPageInputHandler(LapCountProcessor lapCountProcessor, State s
             case Screen.DriverTracker:
             case Screen.ChampionshipStats:
             case Screen.TeamRadio:
+            case Screen.TyreStints:
                 state.CursorOffset = 0;
                 break;
         }

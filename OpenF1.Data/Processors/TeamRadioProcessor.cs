@@ -1,4 +1,3 @@
-using System.Globalization;
 using AutoMapper;
 
 namespace OpenF1.Data;

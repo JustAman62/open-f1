@@ -125,6 +125,11 @@ public class TimingService(
                 obj["RaceControlMessages"]?.ToString(),
                 DateTimeOffset.UtcNow
             );
+            ProcessData(
+                "TyreStintSeries",
+                obj["TyreStintSeries"]?.ToString(),
+                DateTimeOffset.UtcNow
+            );
         }
         catch (Exception ex)
         {
@@ -142,7 +147,12 @@ public class TimingService(
             data = DecompressUtilities.InflateBase64Data(data);
         }
 
-        Logger.LogTrace($"Processing {type} data point for timestamp {timestamp:s} :: {data}");
+        Logger.LogTrace(
+            "Processing {Type} data point for timestamp {Timestamp:s} :: {Data}",
+            type,
+            timestamp,
+            data
+        );
         if (data is null || !Enum.TryParse<LiveTimingDataType>(type, out var liveTimingDataType))
             return;
 
@@ -220,6 +230,31 @@ public class TimingService(
             case LiveTimingDataType.ChampionshipPrediction:
                 SendToProcessor<ChampionshipPredictionDataPoint>(json);
                 break;
+            case LiveTimingDataType.TyreStintSeries:
+                var tyreStintDrivers = json["Stints"]?.AsObject() ?? [];
+                var driverNumbers = tyreStintDrivers.Select(x => x.Key);
+                foreach (var driverNumber in driverNumbers)
+                {
+                    tyreStintDrivers[driverNumber] = ArrayToIndexedDictionary(
+                        tyreStintDrivers[driverNumber]
+                    );
+
+                    foreach (
+                        var (stintNumber, tyreStint) in tyreStintDrivers[driverNumber]!.AsObject()
+                    )
+                    {
+                        if (tyreStint is null)
+                            continue;
+                        tyreStint["New"] = (string?)tyreStint["New"] switch
+                        {
+                            "true" => true,
+                            "false" => false,
+                            _ => null,
+                        };
+                    }
+                }
+                SendToProcessor<TyreStintSeriesDataPoint>(json);
+                break;
         }
     }
 
@@ -251,7 +286,7 @@ public class TimingService(
         {
             Logger.LogError(
                 ex,
-                "Failed to send {}, data to processor: {}",
+                "Failed to send {Name}, data to processor: {Json}",
                 typeof(T).Name,
                 json.ToJsonString(_jsonSerializerOptions)
             );

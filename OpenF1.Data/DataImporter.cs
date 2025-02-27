@@ -28,6 +28,7 @@ public sealed class DataImporter(IOptions<LiveTimingOptions> options, ILogger<Da
         "TimingData",
         "ChampionshipPrediction",
         "TeamRadio",
+        "TyreStintSeries",
     ];
 
     private static readonly string[] _nonRaceTopics =
@@ -46,6 +47,7 @@ public sealed class DataImporter(IOptions<LiveTimingOptions> options, ILogger<Da
         "SessionData",
         "TimingData",
         "TeamRadio",
+        "TyreStintSeries",
     ];
 
     /// <inheritdoc />
@@ -185,7 +187,7 @@ public sealed class DataImporter(IOptions<LiveTimingOptions> options, ILogger<Da
         }
         catch (Exception ex)
         {
-            logger.LogError(ex, "Failed to downloaed {Type} data from {Url}", type, url);
+            logger.LogError(ex, "Failed to download {Type} data from {Url}", type, url);
             return [];
         }
     }
