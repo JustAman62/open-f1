@@ -16,7 +16,7 @@ public class SessionInfoProcessor(IMapper mapper, ILogger<SessionInfoProcessor> 
         if (
             data.CircuitPoints.Count == 0
             && data.Meeting?.Circuit?.Key is not null
-            && _loadCircuitTask is not null
+            && _loadCircuitTask is null
         )
         {
             // Load circuit points from the external API as it hasn't been loaded yet
