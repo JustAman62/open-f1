@@ -32,6 +32,7 @@
     <PackageVersion Include="Swashbuckle.AspNetCore" Version="6.5.0" />
     <PackageVersion Include="system.commandline" Version="2.0.0-beta4.22272.1" />
     <PackageVersion Include="System.Drawing.Common" Version="8.0.6" />
+    <PackageVersion Include="TextCopy" Version="6.2.1" />
     <PackageVersion Include="Vezel.Cathode" Version="0.14.17" />
     <PackageVersion Include="Vezel.Cathode.Extensions" Version="0.14.17" />
     <PackageVersion Include="Whisper.net" Version="1.5.0" />

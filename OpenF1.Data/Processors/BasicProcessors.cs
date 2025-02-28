@@ -1,6 +1,4 @@
-using System.Text.Json;
 using AutoMapper;
-using Microsoft.Extensions.Logging;
 
 namespace OpenF1.Data;
 

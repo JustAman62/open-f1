@@ -14,4 +14,5 @@ public enum Screen
     ChampionshipStats,
     TeamRadio,
     TyreStints,
+    DebugData,
 }

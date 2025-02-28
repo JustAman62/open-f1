@@ -21,7 +21,7 @@ public class TimingStatsDataPointConfiguration : Profile
         >()
             .ConvertUsingDictionaryMerge();
 
-        CreateMap<TimingDataPoint.Driver, TimingDataPoint.Driver>()
+        CreateMap<TimingStatsDataPoint.Driver, TimingStatsDataPoint.Driver>()
             .ForAllMembers(opts => opts.Condition((_, _, member) => member != null));
 
         CreateMap<TimingStatsDataPoint.Driver.Stat, TimingStatsDataPoint.Driver.Stat>()

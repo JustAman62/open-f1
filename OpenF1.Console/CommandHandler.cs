@@ -2,6 +2,7 @@ using InMemLogger;
 using OpenF1.Data;
 using Serilog;
 using Serilog.Events;
+using TextCopy;
 
 namespace OpenF1.Console;
 
@@ -82,7 +83,8 @@ public static partial class CommandHandler
                         .AddSerilog();
                 }
             })
-            .AddLiveTiming(builder.Configuration);
+            .AddLiveTiming(builder.Configuration)
+            .InjectClipboard();
 
         builder.WebHost.UseServer(new NullServer());
 
