@@ -2,6 +2,11 @@ namespace OpenF1.Console;
 
 public static class ConsoleKeyExtensions
 {
+    private static readonly ConsoleKey[] _hiddenKeys =
+    [
+        (ConsoleKey)3, // ^C
+    ];
+
     public static string GetConsoleKeyDisplayCharacter(this ConsoleKey key) =>
         key switch
         {
@@ -14,13 +19,12 @@ public static class ConsoleKeyExtensions
             ConsoleKey.OemComma => ",",
             ConsoleKey.OemPeriod => ".",
             ConsoleKey.Enter => "⏎",
-            _ => key.ToString()
+            _ => key.ToString(),
         };
 
     public static string ToDisplayCharacters(this ConsoleKey[] keys)
     {
-        var characters = keys.Where(x => x != (ConsoleKey)3) // Remove the ^C key code
-            .Select(x => x.GetConsoleKeyDisplayCharacter());
+        var characters = keys.Except(_hiddenKeys).Select(GetConsoleKeyDisplayCharacter);
         return string.Join('/', characters);
     }
 }

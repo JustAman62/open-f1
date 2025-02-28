@@ -12,7 +12,9 @@ public class StartSimulatedSessionInputHandler(
 
     public Screen[] ApplicableScreens => [Screen.StartSimulatedSession];
 
-    public ConsoleKey[] Keys => [ConsoleKey.Enter, ConsoleKey.RightArrow];
+    public ConsoleKey[] Keys => [ConsoleKey.Enter, ConsoleKey.RightArrow, ConsoleKey.L];
+
+    public ConsoleKey[] DisplayKeys => [ConsoleKey.RightArrow];
 
     public string Description => "Select";
 
@@ -56,7 +58,9 @@ public class StartSimulatedSessionDeselectInputHandler(
 
     public Screen[] ApplicableScreens => [Screen.StartSimulatedSession];
 
-    public ConsoleKey[] Keys => [ConsoleKey.LeftArrow];
+    public ConsoleKey[] Keys => [ConsoleKey.LeftArrow, ConsoleKey.H];
+
+    public ConsoleKey[] DisplayKeys => [ConsoleKey.LeftArrow];
 
     public string Description => "Deselect";
 

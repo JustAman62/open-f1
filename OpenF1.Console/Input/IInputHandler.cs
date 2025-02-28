@@ -6,7 +6,18 @@ public interface IInputHandler
 
     Screen[] ApplicableScreens { get; }
 
+    /// <summary>
+    /// Which keys will activate this input handler.
+    /// </summary>
     ConsoleKey[] Keys { get; }
+
+    /// <summary>
+    /// The keys to display to the user that would activate this input handler.
+    // Defaults to <see cref="Keys"/>. Use this to have keys which will activate
+    // this handler without showing the user that those work will work. 
+    // For example, for alternate bindings (e.g. HJKL instead of arrow keys).
+    /// </summary>
+    ConsoleKey[] DisplayKeys => Keys;
 
     string Description { get; }
 

@@ -15,10 +15,13 @@ public class SwitchPageInputHandler(LapCountProcessor lapCountProcessor, State s
             Screen.TimingTower,
             Screen.TimingHistory,
             Screen.TyreStints,
-            Screen.ChampionshipStats
+            Screen.ChampionshipStats,
         ];
 
-    public ConsoleKey[] Keys => [ConsoleKey.LeftArrow, ConsoleKey.RightArrow];
+    public ConsoleKey[] Keys =>
+        [ConsoleKey.LeftArrow, ConsoleKey.H, ConsoleKey.RightArrow, ConsoleKey.L];
+
+    public ConsoleKey[] DisplayKeys => [ConsoleKey.LeftArrow, ConsoleKey.RightArrow];
 
     public string Description => $"Page {GetScreenIndex() + 1}";
 
@@ -33,7 +36,9 @@ public class SwitchPageInputHandler(LapCountProcessor lapCountProcessor, State s
 
         // Find the index of the current screen, and move to the next one
         var index = GetScreenIndex();
-        var newIndex = consoleKeyInfo.Key == ConsoleKey.LeftArrow ? index - 1 : index + 1;
+        var newIndex = consoleKeyInfo.Key is ConsoleKey.LeftArrow or ConsoleKey.H
+            ? index - 1
+            : index + 1;
         var newScreen = newIndex % ApplicableScreens.Length;
         state.CurrentScreen =
             newScreen < 0 ? ApplicableScreens.Last() : ApplicableScreens[newScreen];

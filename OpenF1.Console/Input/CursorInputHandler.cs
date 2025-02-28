@@ -6,7 +6,10 @@ public sealed class CursorInputHandler(State state) : IInputHandler
 
     public Screen[] ApplicableScreens => Enum.GetValues<Screen>();
 
-    public ConsoleKey[] Keys => [ConsoleKey.UpArrow, ConsoleKey.DownArrow];
+    public ConsoleKey[] Keys =>
+        [ConsoleKey.UpArrow, ConsoleKey.DownArrow, ConsoleKey.J, ConsoleKey.K];
+
+    public ConsoleKey[] DisplayKeys => [ConsoleKey.UpArrow, ConsoleKey.DownArrow];
 
     public string Description => $"Cursor {state.CursorOffset}";
 
@@ -17,7 +20,7 @@ public sealed class CursorInputHandler(State state) : IInputHandler
         CancellationToken cancellationToken = default
     )
     {
-        var changeBy = consoleKeyInfo.Key == ConsoleKey.DownArrow ? 1 : -1;
+        var changeBy = consoleKeyInfo.Key is ConsoleKey.DownArrow or ConsoleKey.J ? 1 : -1;
         if (consoleKeyInfo.Modifiers.HasFlag(ConsoleModifiers.Shift))
         {
             changeBy *= 5;
