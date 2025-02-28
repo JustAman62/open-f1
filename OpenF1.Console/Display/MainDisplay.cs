@@ -29,7 +29,7 @@ public class MainDisplay() : IDisplay
             Press Shift with these keys to adjust by a higher amount.
 
             You can download old session data from Formula 1 by running:
-            > openf1-console import <year> list
+            > openf1-console import
             """
         );
 
