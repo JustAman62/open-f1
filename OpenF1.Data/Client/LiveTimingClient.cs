@@ -38,7 +38,8 @@ public sealed class LiveTimingClient(
         "LapCount",
         "TimingData",
         "ChampionshipPrediction",
-        "TeamRadio"
+        "TeamRadio",
+        "TyreStintSeries",
     ];
 
     public HubConnection? Connection { get; private set; }
@@ -158,7 +159,7 @@ public sealed class LiveTimingClient(
     {
         private readonly StringBuilder _buffer;
         private readonly ILogger _logger;
-        
+
         public override Encoding Encoding => Encoding.UTF8;
 
         public LogWriter(ILogger logger)
