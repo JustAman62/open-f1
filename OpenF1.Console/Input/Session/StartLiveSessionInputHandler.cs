@@ -3,7 +3,8 @@ using OpenF1.Data;
 
 public class StartLiveSessionInputHandler(
     SessionInfoProcessor sessionInfo,
-    ILiveTimingClient liveTimingClient
+    ILiveTimingClient liveTimingClient,
+    State state
 ) : IInputHandler
 {
     public bool IsEnabled => sessionInfo.Latest.Name is null;
@@ -19,5 +20,9 @@ public class StartLiveSessionInputHandler(
     public async Task ExecuteAsync(
         ConsoleKeyInfo consoleKeyInfo,
         CancellationToken cancellationToken = default
-    ) => await liveTimingClient.StartAsync();
+    )
+    {
+        await liveTimingClient.StartAsync();
+        state.CurrentScreen = Screen.TimingTower;
+    }
 }

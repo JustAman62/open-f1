@@ -43,7 +43,7 @@ public class StartSimulatedSessionInputHandler(
             if (state.CursorOffset >= 0 && state.CursorOffset < selected.Count)
             {
                 _ = jsonTimingClient.StartAsync(selected.ElementAt(state.CursorOffset).Directory);
-                state.CurrentScreen = Screen.ManageSession;
+                state.CurrentScreen = Screen.TimingTower;
             }
         }
     }

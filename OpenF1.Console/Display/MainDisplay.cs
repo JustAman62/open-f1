@@ -21,10 +21,12 @@ public class MainDisplay() : IDisplay
             Welcome to [bold italic]Open F1 Console[/].
 
             To start a live timing session, press [bold]S[/] then [bold]L[/].
-            To start a replay an recorded session, press [bold]S[/] then [bold]F[/].
+            To start a replay a previously recorded/imported session, press [bold]S[/] then [bold]F[/].
 
             Once a session is started, navigate to the Timing Tower using [bold]T[/]
             Then use the Arrow Keys [bold]◄[/]/[bold]►[/] to switch between timing pages.
+            Use [bold]N[/]/[bold]M[/] to adjust the stream delay, and [bold]▲[/]/[bold]▼[/] keys to use the cursor.
+            Press Shift with these keys to adjust by a higher amount.
 
             You can download old session data from Formula 1 by running:
             > openf1-console import <year> list
