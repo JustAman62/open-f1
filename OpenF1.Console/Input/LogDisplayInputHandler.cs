@@ -8,7 +8,7 @@ public class LogDisplayInputHandler(LogDisplayOptions options) : IInputHandler
 
     public ConsoleKey[] Keys => [ConsoleKey.M];
 
-    public string Description => "Minimum Log Level";
+    public string Description => $"Log Level: {options.MinimumLogLevel}";
 
     public int Sort => 20;
 
@@ -22,7 +22,7 @@ public class LogDisplayInputHandler(LogDisplayOptions options) : IInputHandler
             LogLevel.Debug => LogLevel.Information,
             LogLevel.Information => LogLevel.Warning,
             LogLevel.Warning => LogLevel.Error,
-            _ => LogLevel.Debug
+            _ => LogLevel.Debug,
         };
 
         return Task.CompletedTask;

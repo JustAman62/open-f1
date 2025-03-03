@@ -219,10 +219,6 @@ public class ConsoleLoop(
     {
         switch (bytes)
         {
-            case [_, 0, ..]: // Just a normal key press
-                keyChar = (char)bytes[0];
-                consoleKey = (ConsoleKey)char.ToUpperInvariant(keyChar);
-                return true;
             case [ESC, CSI, ..]: // An ANSI escape sequence starting with a CSI (Control Sequence Introducer)
                 switch (bytes[2..])
                 {
@@ -269,9 +265,17 @@ public class ConsoleLoop(
                     return false;
                 }
                 return true;
+            case [ESC, 0, ..]: // Just the escape key
+                keyChar = (char)ESC;
+                consoleKey = ConsoleKey.Escape;
+                return true;
             case [ESC, ..]:
                 logger.LogInformation("Unknown esc sequence: {Seq}", string.Join('|', bytes[1..]));
                 break;
+            case [var key, ..]: // Just a normal key press
+                keyChar = (char)key;
+                consoleKey = (ConsoleKey)char.ToUpperInvariant(keyChar);
+                return true;
             default:
                 logger.LogInformation("Unknown input: {Input}", string.Join('|', bytes));
                 break;

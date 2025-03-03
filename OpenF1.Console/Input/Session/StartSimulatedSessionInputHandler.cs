@@ -44,6 +44,7 @@ public class StartSimulatedSessionInputHandler(
             {
                 _ = jsonTimingClient.StartAsync(selected.ElementAt(state.CursorOffset).Directory);
                 state.CurrentScreen = Screen.TimingTower;
+                state.CursorOffset = 0;
             }
         }
     }
