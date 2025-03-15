@@ -126,9 +126,32 @@ public sealed class DataImporter(IOptions<LiveTimingOptions> options, ILogger<Da
 
         var prefix = $"https://livetiming.formula1.com/static/{session.Path}";
 
-        var startDate = new DateTimeOffset(session.StartDate, TimeSpan.Zero) - session.GmtOffset;
-        var sessionDataPoint = await GetDataAsync(prefix, "SessionInfo", startDate)
+        var sessionDataPoint = await GetDataAsync(prefix, "SessionInfo", DateTimeOffset.UnixEpoch)
             .ConfigureAwait(false);
+        var heartbeatDataPoint = await GetDataAsync(prefix, "Heartbeat", DateTimeOffset.UnixEpoch)
+            .ConfigureAwait(false);
+
+        if (heartbeatDataPoint.First().Json["Utc"] is null)
+        {
+            throw new InvalidOperationException(
+                "Unable to find the first heartbeat data point for the session"
+            );
+        }
+
+        // Records returned by the API don't have a timestamp, instead they have an offset from the very first datapoint sent
+        // We need to calculate when that first data point was
+        // The heartbeat data point includes the Utc timestamp from when the message was sent,
+        // So use that timestamp, and take away the offset from when that message was received
+        // To get the real start of the sessions data stream
+        var startDate = ((DateTimeOffset)heartbeatDataPoint.First().Json["Utc"]!).AddMilliseconds(
+            -heartbeatDataPoint.First().DateTime.ToUnixTimeMilliseconds()
+        );
+
+        logger.LogInformation(
+            "Found start date {StartDate} with other {Other}",
+            startDate,
+            heartbeatDataPoint.First().DateTime
+        );
 
         var topics = session.Type == "Race" ? _raceTopics : _nonRaceTopics;
         var tasks = topics.Select(topic => GetDataAsync(prefix, topic, startDate));
@@ -150,10 +173,7 @@ public sealed class DataImporter(IOptions<LiveTimingOptions> options, ILogger<Da
         var subscribeJson = new JsonObject
         {
             ["SessionInfo"] = sessionDataPoint.First().Json,
-            ["Heartbeat"] = new JsonObject
-            {
-                ["Utc"] = startDate.ToString(@"yyyy-MM-dd\THH:mm:ss.ffffff\Z"),
-            },
+            ["Heartbeat"] = heartbeatDataPoint.First().Json,
         };
         await File.WriteAllTextAsync(subscribeFilePath, subscribeJson.ToString(), Encoding.UTF8)
             .ConfigureAwait(false);
