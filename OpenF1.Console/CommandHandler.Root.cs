@@ -8,9 +8,19 @@ namespace OpenF1.Console;
 
 public static partial class CommandHandler
 {
-    public static async Task Root(bool isApiEnabled, DirectoryInfo dataDirectory, bool isVerbose)
+    public static async Task Root(
+        bool isApiEnabled,
+        DirectoryInfo dataDirectory,
+        bool isVerbose,
+        bool? notifyEnabled
+    )
     {
-        var builder = GetBuilder(isApiEnabled, dataDirectory, isVerbose);
+        var builder = GetBuilder(
+            isApiEnabled: isApiEnabled,
+            dataDirectory: dataDirectory,
+            isVerbose: isVerbose,
+            notifyEnabled: notifyEnabled
+        );
 
         builder
             .Services.AddSingleton<ConsoleLoop>()
@@ -56,6 +66,8 @@ public static partial class CommandHandler
 
             app.MapTimingEndpoints();
         }
+
+        app.Logger.LogDebug("Options: {Options}", options);
 
         await app.RunAsync();
     }

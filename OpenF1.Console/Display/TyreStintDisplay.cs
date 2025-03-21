@@ -38,7 +38,9 @@ public class TyreStintDisplay(
     {
         var rows = new List<IRenderable>
         {
-            new Text($"LAP {lapCount.Latest.CurrentLap, 2}/{lapCount.Latest.TotalLaps} Pit Stops"),
+            new Text(
+                $"LAP {lapCount.Latest.CurrentLap, 2}/{lapCount.Latest.TotalLaps, 2} Pit Stops"
+            ),
         };
         var totalLapCount = lapCount.Latest.TotalLaps.GetValueOrDefault();
 
@@ -77,7 +79,8 @@ public class TyreStintDisplay(
                 rowMarkup += $"[{markup}]{stint.Compound?[0] ?? ' '}{text}[/]";
             }
 
-            if (totalLapCount > 0) {
+            if (totalLapCount > 0)
+            {
                 // Add a white cell for the final lap
                 var emptyCellsToAdd = Math.Max(0, totalLapCount - lineTotalPadLength);
                 var emptyCells = string.Empty.ToFixedWidth(emptyCellsToAdd);

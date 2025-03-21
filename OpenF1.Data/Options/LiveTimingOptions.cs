@@ -27,4 +27,11 @@ public record LiveTimingOptions
     /// Defaults to <c>false</c>.
     /// </summary>
     public bool Verbose { get; set; } = false;
+
+    /// <summary>
+    /// Whether notifications should be sent to the user when new Race Control messages are received.
+    /// Blue flag related messages do not result in notifications, but all other messages do.
+    /// OpenF1.Console implements these notifications as <c>BEL</c>s sent to your terminal, resulting in an audible beep.
+    /// </summary>
+    public bool Notify { get; set; } = true;
 }

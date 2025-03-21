@@ -12,6 +12,7 @@ public static partial class CommandHandler
         bool isApiEnabled = false,
         DirectoryInfo? dataDirectory = null,
         bool isVerbose = false,
+        bool? notifyEnabled = null,
         bool useConsoleLogging = false
     )
     {
@@ -31,6 +32,10 @@ public static partial class CommandHandler
         if (dataDirectory is not null)
         {
             commandLineOpts.Add(nameof(LiveTimingOptions.DataDirectory), dataDirectory?.FullName);
+        }
+        if (notifyEnabled is not null)
+        {
+            commandLineOpts.Add(nameof(LiveTimingOptions.Notify), notifyEnabled.ToString());
         }
 
         builder

@@ -17,16 +17,22 @@ var dataDirectoryOption = new Option<DirectoryInfo>(
     "--data-directory",
     "The directory to which timing data will be read from and written to"
 );
+var notifyOption = new Option<bool?>(
+    "--notify",
+    "Whether audible BELs are sent to your terminal when new race control messages are received"
+);
 
+rootCommand.AddGlobalOption(isVerboseOption);
 rootCommand.AddGlobalOption(isApiEnabledOption);
 rootCommand.AddGlobalOption(dataDirectoryOption);
-rootCommand.AddGlobalOption(isVerboseOption);
+rootCommand.AddGlobalOption(notifyOption);
 
 rootCommand.SetHandler(
     CommandHandler.Root,
     isApiEnabledOption,
     dataDirectoryOption,
-    isVerboseOption
+    isVerboseOption,
+    notifyOption
 );
 
 var importCommand = new Command(
