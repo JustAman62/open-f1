@@ -21,7 +21,6 @@ public class DriverTrackerDisplay(
     ILogger<DriverTrackerDisplay> logger
 ) : IDisplay
 {
-    private const int IMAGE_SCALE_FACTOR = 30;
     private const int IMAGE_PADDING = 25;
     private const int LEFT_OFFSET = 17;
     private const int TOP_OFFSET = 0;
@@ -187,9 +186,11 @@ public class DriverTrackerDisplay(
             return string.Empty;
         }
 
+        var imageScaleFactor = sessionInfo.Latest.CircuitPoints.Max(x => x.x) / 350;
+
         var circuitPoints = sessionInfo
             .Latest.CircuitPoints.Select(x =>
-                (x: x.x / IMAGE_SCALE_FACTOR, y: x.y / IMAGE_SCALE_FACTOR)
+                (x: x.x / imageScaleFactor, y: x.y / imageScaleFactor)
             )
             .ToList();
 
@@ -228,7 +229,7 @@ public class DriverTrackerDisplay(
 
         var circuitCorners = sessionInfo
             .Latest.CircuitCorners.Select(x =>
-                (x.number, x: x.x / IMAGE_SCALE_FACTOR, y: x.y / IMAGE_SCALE_FACTOR)
+                (x.number, x: x.x / imageScaleFactor, y: x.y / imageScaleFactor)
             )
             .Select(x => (x.number, x: x.x + minX, y: maxY - (x.y + minY)))
             .ToList();
@@ -265,8 +266,8 @@ public class DriverTrackerDisplay(
                 {
                     if (state.SelectedDrivers.Contains(driverNumber))
                     {
-                        var x = (position.X.Value / IMAGE_SCALE_FACTOR) + minX;
-                        var y = maxY - ((position.Y.Value / IMAGE_SCALE_FACTOR) + minY);
+                        var x = (position.X.Value / imageScaleFactor) + minX;
+                        var y = maxY - ((position.Y.Value / imageScaleFactor) + minY);
                         var paint = new SKPaint
                         {
                             Color = SKColor.Parse(data.TeamColour),
@@ -284,8 +285,8 @@ public class DriverTrackerDisplay(
                         canvas.DrawCircle(x, y, 5, paint);
                         canvas.DrawText(
                             data.Tla,
-                            (position.X.Value / IMAGE_SCALE_FACTOR) + minX + 8,
-                            maxY - ((position.Y.Value / IMAGE_SCALE_FACTOR) + minY) + 6,
+                            (position.X.Value / imageScaleFactor) + minX + 8,
+                            maxY - ((position.Y.Value / imageScaleFactor) + minY) + 6,
                             paint
                         );
                     }
@@ -338,6 +339,7 @@ public class DriverTrackerDisplay(
                 80,
                 _errorPaint
             );
+            canvas.DrawText($"Image Scale factor: {imageScaleFactor}", 5, 100, _errorPaint);
         }
 
         var imageData = surface.Snapshot().Encode();
