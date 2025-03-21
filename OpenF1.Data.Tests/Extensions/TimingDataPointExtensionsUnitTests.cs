@@ -30,8 +30,14 @@ public class TimingDataPointExtensionsUnitTests
     public static TheoryData<string, TimeSpan> LapSectorTimeTestData =>
         new()
         {
-            { "1:23.456", new TimeSpan(days: 0, hours: 0, minutes: 1, seconds: 23, milliseconds: 456) },
-            { "23.456", new TimeSpan(days: 0, hours: 0, minutes: 0, seconds: 23, milliseconds: 456) },
+            {
+                "1:23.456",
+                new TimeSpan(days: 0, hours: 0, minutes: 1, seconds: 23, milliseconds: 456)
+            },
+            {
+                "23.456",
+                new TimeSpan(days: 0, hours: 0, minutes: 0, seconds: 23, milliseconds: 456)
+            },
         };
 
     [Theory]

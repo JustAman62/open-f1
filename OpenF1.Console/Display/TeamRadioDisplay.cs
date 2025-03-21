@@ -52,7 +52,7 @@ public sealed class TeamRadioDisplay(
         {
             Header = new PanelHeader("Select Team Radio"),
             Expand = true,
-            Padding = new Padding(0)
+            Padding = new Padding(0),
         };
     }
 

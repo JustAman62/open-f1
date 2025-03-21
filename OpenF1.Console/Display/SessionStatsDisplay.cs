@@ -55,7 +55,7 @@ public sealed class ChampionshipStatsDisplay(
             {
                 > 0 => (Color.Red, "▼"),
                 < 0 => (Color.Green, "▲"),
-                _ => (Color.White, string.Empty)
+                _ => (Color.White, string.Empty),
             };
             table.AddRow(
                 new Text($"{data.PredictedPosition, 2}{indicator}", color),
@@ -100,7 +100,7 @@ public sealed class ChampionshipStatsDisplay(
             {
                 > 0 => (Color.Red, "▼"),
                 < 0 => (Color.Green, "▲"),
-                _ => (Color.White, string.Empty)
+                _ => (Color.White, string.Empty),
             };
 
             table.AddRow(

@@ -2,9 +2,4 @@
 
 namespace OpenF1.Data;
 
-public record struct RawTimingDataPoint(
-    string Type,
-    JsonNode Json,
-    DateTimeOffset DateTime
-);
-
+public record struct RawTimingDataPoint(string Type, JsonNode Json, DateTimeOffset DateTime);

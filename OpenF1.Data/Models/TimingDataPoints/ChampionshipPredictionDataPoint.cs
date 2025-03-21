@@ -20,7 +20,7 @@ namespace OpenF1.Data;
 ///      }
 /// </c>
 /// </summary>
-public sealed class ChampionshipPredictionDataPoint: ILiveTimingDataPoint
+public sealed class ChampionshipPredictionDataPoint : ILiveTimingDataPoint
 {
     /// <inheritdoc />
     public LiveTimingDataType LiveTimingDataType => LiveTimingDataType.ChampionshipPrediction;

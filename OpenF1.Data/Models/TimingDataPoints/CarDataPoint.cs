@@ -3,7 +3,7 @@ using System.Text.Json.Serialization;
 namespace OpenF1.Data;
 
 /// <summary>
-/// Car data is sent as compressed (with deflate) JSON containing Entries. 
+/// Car data is sent as compressed (with deflate) JSON containing Entries.
 /// Each Entry is all the car data for a specific point in time, and they seem to be batched to reduce network load.
 /// </summary>
 public sealed class CarDataPoint : ILiveTimingDataPoint

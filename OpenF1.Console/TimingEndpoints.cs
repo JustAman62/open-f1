@@ -7,8 +7,7 @@ public static class TimingEndpoints
 {
     public static WebApplication MapTimingEndpoints(this WebApplication app)
     {
-        app
-            .MapLatestDataEndpoint<DriverListProcessor, DriverListDataPoint>()
+        app.MapLatestDataEndpoint<DriverListProcessor, DriverListDataPoint>()
             .MapLatestDataEndpoint<ExtrapolatedClockProcessor, ExtrapolatedClockDataPoint>()
             .MapLatestDataEndpoint<HeartbeatProcessor, HeartbeatDataPoint>()
             .MapLatestDataEndpoint<LapCountProcessor, LapCountDataPoint>()

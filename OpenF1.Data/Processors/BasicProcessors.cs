@@ -19,4 +19,5 @@ public class ChampionshipPredictionProcessor(IMapper mapper)
 
 public class TimingStatsProcessor(IMapper mapper) : ProcessorBase<TimingStatsDataPoint>(mapper);
 
-public class TyreStintSeriesProcessor(IMapper mapper) : ProcessorBase<TyreStintSeriesDataPoint>(mapper);
+public class TyreStintSeriesProcessor(IMapper mapper)
+    : ProcessorBase<TyreStintSeriesDataPoint>(mapper);

@@ -20,7 +20,7 @@ public sealed class TranscribeTeamRadioInputHandler(
         {
             null or { IsCompletedSuccessfully: true } => "Transcribe",
             { IsCompleted: false } => "Transcribing...",
-            _ => "Transcribe (Errored)"
+            _ => "Transcribe (Errored)",
         };
 
     public int Sort => 41;

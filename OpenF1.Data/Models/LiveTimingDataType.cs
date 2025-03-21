@@ -1,6 +1,6 @@
 namespace OpenF1.Data;
 
-public enum LiveTimingDataType 
+public enum LiveTimingDataType
 {
     Heartbeat,
     CarData,

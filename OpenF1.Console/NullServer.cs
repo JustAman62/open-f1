@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Http.Features;
 namespace OpenF1.Console;
 
 /// <summary>
-/// A empty <see cref="IServer"/> implementation which does nothing. 
+/// A empty <see cref="IServer"/> implementation which does nothing.
 /// Used when we want to have a ASP.NETCore app but with the actual server disabled.
 /// </summary>
 internal class NullServer : IServer

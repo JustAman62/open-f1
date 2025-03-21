@@ -19,7 +19,7 @@ namespace OpenF1.Data;
 /// }
 /// </c>
 /// </summary>
-public sealed class TeamRadioDataPoint: ILiveTimingDataPoint
+public sealed class TeamRadioDataPoint : ILiveTimingDataPoint
 {
     /// <inheritdoc />
     public LiveTimingDataType LiveTimingDataType => LiveTimingDataType.TeamRadio;

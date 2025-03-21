@@ -17,7 +17,7 @@ public sealed class PositionDataPoint : ILiveTimingDataPoint
         /// <summary>
         /// Dictionary of DriverNumber to Entry with position data.
         /// </summary>
-        public Dictionary<string, Entry> Entries { get; set; } = new();
+        public Dictionary<string, Entry> Entries { get; set; } = [];
 
         public sealed class Entry
         {
@@ -42,7 +42,7 @@ public sealed class PositionDataPoint : ILiveTimingDataPoint
             public enum DriverStatus
             {
                 OnTrack,
-                OffTrack
+                OffTrack,
             }
         }
     }

@@ -1,6 +1,6 @@
 namespace OpenF1.Data;
 
-public sealed record ExtrapolatedClockDataPoint: ILiveTimingDataPoint
+public sealed record ExtrapolatedClockDataPoint : ILiveTimingDataPoint
 {
     /// <inheritdoc />
     public LiveTimingDataType LiveTimingDataType => LiveTimingDataType.ExtrapolatedClock;

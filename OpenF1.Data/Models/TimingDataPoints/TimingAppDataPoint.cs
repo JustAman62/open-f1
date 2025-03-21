@@ -22,7 +22,7 @@ namespace OpenF1.Data;
 ///   }
 /// }
 /// </summary>
-public sealed record TimingAppDataPoint: ILiveTimingDataPoint
+public sealed record TimingAppDataPoint : ILiveTimingDataPoint
 {
     /// <inheritdoc />
     public LiveTimingDataType LiveTimingDataType => LiveTimingDataType.TimingAppData;

@@ -19,7 +19,7 @@ public class ExtrapolatedClockProcessor(IDateTimeProvider dateTimeProvider, IMap
                 return initialRemaining;
             }
         }
-        else 
+        else
         {
             return TimeSpan.MinValue;
         }

@@ -34,7 +34,7 @@ public sealed class DriverListDataPoint
         public string? Tla { get; set; }
 
         /// <summary>
-        /// The same as the driver position in <see cref="TimingDataPoint.Driver.Line" />, 
+        /// The same as the driver position in <see cref="TimingDataPoint.Driver.Line" />,
         /// however unlike that property this only gets updated at the end of every lap.
         /// </summary>
         public int? Line { get; set; }

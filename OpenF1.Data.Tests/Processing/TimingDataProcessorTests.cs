@@ -28,17 +28,17 @@ public class TimingDataProcessorTests
                         Line = 1,
                         GapToLeader = "+1.000",
                         InPit = true,
-                        BestLapTime = new() { Value = "1.11" }
-                    }
-                }
+                        BestLapTime = new() { Value = "1.11" },
+                    },
+                },
             },
             new()
             {
                 Lines = new Dictionary<string, TimingDataPoint.Driver>()
                 {
-                    ["1"] = new() { InPit = false, }
-                }
-            }
+                    ["1"] = new() { InPit = false },
+                },
+            },
         };
 
         // Act
@@ -81,9 +81,9 @@ public class TimingDataProcessorTests
                     {
                         Line = 1,
                         NumberOfLaps = 1,
-                        BestLapTime = new() { Value = initialBestLapTime }
-                    }
-                }
+                        BestLapTime = new() { Value = initialBestLapTime },
+                    },
+                },
             },
             new()
             {
@@ -92,10 +92,10 @@ public class TimingDataProcessorTests
                     ["1"] = new()
                     {
                         NumberOfLaps = 2,
-                        BestLapTime = new() { Value = fasterBestLapTime }
-                    }
-                }
-            }
+                        BestLapTime = new() { Value = fasterBestLapTime },
+                    },
+                },
+            },
         };
 
         // Act
@@ -139,9 +139,9 @@ public class TimingDataProcessorTests
                     {
                         Line = 1,
                         NumberOfLaps = 1,
-                        BestLapTime = new() { Value = initialBestLapTime }
-                    }
-                }
+                        BestLapTime = new() { Value = initialBestLapTime },
+                    },
+                },
             },
             new()
             {
@@ -150,10 +150,10 @@ public class TimingDataProcessorTests
                     ["1"] = new()
                     {
                         NumberOfLaps = 2,
-                        BestLapTime = new() { Value = slowerBestLapTime }
-                    }
-                }
-            }
+                        BestLapTime = new() { Value = slowerBestLapTime },
+                    },
+                },
+            },
         };
 
         // Act

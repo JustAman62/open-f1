@@ -14,7 +14,7 @@ public interface IInputHandler
     /// <summary>
     /// The keys to display to the user that would activate this input handler.
     // Defaults to <see cref="Keys"/>. Use this to have keys which will activate
-    // this handler without showing the user that those work will work. 
+    // this handler without showing the user that those work will work.
     // For example, for alternate bindings (e.g. HJKL instead of arrow keys).
     /// </summary>
     ConsoleKey[] DisplayKeys => Keys;
