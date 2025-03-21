@@ -127,17 +127,53 @@ public class DriverTrackerDisplay(
 
             driverTag = state.CursorOffset == line.Line ? $">{driverTag}<" : $" {driverTag} ";
 
-            table.AddRow(
-                new Markup(driverTag),
-                state.CursorOffset > 0
-                    ? DisplayUtils.GetGapBetweenLines(comparisonDataPoint.Value, line, decoration)
-                    : new Text(
-                        $"{(car?.Channels.Drs >= 8 ? "•" : "")}{line.IntervalToPositionAhead?.Value}".ToFixedWidth(
-                            7
-                        ),
-                        DisplayUtils.GetStyle(line.IntervalToPositionAhead, false, car, decoration)
-                    )
-            );
+            if (sessionInfo.Latest.IsRace())
+            {
+                table.AddRow(
+                    new Markup(driverTag),
+                    state.CursorOffset > 0
+                        ? DisplayUtils.GetGapBetweenLines(
+                            comparisonDataPoint.Value,
+                            line,
+                            decoration
+                        )
+                        : new Text(
+                            $"{(car?.Channels.Drs >= 8 ? "•" : "")}{line.IntervalToPositionAhead?.Value}".ToFixedWidth(
+                                7
+                            ),
+                            DisplayUtils.GetStyle(
+                                line.IntervalToPositionAhead,
+                                false,
+                                car,
+                                decoration
+                            )
+                        )
+                );
+            }
+            else
+            {
+                var bestDriver = timingData.Latest.GetOrderedLines().First();
+                var position =
+                    positionData
+                        .Latest.Position.LastOrDefault()
+                        ?.Entries.GetValueOrDefault(driverNumber) ?? new();
+                var gapToLeader = (
+                    line.BestLapTime.ToTimeSpan() - bestDriver.Value.BestLapTime.ToTimeSpan()
+                )?.TotalSeconds;
+
+                table.AddRow(
+                    new Markup(driverTag),
+                    position.Status == PositionDataPoint.PositionData.Entry.DriverStatus.OffTrack
+                        ? new Text(
+                            "OFF TRK",
+                            new Style(background: Color.Red, foreground: Color.White)
+                        )
+                        : new Text(
+                            $"{(gapToLeader > 0 ? "+" : "")}{gapToLeader:f3}".ToFixedWidth(7),
+                            DisplayUtils.STYLE_NORMAL.Combine(new Style(decoration: decoration))
+                        )
+                );
+            }
         }
 
         return table;

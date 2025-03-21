@@ -70,7 +70,7 @@ public class RaceControlDisplay(
         {
             Header = new PanelHeader("Race Control Messages"),
             Expand = true,
-            Border = BoxBorder.Rounded
+            Border = BoxBorder.Rounded,
         };
     }
 
@@ -89,7 +89,7 @@ public class RaceControlDisplay(
                 "4" => new Style(foreground: Color.Black, background: Color.Yellow), // Safety Car
                 "6" => new Style(foreground: Color.Black, background: Color.Yellow), // VSC Deployed
                 "5" => new Style(foreground: Color.White, background: Color.Red), // Red Flag
-                _ => Style.Plain
+                _ => Style.Plain,
             };
             items.Add(
                 new Text(
@@ -102,7 +102,7 @@ public class RaceControlDisplay(
         items.AddRange(
             [
                 new Text(sessionInfo.Latest.Meeting?.Circuit?.ShortName ?? string.Empty),
-                new Text(sessionInfo.Latest.Name ?? string.Empty)
+                new Text(sessionInfo.Latest.Name ?? string.Empty),
             ]
         );
 
@@ -111,7 +111,7 @@ public class RaceControlDisplay(
         {
             Header = new PanelHeader("Status"),
             Expand = true,
-            Border = BoxBorder.Rounded
+            Border = BoxBorder.Rounded,
         };
     }
 
@@ -137,7 +137,7 @@ public class RaceControlDisplay(
         {
             Header = new PanelHeader("Clock"),
             Expand = true,
-            Border = BoxBorder.Rounded
+            Border = BoxBorder.Rounded,
         };
     }
 
@@ -161,7 +161,7 @@ public class RaceControlDisplay(
         {
             Header = new PanelHeader("Weather"),
             Expand = true,
-            Border = BoxBorder.Rounded
+            Border = BoxBorder.Rounded,
         };
     }
 }
