@@ -1,11 +1,13 @@
+using System.Reflection.Emit;
+using LiveChartsCore;
 using LiveChartsCore.SkiaSharpView;
 using LiveChartsCore.SkiaSharpView.Painting;
+using LiveChartsCore.SkiaSharpView.SKCharts;
 using LiveChartsCore.SkiaSharpView.VisualElements;
 using Microsoft.Extensions.Options;
 using OpenF1.Data;
 using SkiaSharp;
 using Spectre.Console;
-using Spectre.Console.Advanced;
 using Spectre.Console.Rendering;
 
 namespace OpenF1.Console;
@@ -24,6 +26,7 @@ public class TimingHistoryDisplay(
     private const int LEFT_OFFSET = 70; // The normal width of the timing table
     private const int BOTTOM_OFFSET = 2;
     private const int LAPS_IN_CHART = 15;
+    private const double TERMINAL_CELL_ASPECT_RATIO = 2.2;
 
     private readonly Style _personalBest = new(
         foreground: Color.White,
@@ -178,18 +181,20 @@ public class TimingHistoryDisplay(
 
         var widthCells = Terminal.Size.Width - LEFT_OFFSET;
         var heightCells = Terminal.Size.Height - BOTTOM_OFFSET;
-        // Double the width as cells are twice as high as wide
-        var ratio = widthCells * 2 / heightCells;
+        var ratio = widthCells * 1d / heightCells;
 
         var heightPixels = 1000;
-        var widthPixels = heightPixels * ratio;
+        var widthPixels = (int)Math.Ceiling(heightPixels * ratio);
 
         var surface = SKSurface.Create(new SKImageInfo(widthPixels, heightPixels));
         var canvas = surface.Canvas;
 
-        var seriesData = driverList
+        var gapSeriesData = driverList
             .Latest.Where(x => x.Key != "_kf") // Data quirk, dictionaries include _kf which obviously isn't a driver
-            .ToDictionary(x => x.Key, _ => new List<double>());
+            .ToDictionary(x => x.Key, _ => new List<double?>());
+        var lapSeriesData = driverList
+            .Latest.Where(x => x.Key != "_kf") // Data quirk, dictionaries include _kf which obviously isn't a driver
+            .ToDictionary(x => x.Key, _ => new List<double?>());
 
         // Only use data from the last LAPS_IN_CHART laps
         foreach (
@@ -198,18 +203,32 @@ public class TimingHistoryDisplay(
                 .Take(LAPS_IN_CHART)
         )
         {
+            // Discard laps slower than 105% of the fastest car on that lap
+            // This should discard laps where cars pit, as those laps aren't very useful
+            var fastestLap =
+                lines.Min(x => x.Value.LastLapTime?.ToTimeSpan()) ?? TimeSpan.FromHours(1);
+            var threshold = fastestLap * 1.05;
             foreach (var (driver, timingData) in lines)
             {
-                seriesData[driver].Add((double)(timingData.GapToLeaderSeconds() ?? 0));
+                gapSeriesData[driver].Add((double)(timingData.GapToLeaderSeconds() ?? 0));
+                var lapTime = timingData.LastLapTime?.ToTimeSpan();
+                if (lapTime > threshold)
+                {
+                    lapSeriesData[driver].Add(null);
+                }
+                else
+                {
+                    lapSeriesData[driver].Add(lapTime?.TotalMilliseconds);
+                }
             }
         }
 
-        var series = seriesData
+        var gapSeries = gapSeriesData
             .Select(x =>
             {
                 var driver = driverList.Latest.GetValueOrDefault(x.Key) ?? new();
                 var colour = driver.TeamColour ?? "FFFFFF";
-                return new LineSeries<double>(x.Value)
+                return new LineSeries<double?>(x.Value)
                 {
                     Name = x.Key,
                     Fill = new SolidColorPaint(SKColors.Transparent),
@@ -231,18 +250,98 @@ public class TimingHistoryDisplay(
             })
             .ToArray();
 
+        var lapSeries = lapSeriesData
+            .Select(x =>
+            {
+                var driver = driverList.Latest.GetValueOrDefault(x.Key) ?? new();
+                var colour = driver.TeamColour ?? "FFFFFF";
+                return new LineSeries<double?>(x.Value)
+                {
+                    Name = x.Key,
+                    Fill = new SolidColorPaint(SKColors.Transparent),
+                    GeometryStroke = null,
+                    GeometryFill = null,
+                    Stroke = new SolidColorPaint(SKColor.Parse(driver.TeamColour))
+                    {
+                        StrokeThickness = 2,
+                    },
+                    IsVisible = state.SelectedDrivers.Contains(x.Key),
+                    LineSmoothness = 0,
+                    DataLabelsFormatter = p =>
+                        p.Index == x.Value.Count - 1 ? driver.Tla! : string.Empty,
+                    DataLabelsPosition = LiveChartsCore.Measure.DataLabelsPosition.Right,
+                    DataLabelsSize = 16,
+                    DataLabelsPaint = new SolidColorPaint(SKColor.Parse(driver.TeamColour)),
+                    DataPadding = new LiveChartsCore.Drawing.LvcPoint(1, 0),
+                };
+            })
+            .ToArray();
+
+        var gapChart = CreateChart(
+            gapSeries,
+            "Gap to Leader (s)",
+            heightPixels / 2,
+            widthPixels,
+            labeler: Labelers.Default,
+            axisMin: 0
+        );
+        gapChart.DrawOnCanvas(canvas);
+        var lapChart = CreateChart(
+            lapSeries,
+            "Lap Time",
+            heightPixels / 2,
+            widthPixels,
+            labeler: v => TimeSpan.FromMilliseconds(v).ToString("mm':'ss"),
+            yMinStep: 1000
+        );
+        var lapChartImage = lapChart.GetImage();
+        canvas.DrawImage(lapChartImage, new SKPoint(0, 500));
+
+        if (options.Value.Verbose)
+        {
+            // Add some debug information when verbose mode is on
+            canvas.DrawRect(0, 0, widthPixels - 1, heightPixels - 1, _errorPaint);
+            canvas.DrawText($"Ratio: {ratio}", 5, 20, _errorPaint);
+        }
+
+        var imageData = surface.Snapshot().Encode();
+        var base64 = Convert.ToBase64String(imageData.AsSpan());
+
+        if (terminalInfo.IsITerm2ProtocolSupported.Value)
+        {
+            return TerminalGraphics.ITerm2GraphicsSequence(heightCells, widthCells, base64);
+        }
+        else if (terminalInfo.IsKittyProtocolSupported.Value)
+        {
+            return TerminalGraphics.KittyGraphicsSequenceDelete()
+                + TerminalGraphics.KittyGraphicsSequence(heightCells, widthCells, base64);
+        }
+
+        return "Unexpected error, shouldn't have got here. Please report!";
+    }
+
+    private SKCartesianChart CreateChart(
+        LineSeries<double?>[] series,
+        string title,
+        int height,
+        int width,
+        Func<double, string> labeler,
+        double? axisMin = null,
+        double yMinStep = 0
+    )
+    {
         var axisStartLap = state.CursorOffset - LAPS_IN_CHART + 1;
-        var chart = new LiveChartsCore.SkiaSharpView.SKCharts.SKCartesianChart
+        return new SKCartesianChart
         {
             Series = series,
-            Height = heightPixels / 2,
-            Width = widthPixels,
+            Height = height,
+            Width = width,
             Background = SKColors.Black,
             Title = new LabelVisual
             {
-                Text = "Gap To Leader (s)",
+                Text = title,
                 Paint = new SolidColorPaint(SKColors.White),
-                TextSize = 36,
+                TextSize = 26,
             },
             XAxes =
             [
@@ -260,38 +359,11 @@ public class TimingHistoryDisplay(
                 {
                     SeparatorsPaint = new SolidColorPaint(SKColors.LightGray),
                     LabelsPaint = new SolidColorPaint(SKColors.LightGray),
-                    MinLimit = 0,
+                    MinLimit = axisMin,
+                    Labeler = labeler,
+                    MinStep = yMinStep,
                 },
             ],
         };
-        chart.DrawOnCanvas(canvas);
-
-        if (options.Value.Verbose)
-        {
-            // Add some debug information when verbose mode is on
-            canvas.DrawRect(0, 0, widthPixels - 1, heightPixels - 1, _errorPaint);
-            canvas.DrawText($"Series Count: {series.Count()}", 5, 20, _errorPaint);
-            canvas.DrawText(
-                $"First Series Data: {string.Join(',', series.ElementAt(1).Values!)}",
-                5,
-                40,
-                _errorPaint
-            );
-        }
-
-        var imageData = surface.Snapshot().Encode();
-        var base64 = Convert.ToBase64String(imageData.AsSpan());
-
-        if (terminalInfo.IsITerm2ProtocolSupported.Value)
-        {
-            return TerminalGraphics.ITerm2GraphicsSequence(heightCells, widthCells, base64);
-        }
-        else if (terminalInfo.IsKittyProtocolSupported.Value)
-        {
-            return TerminalGraphics.KittyGraphicsSequenceDelete()
-                + TerminalGraphics.KittyGraphicsSequence(heightCells, widthCells, base64);
-        }
-
-        return "Unexpected error, shouldn't have got here. Please report!";
     }
 }
