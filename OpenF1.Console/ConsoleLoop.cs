@@ -117,6 +117,10 @@ public class ConsoleLoop(
             await Terminal.OutLineAsync("Exiting openf1-console...", CancellationToken.None);
             logger.LogInformation("ConsoleLoop Stopping.");
         }
+        await Terminal.OutAsync(
+            ControlSequences.ClearScreen(ClearMode.Full),
+            CancellationToken.None
+        );
         await Terminal.OutAsync(ControlSequences.SetCursorVisibility(true), CancellationToken.None);
         await Terminal.OutAsync(
             ControlSequences.SetScreenBuffer(ScreenBuffer.Main),
