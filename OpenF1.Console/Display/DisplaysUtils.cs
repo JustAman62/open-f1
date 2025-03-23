@@ -23,7 +23,8 @@ public static class DisplayUtils
     public static IRenderable DriverTag(
         DriverListDataPoint.Driver driver,
         TimingDataPoint.Driver line,
-        bool selected
+        bool selected = false,
+        Decoration decoration = Decoration.None
     )
     {
         var lineStyle = selected ? STYLE_INVERT : STYLE_NORMAL;
@@ -44,6 +45,8 @@ public static class DisplayUtils
         {
             lineStyle = lineStyle.Combine(new Style(decoration: Decoration.Invert));
         }
+
+        lineStyle = lineStyle.Combine(new Style(decoration: decoration));
 
         return new Markup($"{line.Line, 2} {MarkedUpDriverNumber(driver)}", lineStyle);
     }

@@ -5,6 +5,7 @@ using Microsoft.Extensions.Options;
 using OpenF1.Data;
 using SkiaSharp;
 using Spectre.Console;
+using Spectre.Console.Advanced;
 using Spectre.Console.Rendering;
 
 namespace OpenF1.Console;
@@ -96,8 +97,12 @@ public class TimingHistoryDisplay(
 
             var positionChange = line.Line - previousLap.Line;
 
+            var driverTagDecoration = state.SelectedDrivers.Contains(driverNumber)
+                ? Decoration.None
+                : Decoration.Dim;
+
             table.AddRow(
-                DisplayUtils.DriverTag(driver, line, selected: false),
+                DisplayUtils.DriverTag(driver, line, decoration: driverTagDecoration),
                 new Markup(
                     $"{line.GapToLeader}{GetMarkedUp(line.GapToLeaderSeconds() - previousLap.GapToLeaderSeconds())}"
                         ?? "",
@@ -189,7 +194,7 @@ public class TimingHistoryDisplay(
         // Only use data from the last LAPS_IN_CHART laps
         foreach (
             var (lap, lines) in timingData
-                .DriversByLap.Skip(state.CursorOffset - LAPS_IN_CHART)
+                .DriversByLap.Skip(state.CursorOffset - LAPS_IN_CHART + 1)
                 .Take(LAPS_IN_CHART)
         )
         {
@@ -208,25 +213,25 @@ public class TimingHistoryDisplay(
                 {
                     Name = x.Key,
                     Fill = new SolidColorPaint(SKColors.Transparent),
-                    GeometryStroke = new SolidColorPaint(SKColors.Transparent)
-                    {
-                        StrokeThickness = 0,
-                    },
-                    GeometryFill = new SolidColorPaint(SKColor.Parse(driver.TeamColour))
+                    GeometryStroke = null,
+                    GeometryFill = null,
+                    Stroke = new SolidColorPaint(SKColor.Parse(driver.TeamColour))
                     {
                         StrokeThickness = 2,
                     },
-                    Stroke = new SolidColorPaint(SKColor.Parse(driver.TeamColour))
-                    {
-                        StrokeThickness = 1,
-                    },
                     IsVisible = state.SelectedDrivers.Contains(x.Key),
                     LineSmoothness = 0,
+                    DataLabelsFormatter = p =>
+                        p.Index == x.Value.Count - 1 ? driver.Tla! : string.Empty,
+                    DataLabelsPosition = LiveChartsCore.Measure.DataLabelsPosition.Right,
+                    DataLabelsSize = 16,
+                    DataLabelsPaint = new SolidColorPaint(SKColor.Parse(driver.TeamColour)),
+                    DataPadding = new LiveChartsCore.Drawing.LvcPoint(1, 0),
                 };
             })
             .ToArray();
 
-        var axisStartLap = state.CursorOffset - LAPS_IN_CHART;
+        var axisStartLap = state.CursorOffset - LAPS_IN_CHART + 1;
         var chart = new LiveChartsCore.SkiaSharpView.SKCharts.SKCartesianChart
         {
             Series = series,
@@ -235,7 +240,7 @@ public class TimingHistoryDisplay(
             Background = SKColors.Black,
             Title = new LabelVisual
             {
-                Text = "Gap To Leader",
+                Text = "Gap To Leader (s)",
                 Paint = new SolidColorPaint(SKColors.White),
                 TextSize = 36,
             },
@@ -245,7 +250,8 @@ public class TimingHistoryDisplay(
                 {
                     MinStep = 1,
                     LabelsPaint = new SolidColorPaint(SKColors.LightGray),
-                    Labeler = v => axisStartLap > 0 ? (v + axisStartLap).ToString() : v.ToString(),
+                    Labeler = v =>
+                        axisStartLap > 0 ? (v + axisStartLap + 1).ToString() : (v + 1).ToString(),
                 },
             ],
             YAxes =
@@ -254,6 +260,7 @@ public class TimingHistoryDisplay(
                 {
                     SeparatorsPaint = new SolidColorPaint(SKColors.LightGray),
                     LabelsPaint = new SolidColorPaint(SKColors.LightGray),
+                    MinLimit = 0,
                 },
             ],
         };
