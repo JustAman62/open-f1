@@ -47,6 +47,7 @@ public class SessionInfoProcessor(IMapper mapper, ILogger<SessionInfoProcessor> 
             Latest.CircuitCorners = circuitInfo
                 .Corners.Select(x => (x.Number, x.TrackPosition.X, x.TrackPosition.Y))
                 .ToList();
+            Latest.CircuitRotation = circuitInfo!.Rotation;
         }
         catch (Exception ex)
         {
@@ -57,7 +58,8 @@ public class SessionInfoProcessor(IMapper mapper, ILogger<SessionInfoProcessor> 
     private sealed record CircuitInfoResponse(
         List<int> X,
         List<int> Y,
-        List<TrackCornerResponse> Corners
+        List<TrackCornerResponse> Corners,
+        int Rotation
     );
 
     private sealed record TrackCornerResponse(int Number, TrackPositionResponse TrackPosition);

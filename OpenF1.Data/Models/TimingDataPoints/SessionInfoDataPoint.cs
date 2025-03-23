@@ -24,6 +24,11 @@ public sealed record SessionInfoDataPoint : ILiveTimingDataPoint
     /// </summary>
     public List<(int x, int y)> CircuitPoints { get; set; } = [];
     public List<(int number, float x, float y)> CircuitCorners { get; set; } = [];
+    /// <summary>
+    /// Populated manually by OpenF1.Data when the data is first processed, from an external API provider.
+    /// The rotation that should be applied to the circuit image to make it match the F1 visualisation.
+    /// </summary>
+    public int CircuitRotation { get; set; } = 0;
 
     public sealed record MeetingDetail
     {
