@@ -9,6 +9,9 @@
     <PackageVersion Include="CSCore.Ffmpeg" Version="1.2.0-beta1" />
     <PackageVersion Include="FFMpegCore" Version="5.1.0" />
     <PackageVersion Include="InMemoryLogger" Version="1.0.66" />
+    <PackageVersion Include="LiveChartsCore" Version="2.0.0-rc5.4" />
+    <PackageVersion Include="LiveChartsCore.SkiaSharpView" Version="2.0.0-rc5.4" />
+    <PackageVersion Include="Microcharts" Version="0.9.5.9" />
     <PackageVersion Include="Microsoft.AspNetCore.OpenApi" Version="7.0.7" />
     <PackageVersion Include="Microsoft.AspNet.SignalR.Client" Version="2.4.3" />
     <PackageVersion Include="Microsoft.AspNetCore.SignalR.Client" Version="8.0.6" />
@@ -27,7 +30,7 @@
     <PackageVersion Include="Serilog" Version="4.0.0" />
     <PackageVersion Include="Serilog.AspNetCore" Version="8.0.1" />
     <PackageVersion Include="Serilog.Sinks.File" Version="6.0.0" />
-    <PackageVersion Include="SkiaSharp" Version="2.88.8" />
+    <PackageVersion Include="SkiaSharp" Version="2.88.9" />
     <PackageVersion Include="Spectre.Console" Version="0.48.0" />
     <PackageVersion Include="Swashbuckle.AspNetCore" Version="6.5.0" />
     <PackageVersion Include="system.commandline" Version="2.0.0-beta4.22272.1" />
