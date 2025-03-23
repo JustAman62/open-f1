@@ -113,7 +113,7 @@ public class JsonTimingClient(
                 }
                 catch (Exception ex)
                 {
-                    logger.LogError(ex, $"Failed to handle data: {line}");
+                    logger.LogError(ex, "Failed to handle data: {Line}", line);
                 }
             }
         }
@@ -153,7 +153,7 @@ public class JsonTimingClient(
         return delay;
     }
 
-    private (string type, string? data, DateTimeOffset timestamp) ProcessLine(string line)
+    private static (string type, string? data, DateTimeOffset timestamp) ProcessLine(string line)
     {
         var json = JsonNode.Parse(line);
         // When we used the old ASP.NET SignalR, we received messages in an older format

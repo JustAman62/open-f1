@@ -1,4 +1,3 @@
-using System.Reflection.Emit;
 using LiveChartsCore;
 using LiveChartsCore.SkiaSharpView;
 using LiveChartsCore.SkiaSharpView.Painting;
@@ -16,7 +15,8 @@ public class TimingHistoryDisplay(
     State state,
     TimingDataProcessor timingData,
     DriverListProcessor driverList,
-    LapCountProcessor lapCountProcessor,
+    LapCountProcessor lapCount,
+    SessionInfoProcessor sessionInfo,
     TerminalInfoProvider terminalInfo,
     IOptions<LiveTimingOptions> options
 ) : IDisplay
@@ -26,7 +26,6 @@ public class TimingHistoryDisplay(
     private const int LEFT_OFFSET = 70; // The normal width of the timing table
     private const int BOTTOM_OFFSET = 2;
     private const int LAPS_IN_CHART = 15;
-    private const double TERMINAL_CELL_ASPECT_RATIO = 2.2;
 
     private readonly Style _personalBest = new(
         foreground: Color.White,
@@ -55,6 +54,7 @@ public class TimingHistoryDisplay(
     public Task<IRenderable> GetContentAsync()
     {
         var timingTower = GetTimingTower();
+
         _chartPanelControlSequence = GetChartPanel();
 
         var layout = new Layout("Root").SplitRows(new Layout("Timing Tower", timingTower));
@@ -81,7 +81,7 @@ public class TimingHistoryDisplay(
         var table = new Table();
         table
             .AddColumns(
-                $"LAP {selectedLapNumber, 2}/{lapCountProcessor.Latest?.TotalLaps}",
+                $"LAP {selectedLapNumber, 2}/{lapCount.Latest?.TotalLaps}",
                 "Gap",
                 "Interval",
                 "Last Lap",
@@ -179,6 +179,11 @@ public class TimingHistoryDisplay(
             return string.Empty;
         }
 
+        if (!sessionInfo.Latest.IsRace())
+        {
+            return string.Empty;
+        }
+
         var widthCells = Terminal.Size.Width - LEFT_OFFSET;
         var heightCells = Terminal.Size.Height - BOTTOM_OFFSET;
         var ratio = widthCells * 1d / heightCells;
@@ -199,7 +204,8 @@ public class TimingHistoryDisplay(
         // Only use data from the last LAPS_IN_CHART laps
         foreach (
             var (lap, lines) in timingData
-                .DriversByLap.Skip(state.CursorOffset - LAPS_IN_CHART + 1)
+                .DriversByLap.OrderBy(x => x.Key)
+                .Skip(state.CursorOffset - LAPS_IN_CHART + 1)
                 .Take(LAPS_IN_CHART)
         )
         {
@@ -210,7 +216,17 @@ public class TimingHistoryDisplay(
             var threshold = fastestLap * 1.05;
             foreach (var (driver, timingData) in lines)
             {
-                gapSeriesData[driver].Add((double)(timingData.GapToLeaderSeconds() ?? 0));
+                // Lapped cars don't have a gap to leader, so null them out
+                // We can't just null non-numbers though, because P1 should have a gap of 0
+                if (!timingData.GapToLeader?.Contains(" L") ?? true)
+                {
+                    gapSeriesData[driver].Add((double)(timingData.GapToLeaderSeconds() ?? 0));
+                }
+                else
+                {
+                    gapSeriesData[driver].Add(null);
+                }
+
                 var lapTime = timingData.LastLapTime?.ToTimeSpan();
                 if (lapTime > threshold)
                 {
@@ -336,12 +352,12 @@ public class TimingHistoryDisplay(
             Series = series,
             Height = height,
             Width = width,
-            Background = SKColors.Black,
+            Background = SKColors.Transparent,
             Title = new LabelVisual
             {
                 Text = title,
                 Paint = new SolidColorPaint(SKColors.White),
-                TextSize = 26,
+                TextSize = 20,
             },
             XAxes =
             [

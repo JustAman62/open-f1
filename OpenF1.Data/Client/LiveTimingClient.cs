@@ -65,13 +65,14 @@ public sealed class LiveTimingClient(
         Connection.Error += (ex) =>
             logger.LogError(ex, "Error in live timing client: {}", ex.ToString());
         Connection.Reconnecting += () => logger.LogWarning("Live timing client is reconnecting");
+        Connection.Closed += HandleClosed;
 
         var hub = Connection.CreateHubProxy("Streaming");
 
         await Connection.Start();
 
         logger.LogInformation("Subscribing");
-        var res = await hub.Invoke<JObject>("Subscribe", new[] { _topics });
+        var res = await hub.Invoke<JObject>("Subscribe", [_topics]);
         HandleSubscriptionResponse(res.ToString());
 
         logger.LogInformation("Started Live Timing client");
@@ -136,6 +137,15 @@ public sealed class LiveTimingClient(
         catch (Exception ex)
         {
             logger.LogError(ex, "Failed to handle live timing data: {Res}", res);
+        }
+    }
+
+    private void HandleClosed()
+    {
+        logger.LogWarning("Live timing client connection closed, attempting to reconnect");
+        if (!Connection.EnsureReconnecting())
+        {
+            Connection?.Start();
         }
     }
 
