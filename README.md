@@ -108,6 +108,8 @@ Use the <kbd>▼</kbd>/<kbd>▲</kbd> `Cursor` actions to view more information 
 
 In the `Timing by Lap` page, you can use the cursor controlled by the <kbd>▼</kbd>/<kbd>▲</kbd> `Cursor` actions to view historical snapshots of the timing tower at the end of every lap. This view will show position changes during that lap, and relative changes in Gap and Interval. Scrolling through laps allows you to build a picture of how the race is unfolding.
 
+Charts on the right display how Gap to Leader and Lap Time for all selected drivers over the last 15 laps, letting you see trends and catch strategies unfolding.
+
 ![Using a Cursor to View Timing History by Lap](docs/screenshots/timing-history-screen.png)
 
 ### Listen to and Transcribe Team Radio
