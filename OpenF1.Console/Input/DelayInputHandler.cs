@@ -10,8 +10,9 @@ public class IncreaseDelayInputHandler(IDateTimeProvider dateTimeProvider) : IIn
         [
             Screen.ManageSession,
             Screen.RaceControl,
-            Screen.TimingTower,
             Screen.DriverTracker,
+            Screen.TimingTower,
+            Screen.TimingHistory,
             Screen.TyreStints,
         ];
 
