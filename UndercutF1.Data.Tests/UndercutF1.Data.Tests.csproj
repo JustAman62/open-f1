@@ -22,6 +22,8 @@
 		<ProjectReference Include="..\UndercutF1.Data\UndercutF1.Data.csproj" />
 	</ItemGroup>
 	<ItemGroup>
+  	<PackageReference Include="AutoMapper" VersionOverride="15.0.1" />
+  	<PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection" VersionOverride="12.0.1" />
 	  <None Update="TimingData.json">
 	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 	  </None>
