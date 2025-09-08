@@ -9,7 +9,7 @@
     />
     <PackageVersion Include="FFMpegCore" Version="5.2.0" />
     <PackageVersion Include="InMemoryLogger" Version="1.0.66" />
-    <PackageVersion Include="JsonSchema.Net" Version="7.3.4" />
+    <PackageVersion Include="JsonSchema.Net" Version="7.4.0" />
     <PackageVersion Include="JsonSchema.Net.Generation" Version="5.0.4" />
     <PackageVersion Include="LiveChartsCore" Version="2.0.0-rc5.4" />
     <PackageVersion Include="LiveChartsCore.SkiaSharpView" Version="2.0.0-rc5.4" />
