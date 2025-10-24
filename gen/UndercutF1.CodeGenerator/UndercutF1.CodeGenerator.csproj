@@ -8,6 +8,7 @@
   <ItemGroup>
     <PackageReference Include="JsonSchema.Net" />
     <PackageReference Include="JsonSchema.Net.Generation" />
+  <PackageReference Include="LiveChartsCore" VersionOverride="2.0.0-rc6.1" />
     <PackageReference Include="Microsoft.Extensions.Configuration" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection" />
     <PackageReference Include="Microsoft.Extensions.Hosting" />
