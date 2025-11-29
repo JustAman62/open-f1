@@ -7,14 +7,23 @@ public static class TimingEndpoints
 {
     public static WebApplication MapTimingEndpoints(this WebApplication app)
     {
-        app.MapLatestDataEndpoint<DriverListProcessor, DriverListDataPoint>()
+        app.MapLatestDataEndpoint<CarDataProcessor, CarDataPoint>()
+            .MapLatestDataEndpoint<
+                ChampionshipPredictionProcessor,
+                ChampionshipPredictionDataPoint
+            >()
+            .MapLatestDataEndpoint<DriverListProcessor, DriverListDataPoint>()
             .MapLatestDataEndpoint<ExtrapolatedClockProcessor, ExtrapolatedClockDataPoint>()
             .MapLatestDataEndpoint<HeartbeatProcessor, HeartbeatDataPoint>()
             .MapLatestDataEndpoint<LapCountProcessor, LapCountDataPoint>()
+            .MapLatestDataEndpoint<PitLaneTimeCollectionProcessor, PitLaneTimeCollectionDataPoint>()
+            .MapLatestDataEndpoint<PitStopSeriesProcessor, PitStopSeriesDataPoint>()
+            .MapLatestDataEndpoint<PositionDataProcessor, PositionDataPoint>()
             .MapLatestDataEndpoint<RaceControlMessageProcessor, RaceControlMessageDataPoint>()
             .MapLatestDataEndpoint<SessionInfoProcessor, SessionInfoDataPoint>()
             .MapLatestDataEndpoint<TimingAppDataProcessor, TimingAppDataPoint>()
             .MapLatestDataEndpoint<TimingDataProcessor, TimingDataPoint>()
+            .MapLatestDataEndpoint<TimingStatsProcessor, TimingStatsDataPoint>()
             .MapLatestDataEndpoint<TrackStatusProcessor, TrackStatusDataPoint>()
             .MapLatestDataEndpoint<WeatherProcessor, WeatherDataPoint>();
 
