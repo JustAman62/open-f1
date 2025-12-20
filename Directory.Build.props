@@ -4,7 +4,7 @@
     <Authors>Aman Dhoot</Authors>
     <Company>Undercut F1</Company>
     <Product>Undercut F1</Product>
-    <TargetFramework>net9.0</TargetFramework>
+    <TargetFramework>net10.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>

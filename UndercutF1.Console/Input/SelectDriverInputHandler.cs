@@ -28,10 +28,7 @@ public sealed class SelectDriverInputHandler(
             .Key;
 
         var driver = driverList.Latest.GetValueOrDefault(selectedDriverNumber);
-        if (driver is not null)
-        {
-            driver.IsSelected = !driver.IsSelected;
-        }
+        driver?.IsSelected = !driver.IsSelected;
 
         return Task.CompletedTask;
     }
