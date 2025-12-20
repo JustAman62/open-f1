@@ -2,19 +2,17 @@ namespace UndercutF1.Console;
 
 public record State
 {
-    private Screen _screen = Screen.Main;
-
     public Screen PreviousScreen = Screen.Main;
 
     public Screen CurrentScreen
     {
-        get => _screen;
+        get;
         set
         {
-            PreviousScreen = _screen;
-            _screen = value;
+            PreviousScreen = field;
+            field = value;
         }
-    }
+    } = Screen.Main;
 
     public int CursorOffset { get; set; } = 0;
 
