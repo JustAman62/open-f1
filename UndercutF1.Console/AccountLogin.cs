@@ -1,26 +1,36 @@
 using System.Text.Json.Nodes;
 using SharpWebview;
 using SharpWebview.Content;
+using Spectre.Console;
 using UndercutF1.Data;
 
 namespace UndercutF1.Console;
 
 public sealed class AccountLogin(Formula1Account accountService, ILogger<AccountLogin> logger)
 {
-    public async Task<Formula1Account.TokenPayload?> Login(Action<LoginStatus> onStatusUpdate)
+    public async Task<Formula1Account.TokenPayload?> LoginAsync(Action<LoginStatus> onStatusUpdate)
+    {
+        await MainThreadDispatch.Execute(async () => await LoginCoreAsync(onStatusUpdate));
+        return accountService.Payload;
+    }
+
+    public async Task LogoutAsync()
+    {
+        var configFileJson = await ReadConfigFileAsync();
+        configFileJson.Remove(nameof(Options.Formula1AccessToken));
+
+        await File.WriteAllTextAsync(
+            Options.ConfigFilePath,
+            configFileJson.ToJsonString(Constants.JsonSerializerOptions)
+        );
+    }
+
+    private async Task LoginCoreAsync(Action<LoginStatus> onStatusUpdate)
     {
         var token = LoginWithWebView(onStatusUpdate);
 
         if (token is null)
-            return null;
-
-        var authResult = accountService.CheckToken(token, out var payload);
-
-        if (authResult != Formula1Account.AuthenticationResult.Success)
-        {
-            onStatusUpdate(LoginStatus.Failed);
-            return null;
-        }
+            return;
 
         // Read in the existing config file, then write out the file including the access token
         // We read the file rather than just save the config to try and avoid changing other contents in the file
@@ -33,18 +43,12 @@ public sealed class AccountLogin(Formula1Account accountService, ILogger<Account
             configFileJson.ToJsonString(Constants.JsonSerializerOptions)
         );
 
-        return payload;
-    }
+        accountService.Refresh(token);
 
-    public async Task Logout()
-    {
-        var configFileJson = await ReadConfigFileAsync();
-        configFileJson.Remove(nameof(Options.Formula1AccessToken));
-
-        await File.WriteAllTextAsync(
-            Options.ConfigFilePath,
-            configFileJson.ToJsonString(Constants.JsonSerializerOptions)
-        );
+        if (accountService.IsAuthenticated != Formula1Account.AuthenticationResult.Success)
+        {
+            onStatusUpdate(LoginStatus.Failed);
+        }
     }
 
     private string? LoginWithWebView(Action<LoginStatus> onStatusUpdate)
@@ -74,6 +78,8 @@ public sealed class AccountLogin(Formula1Account accountService, ILogger<Account
 
                     logger.LogDebug("F1 account cookie received from WebView binding");
                     onStatusUpdate(LoginStatus.TokenReceived);
+
+                    webView.Terminate();
                 }
             )
             .InitScript(GetInitScript())
@@ -87,6 +93,8 @@ public sealed class AccountLogin(Formula1Account accountService, ILogger<Account
             onStatusUpdate(LoginStatus.Failed);
             return null;
         }
+
+        onStatusUpdate(LoginStatus.Complete);
 
         return cookie;
     }

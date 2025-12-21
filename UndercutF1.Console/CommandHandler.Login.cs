@@ -64,7 +64,7 @@ public static partial class CommandHandler
         AnsiConsole.WriteLine();
 
         var accountLogin = app.Services.GetRequiredService<AccountLogin>();
-        var payload = await accountLogin.Login(
+        var payload = await accountLogin.LoginAsync(
             (status) =>
             {
                 AnsiConsole.WriteLine();
@@ -113,7 +113,7 @@ public static partial class CommandHandler
         var app = builder.Build();
 
         var accountLogin = app.Services.GetRequiredService<AccountLogin>();
-        await accountLogin.Logout();
+        await accountLogin.LogoutAsync();
 
         AnsiConsole.MarkupLine(
             $"""

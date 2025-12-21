@@ -115,7 +115,6 @@ public static partial class CommandHandler
         );
 
         await EnsureConfigFileExistsAsync(app.Logger);
-
         await app.RunAsync();
     }
 }

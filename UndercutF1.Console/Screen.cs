@@ -18,4 +18,5 @@ public enum Screen
     DownloadTranscriptionModel,
     Info,
     SelectDriver,
+    ManageAccount,
 }
