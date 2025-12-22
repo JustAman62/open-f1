@@ -1,3 +1,5 @@
+using System.Collections.Concurrent;
+
 namespace UndercutF1.Console;
 
 /// <summary>
@@ -6,12 +8,12 @@ namespace UndercutF1.Console;
 /// </summary>
 public static class MainThreadDispatch
 {
-    private static Queue<(TaskCompletionSource, Func<Task>)> _channel = new();
+    private static BlockingCollection<(TaskCompletionSource, Func<Task>)> _channel = new();
 
     public static async Task Execute(Func<Task> func)
     {
         var tcs = new TaskCompletionSource();
-        _channel.Enqueue((tcs, func));
+        _channel.Add((tcs, func));
         await tcs.Task;
     }
 
@@ -25,15 +27,25 @@ public static class MainThreadDispatch
             Thread.CurrentThread.SetApartmentState(ApartmentState.STA);
         }
 
-        while (!cancellationToken.IsCancellationRequested)
+        try
         {
-            SpinWait.SpinUntil(() => _channel.Count > 0, 500);
-            if (_channel.Count > 0)
+            while (!cancellationToken.IsCancellationRequested)
             {
-                var (tcs, func) = _channel.Dequeue();
-                await func();
-                tcs.SetResult();
+                var (tcs, func) = _channel.Take(cancellationToken);
+                try
+                {
+                    await func();
+                    tcs.SetResult();
+                }
+                catch (Exception e)
+                {
+                    tcs.SetException(e);
+                }
             }
+        }
+        catch (OperationCanceledException)
+        {
+            // expected, do nothing
         }
     }
 }
