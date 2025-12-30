@@ -18,6 +18,8 @@ public sealed class Formula1Account
         _options = options;
         _logger = logger;
 
+        _options.OnChange((opts) => Refresh(opts.Formula1AccessToken));
+
         Refresh(_options.CurrentValue.Formula1AccessToken);
     }
 

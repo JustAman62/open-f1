@@ -257,7 +257,7 @@ public static partial class CommandHandler
         }
 
         _ = builder
-            .Configuration.AddJsonFile(Options.ConfigFilePath, optional: true)
+            .Configuration.AddJsonFile(Options.ConfigFilePath, optional: true, reloadOnChange: true)
             .AddEnvironmentVariables("UNDERCUTF1_")
             .AddInMemoryCollection(commandLineOpts);
 

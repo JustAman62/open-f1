@@ -373,6 +373,8 @@ Importing a session after it finishes still fetches all the data, so all functio
 
 Linking your F1 TV account with undercut-f1 is as simple as running `undercutf1 login` before starting your session, and following the instructions displayed. undercutf1 will open a WebView on to the F1 website, allowing you to sign in. It will then read the generated access token cookie for you from the WebView, and save it in the undercutf1 config file. This token is usually valid for a week, so you will likely have to perform this action often.
 
+If you've already started a session, you can launch the login window using the <kbd>A</kbd> `Account` screen, then pressing <kbd>L</kbd> `Login`.
+
 The current validity of your access token can be shown by running `undercutf1 info` (or in the Info screen of the TUI). A note will also be displayed on the entrypoint display of the TUI, reminding you to re-login if the current token has expired.
 
 If the `undercutf1 login` command does not work for you, there is a manual process:
