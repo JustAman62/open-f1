@@ -1,4 +1,3 @@
-using System.Reflection.Metadata.Ecma335;
 using Spectre.Console;
 using Spectre.Console.Rendering;
 using UndercutF1.Data;

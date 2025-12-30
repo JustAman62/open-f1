@@ -1,7 +1,6 @@
 using System.Text.Json.Nodes;
 using SharpWebview;
 using SharpWebview.Content;
-using Spectre.Console;
 using UndercutF1.Data;
 
 namespace UndercutF1.Console;

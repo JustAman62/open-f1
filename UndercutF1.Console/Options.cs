@@ -1,4 +1,3 @@
-using System.Text;
 using UndercutF1.Console.Graphics;
 using UndercutF1.Data;
 
