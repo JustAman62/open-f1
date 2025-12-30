@@ -244,6 +244,7 @@ public static partial class CommandHandler
         var configFileContents = await File.ReadAllTextAsync(Options.ConfigFilePath);
         return JsonNode
                 .Parse(configFileContents, new() { PropertyNameCaseInsensitive = true })
-                ?.AsObject() ?? throw new InvalidOperationException("Unable to parse config JSON");
+                ?.AsObject()
+            ?? throw new InvalidOperationException("Unable to parse config JSON");
     }
 }
