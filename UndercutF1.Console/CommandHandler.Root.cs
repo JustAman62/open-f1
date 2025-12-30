@@ -91,7 +91,16 @@ public static partial class CommandHandler
             app.MapControlEndpoints().MapTimingEndpoints();
         }
 
-        app.Logger.LogInformation("{Options}", options);
+        app.Logger.LogInformation(
+            "{Options}",
+            options with
+            {
+                // Redact the token from logs
+                Formula1AccessToken = options.Formula1AccessToken is null
+                    ? "<missing>"
+                    : "<present>",
+            }
+        );
 
         Whisper.net.Logger.LogProvider.AddLogger(
             (level, msg) =>
@@ -115,7 +124,6 @@ public static partial class CommandHandler
         );
 
         await EnsureConfigFileExistsAsync(app.Logger);
-
         await app.RunAsync();
     }
 }

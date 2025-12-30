@@ -7,31 +7,38 @@ namespace UndercutF1.Data;
 
 public sealed class Formula1Account
 {
-    private readonly IOptions<LiveTimingOptions> _options;
+    private readonly IOptionsMonitor<LiveTimingOptions> _options;
     private readonly ILogger<Formula1Account> _logger;
 
-    public Formula1Account(IOptions<LiveTimingOptions> options, ILogger<Formula1Account> logger)
+    public Formula1Account(
+        IOptionsMonitor<LiveTimingOptions> options,
+        ILogger<Formula1Account> logger
+    )
     {
         _options = options;
         _logger = logger;
 
-        var authResult = CheckToken(out var payload);
+        _options.OnChange((opts) => Refresh(opts.Formula1AccessToken));
+
+        Refresh(_options.CurrentValue.Formula1AccessToken);
+    }
+
+    public string? AccessToken { get; private set; }
+    public TokenPayload? Payload { get; private set; }
+    public AuthenticationResult IsAuthenticated { get; private set; }
+
+    public void Refresh(string? token)
+    {
+        var authResult = CheckToken(token, out var payload);
         Payload = authResult == AuthenticationResult.Success ? payload : null;
         IsAuthenticated = authResult;
         AccessToken =
             authResult == AuthenticationResult.Success
-                ? SubscriptionTokenFromAccessToken(options.Value.Formula1AccessToken!)
+                ? SubscriptionTokenFromAccessToken(token!)
                 : null;
     }
 
-    public string? AccessToken { get; }
-    public TokenPayload? Payload { get; }
-    public AuthenticationResult IsAuthenticated { get; }
-
-    private AuthenticationResult CheckToken(out TokenPayload? payload) =>
-        CheckToken(_options.Value.Formula1AccessToken, out payload);
-
-    public AuthenticationResult CheckToken(string? token, out TokenPayload? payload)
+    private AuthenticationResult CheckToken(string? token, out TokenPayload? payload)
     {
         payload = null;
         if (string.IsNullOrWhiteSpace(token))
