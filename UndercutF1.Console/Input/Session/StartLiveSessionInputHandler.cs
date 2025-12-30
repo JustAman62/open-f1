@@ -1,5 +1,6 @@
-using UndercutF1.Console;
 using UndercutF1.Data;
+
+namespace UndercutF1.Console;
 
 public class StartLiveSessionInputHandler(
     SessionInfoProcessor sessionInfo,

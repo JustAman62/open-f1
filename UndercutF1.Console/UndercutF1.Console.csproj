@@ -11,6 +11,7 @@
     <GenerateRuntimeConfigurationFiles>true</GenerateRuntimeConfigurationFiles>
     <InvariantGlobalization>true</InvariantGlobalization>
     <EnableCompressionInSingleFile>true</EnableCompressionInSingleFile>
+    <PublishAot>true</PublishAot>
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="HarfBuzzSharp.NativeAssets.Linux" />
@@ -35,6 +36,11 @@
     <PackageReference Include="Vezel.Cathode.Extensions" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference
+      Include="../gen/UndercutF1.Console.SourceGeneration/UndercutF1.Console.SourceGeneration.csproj"
+      OutputItemType="Analyzer"
+      ReferenceOutputAssembly="false"
+    />
     <ProjectReference Include="..\UndercutF1.Data\UndercutF1.Data.csproj" />
   </ItemGroup>
   <ItemGroup>
