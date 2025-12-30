@@ -19,8 +19,8 @@
     },
     "formula1AccessToken": {
       "type": [
-        "string",
-        "null"
+        "null",
+        "string"
       ]
     },
     "preferFfmpegPlayback": {
@@ -43,8 +43,8 @@
     "externalPlayerSync": {
       "description": "Options to configure the external player synchronisation service",
       "type": [
-        "object",
-        "null"
+        "null",
+        "object"
       ],
       "properties": {
         "enabled": {
@@ -59,8 +59,8 @@
         },
         "url": {
           "type": [
-            "string",
-            "null"
+            "null",
+            "string"
           ],
           "format": "uri",
           "description": "The URL where the external players API can be found."
