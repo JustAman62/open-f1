@@ -1,12 +1,6 @@
-using UndercutF1.Data;
-
 namespace UndercutF1.Console;
 
-public sealed class ManageAccountInputHandler(
-    AccountLogin accountLogin,
-    ILiveTimingClient liveTimingClient,
-    ILogger<ManageAccountInputHandler> logger
-) : IInputHandler
+public sealed class ManageAccountInputHandler(AccountLogin accountLogin) : IInputHandler
 {
     public bool IsEnabled => true;
 
@@ -43,28 +37,13 @@ public sealed class ManageAccountInputHandler(
         _loginTask = accountLogin.LoginAsync(
             async (status) =>
             {
-                switch (status)
+                _status = status switch
                 {
-                    case AccountLogin.LoginStatus.TokenReceived:
-                        _status = StatusFlags.TokenReceived;
-                        break;
-                    case AccountLogin.LoginStatus.Failed:
-                        _status = StatusFlags.Failed;
-                        break;
-                    case AccountLogin.LoginStatus.Complete:
-                        _status = StatusFlags.Complete;
-                        if (
-                            liveTimingClient.Connection?.State
-                            == Microsoft.AspNetCore.SignalR.Client.HubConnectionState.Connected
-                        )
-                        {
-                            logger.LogInformation(
-                                "F1TV login (via TUI) complete, restarting live timing client with new token"
-                            );
-                            await liveTimingClient.StartAsync();
-                        }
-                        break;
-                }
+                    AccountLogin.LoginStatus.TokenReceived => StatusFlags.TokenReceived,
+                    AccountLogin.LoginStatus.Failed => StatusFlags.Failed,
+                    AccountLogin.LoginStatus.Complete => StatusFlags.Complete,
+                    _ => StatusFlags.None,
+                };
             }
         );
         await _loginTask;

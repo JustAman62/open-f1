@@ -7,13 +7,7 @@ using Microsoft.Extensions.Options;
 
 namespace UndercutF1.Data;
 
-public sealed class LiveTimingClient(
-    ITimingService timingService,
-    Formula1Account formula1Account,
-    ILoggerProvider loggerProvider,
-    IOptions<LiveTimingOptions> options,
-    ILogger<LiveTimingClient> logger
-) : ILiveTimingClient, IDisposable
+public sealed class LiveTimingClient : ILiveTimingClient, IDisposable
 {
     private bool _disposedValue;
     private string _sessionKey = "UnknownSession";
@@ -46,15 +40,48 @@ public sealed class LiveTimingClient(
         // Only available after a session?
         "PitStopSeries",
     ];
+    private readonly ITimingService _timingService;
+    private readonly Formula1Account _formula1Account;
+    private readonly ILoggerProvider _loggerProvider;
+    private readonly IOptionsMonitor<LiveTimingOptions> _options;
+    private readonly ILogger<LiveTimingClient> _logger;
+
+    public LiveTimingClient(
+        ITimingService timingService,
+        Formula1Account formula1Account,
+        ILoggerProvider loggerProvider,
+        IOptionsMonitor<LiveTimingOptions> options,
+        ILogger<LiveTimingClient> logger
+    )
+    {
+        _timingService = timingService;
+        _formula1Account = formula1Account;
+        _loggerProvider = loggerProvider;
+        _options = options;
+        _logger = logger;
+
+        _options.OnChange(async _opts =>
+        {
+            if (Connection is not null)
+            {
+                logger.LogInformation("Options updated, restarting live timing client");
+                await StartAsync();
+            }
+            else
+            {
+                _logger.LogDebug("Options updated but no live session, so not restarting.");
+            }
+        });
+    }
 
     public HubConnection? Connection { get; private set; }
 
     public async Task StartAsync()
     {
-        logger.LogInformation("Starting Live Timing client");
+        _logger.LogInformation("Starting Live Timing client");
 
         if (Connection is not null)
-            logger.LogWarning("Live timing connection already exists, restarting it");
+            _logger.LogWarning("Live timing connection already exists, restarting it");
 
         await DisposeConnectionAsync();
 
@@ -64,12 +91,12 @@ public sealed class LiveTimingClient(
                 configure =>
                 {
                     configure.AccessTokenProvider = () =>
-                        Task.FromResult(formula1Account.AccessToken);
+                        Task.FromResult(_formula1Account.AccessToken);
                 }
             )
             .WithAutomaticReconnect()
             .ConfigureLogging(configure =>
-                configure.AddProvider(loggerProvider).SetMinimumLevel(LogLevel.Information)
+                configure.AddProvider(_loggerProvider).SetMinimumLevel(LogLevel.Information)
             )
             .AddJsonProtocol()
             .Build();
@@ -79,11 +106,11 @@ public sealed class LiveTimingClient(
 
         await Connection.StartAsync();
 
-        logger.LogInformation("Subscribing");
+        _logger.LogInformation("Subscribing");
         var res = await Connection.InvokeAsync<JsonObject>("Subscribe", _topics);
         HandleSubscriptionResponse(res);
 
-        logger.LogInformation("Started Live Timing client");
+        _logger.LogInformation("Started Live Timing client");
     }
 
     private void HandleSubscriptionResponse(JsonObject obj)
@@ -94,30 +121,33 @@ public sealed class LiveTimingClient(
         var year = sessionInfo?["Path"]?.ToString().Split('/')[0] ?? DateTime.Now.Year.ToString();
         _sessionKey = $"{year}_{location}_{sessionName}".Replace(' ', '_');
 
-        logger.LogInformation(
+        _logger.LogInformation(
             "Found session key from subscription data: {SessionKey}",
             _sessionKey
         );
 
         var res = obj!.ToJsonString(_prettyJsonOptions);
 
-        var filePath = Path.Join(options.Value.DataDirectory, $"{_sessionKey}/subscribe.json");
+        var filePath = Path.Join(
+            _options.CurrentValue.DataDirectory,
+            $"{_sessionKey}/subscribe.json"
+        );
         if (!File.Exists(filePath))
         {
-            var path = $"{options.Value.DataDirectory}/{_sessionKey}";
+            var path = $"{_options.CurrentValue.DataDirectory}/{_sessionKey}";
             Directory.CreateDirectory(path);
-            logger.LogInformation("Writing subscription response to {Path}", path);
+            _logger.LogInformation("Writing subscription response to {Path}", path);
             File.WriteAllText(filePath, obj!.ToJsonString(_prettyJsonOptions));
         }
         else
         {
-            logger.LogWarning(
+            _logger.LogWarning(
                 "Data Subscription file at {Path} already exists, will not create a new one",
                 filePath
             );
         }
 
-        timingService.ProcessSubscriptionData(res);
+        _timingService.ProcessSubscriptionData(res);
     }
 
     private void HandleData(string type, JsonNode json, DateTimeOffset dateTime)
@@ -126,22 +156,30 @@ public sealed class LiveTimingClient(
         try
         {
             File.AppendAllText(
-                Path.Join(options.Value.DataDirectory, $"{_sessionKey}/live.jsonl"),
+                Path.Join(_options.CurrentValue.DataDirectory, $"{_sessionKey}/live.jsonl"),
                 JsonSerializer.Serialize(raw) + Environment.NewLine
             );
 
             // TODO: converting `json` to a string shouldn't be needed here, we need to change the signature in TimingService
-            timingService.EnqueueAsync(type, json.ToString(), dateTime);
+            _timingService.EnqueueAsync(type, json.ToString(), dateTime);
         }
         catch (Exception ex)
         {
-            logger.LogError(ex, "Failed to handle live timing data: {Res}", raw);
+            _logger.LogError(ex, "Failed to handle live timing data: {Res}", raw);
         }
     }
 
     private async Task HandleClosedAsync(Exception? cause)
     {
-        logger.LogWarning(cause, "Live timing client connection closed, attempting to reconnect");
+        if (cause is null)
+        {
+            _logger.LogWarning(
+                "Live timing client connection closed with no cause, so not restarting"
+            );
+            return;
+        }
+
+        _logger.LogWarning(cause, "Live timing client connection closed, attempting to reconnect");
         try
         {
             await DisposeConnectionAsync();
@@ -149,7 +187,7 @@ public sealed class LiveTimingClient(
         }
         catch (Exception ex)
         {
-            logger.LogError(ex, "Failed to reconnect");
+            _logger.LogError(ex, "Failed to reconnect");
         }
     }
 
