@@ -1,6 +1,9 @@
 namespace UndercutF1.Data;
 
-public interface IProcessor { }
+public interface IProcessor
+{
+    ILiveTimingDataPoint GetLatestData();
+}
 
 public interface IProcessor<T> : IProcessor
     where T : ILiveTimingDataPoint
@@ -10,4 +13,6 @@ public interface IProcessor<T> : IProcessor
     T Latest { get; }
 
     void Process(T data);
+
+    ILiveTimingDataPoint IProcessor.GetLatestData() => Latest;
 }
