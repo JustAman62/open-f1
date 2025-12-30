@@ -18,10 +18,7 @@ public sealed class DebugDataDisplay(IEnumerable<IProcessor> processors, State s
             );
         var processorName = processor.GetType().Name;
 
-        var latestDataPoint = processor
-            .GetType()
-            .GetProperty(nameof(IProcessor<TimingDataPoint>.Latest))
-            ?.GetValue(processor);
+        var latestDataPoint = processor.GetLatestData();
         if (latestDataPoint is null)
             return Task.FromResult<IRenderable>(
                 new Text($"Latest datapoint for {processorName} is null")
