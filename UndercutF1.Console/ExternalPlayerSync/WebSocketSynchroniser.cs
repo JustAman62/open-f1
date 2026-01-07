@@ -10,7 +10,7 @@ namespace UndercutF1.Console.ExternalPlayerSync;
 public sealed class WebSocketSynchroniser(
     SessionInfoProcessor sessionInfo,
     IDateTimeProvider dateTimeProvider,
-    IOptions<Console.Options> options,
+    IOptions<Console.ConsoleOptions> options,
     ILogger<WebSocketSynchroniser> logger
 ) : BackgroundService
 {

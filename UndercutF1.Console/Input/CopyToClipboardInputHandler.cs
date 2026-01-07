@@ -29,14 +29,14 @@ public class CopyToClipboardInputHandler(
         if (processor is null)
             return;
 
-        var latestDataPoint = processor
-            .GetType()
-            .GetProperty(nameof(IProcessor<TimingDataPoint>.Latest))
-            ?.GetValue(processor);
+        var latestDataPoint = processor.GetLatestData();
         if (latestDataPoint is null)
             return;
 
-        var serialized = JsonSerializer.Serialize(latestDataPoint, Constants.JsonSerializerOptions);
+        var serialized = JsonSerializer.Serialize(
+            latestDataPoint,
+            TimingDataSerializerContext.Pretty.GetTypeInfo(latestDataPoint.GetType())!
+        );
         await clipboard.SetTextAsync(serialized, cancellationToken);
     }
 }

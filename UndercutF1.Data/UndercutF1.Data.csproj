@@ -4,6 +4,7 @@
     <PackageId>UndercutF1.Data</PackageId>
     <PackageReadmeFile>README.md</PackageReadmeFile>
     <PackageTags>formula1;f1;livetiming;timing</PackageTags>
+    <PublishAot>true</PublishAot>
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="AutoMapper" />

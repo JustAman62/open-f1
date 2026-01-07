@@ -35,8 +35,12 @@ public class TimingDataProcessor(IMapper mapper) : IProcessor<TimingDataPoint>
             // Super hacky way of doing a clean clone. Using AutoMapper seems to not clone the Sectors array properly.
             // We need this clone because we want to store a snapshot of the lap which means we don't want to store the
             // same reference.
-            var cloned = JsonSerializer.Deserialize<TimingDataPoint.Driver>(
-                JsonSerializer.Serialize(Latest.Lines[driverNumber])
+            var cloned = JsonSerializer.Deserialize(
+                JsonSerializer.Serialize(
+                    Latest.Lines[driverNumber],
+                    TimingDataSerializerContext.Raw.TimingDataPoint_Driver
+                ),
+                TimingDataSerializerContext.Raw.TimingDataPoint_Driver
             )!;
 
             // If this update changes the NumberOfLaps, then take a snapshot of that drivers data for that lap

@@ -13,7 +13,7 @@ public sealed class ManageAccountDisplay(Formula1Account accountService) : IDisp
         var markupText = accountService.IsAuthenticated switch
         {
             Formula1Account.AuthenticationResult.Success => $"""
-                An access token is already configured in [bold]{Options.ConfigFilePath}[/].
+                An access token is already configured in [bold]{ConsoleOptions.ConfigFilePath}[/].
                 [dim]{accountService.Payload}[/]
                 This token will expire on [bold]{accountService.Payload?.Expiry:yyyy-MM-dd}[/], at which point you'll need to login again.
                 """,
@@ -28,7 +28,7 @@ public sealed class ManageAccountDisplay(Formula1Account accountService) : IDisp
 
                 Additionally, logging in is [bold]NOT[/] required for the above features if you import data for already completed sessions, as all data feeds are available after a session is complete.
 
-                Once logged in, your access token will be stored in [bold]{Options.ConfigFilePath}[/]. Your actual account credentials will not be stored anywhere.
+                Once logged in, your access token will be stored in [bold]{ConsoleOptions.ConfigFilePath}[/]. Your actual account credentials will not be stored anywhere.
                 Simply remove the token entry from this file, or run [bold]undercutf1 logout[/] to remove usage of your token.
 
                 See https://github.com/JustAman62/undercut-f1#f1-tv-account-login for details

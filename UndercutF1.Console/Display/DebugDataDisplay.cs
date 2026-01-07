@@ -26,7 +26,12 @@ public sealed class DebugDataDisplay(IEnumerable<IProcessor> processors, State s
 
         var rows = new Rows(
             new Text($"Name: {processorName}"),
-            new Text(JsonSerializer.Serialize(latestDataPoint, Constants.JsonSerializerOptions))
+            new Text(
+                JsonSerializer.Serialize(
+                    latestDataPoint,
+                    TimingDataSerializerContext.Pretty.GetTypeInfo(latestDataPoint.GetType())!
+                )
+            )
         );
 
         return Task.FromResult<IRenderable>(rows);

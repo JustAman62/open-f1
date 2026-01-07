@@ -16,11 +16,11 @@ public sealed class AccountLogin(Formula1Account accountService, ILogger<Account
     public async Task LogoutAsync()
     {
         var configFileJson = await ReadConfigFileAsync();
-        configFileJson.Remove(nameof(Options.Formula1AccessToken));
+        configFileJson.Remove(nameof(ConsoleOptions.Formula1AccessToken));
 
         await File.WriteAllTextAsync(
-            Options.ConfigFilePath,
-            configFileJson.ToJsonString(Constants.JsonSerializerOptions)
+            ConsoleOptions.ConfigFilePath,
+            configFileJson.ToJsonString(ConsoleSerializerContext.Pretty.Options)
         );
     }
 
@@ -36,10 +36,10 @@ public sealed class AccountLogin(Formula1Account accountService, ILogger<Account
         // e.g. we might have config set by environment variables that shouldn't end up in the file
         // or the file might have keys in it that we don't read in to config, but we shouldn't remove from the file.
         var configFileJson = await ReadConfigFileAsync();
-        configFileJson[nameof(Options.Formula1AccessToken)] = token;
+        configFileJson[nameof(ConsoleOptions.Formula1AccessToken)] = token;
         await File.WriteAllTextAsync(
-            Options.ConfigFilePath,
-            configFileJson.ToJsonString(Constants.JsonSerializerOptions)
+            ConsoleOptions.ConfigFilePath,
+            configFileJson.ToJsonString(ConsoleSerializerContext.Pretty.Options)
         );
 
         accountService.Refresh(token);
@@ -159,7 +159,7 @@ public sealed class AccountLogin(Formula1Account accountService, ILogger<Account
 
     private static async Task<JsonObject> ReadConfigFileAsync()
     {
-        var configFileContents = await File.ReadAllTextAsync(Options.ConfigFilePath);
+        var configFileContents = await File.ReadAllTextAsync(ConsoleOptions.ConfigFilePath);
         return JsonNode
                 .Parse(configFileContents, new() { PropertyNameCaseInsensitive = true })
                 ?.AsObject()

@@ -2,7 +2,7 @@ using Microsoft.Extensions.Options;
 
 namespace UndercutF1.Console;
 
-public class SwitchToDebugInputHandler(State state, IOptions<Options> Options) : IInputHandler
+public class SwitchToDebugInputHandler(State state, IOptions<ConsoleOptions> Options) : IInputHandler
 {
     public bool IsEnabled => Options.Value.Verbose;
 

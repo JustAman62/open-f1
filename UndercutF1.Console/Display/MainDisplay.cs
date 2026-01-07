@@ -105,13 +105,14 @@ public class MainDisplay(
     private async Task<string?> GetLatestVersionAsync()
     {
         var httpClient = httpClientFactory.CreateClient("Default");
-        var res = await httpClient.GetFromJsonAsync<GitHubTagEntry[]>(
-            "https://api.github.com/repos/justaman62/undercut-f1/tags"
+        var res = await httpClient.GetFromJsonAsync(
+            "https://api.github.com/repos/justaman62/undercut-f1/tags",
+            ConsoleSerializerContext.Default.GitHubTagEntryArray
         );
         var tag = res?.FirstOrDefault()?.Name;
         logger.LogInformation("Latest tag from GitHub: {Tag}", tag);
         return tag;
     }
 
-    private record GitHubTagEntry(string Name);
+    internal record GitHubTagEntry(string Name);
 }
