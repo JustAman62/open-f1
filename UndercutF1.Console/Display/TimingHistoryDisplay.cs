@@ -21,7 +21,7 @@ public class TimingHistoryDisplay(
     LapCountProcessor lapCount,
     SessionInfoProcessor sessionInfo,
     TerminalInfoProvider terminalInfo,
-    IOptions<Options> options
+    IOptions<ConsoleOptions> options
 ) : IDisplay
 {
     public Screen Screen => Screen.TimingHistory;

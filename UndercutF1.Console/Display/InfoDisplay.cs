@@ -11,7 +11,7 @@ public sealed class InfoDisplay(
     TerminalInfoProvider terminalInfo,
     WebSocketSynchroniser synchroniser,
     Formula1Account accountService,
-    IOptions<Options> options
+    IOptions<ConsoleOptions> options
 ) : IDisplay
 {
     public Screen Screen => Screen.Info;
@@ -28,8 +28,8 @@ public sealed class InfoDisplay(
             [bold]Prevent Display Sleep:[/] {options.Value.PreventDisplaySleep}
             [bold]F1 TV Account:[/]         {accountService.IsAuthenticated}
             [bold]Config Override File:[/]  {File.Exists(
-                Options.ConfigFilePath
-            )} ({Options.ConfigFilePath})
+                ConsoleOptions.ConfigFilePath
+            )} ({ConsoleOptions.ConfigFilePath})
             See https://github.com/JustAman62/undercut-f1#configuration for information on how to configure these options.
             [dim]{accountService.Payload}[/]
 

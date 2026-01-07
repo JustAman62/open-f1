@@ -6,7 +6,7 @@ namespace UndercutF1.Console;
 /// <summary>
 /// Options specific to the console app part of UndercutF1.
 /// </summary>
-public sealed record Options : LiveTimingOptions
+public sealed record ConsoleOptions : LiveTimingOptions
 {
     /// <summary>
     /// Try to conform to Windows/XDG directory standards by default.

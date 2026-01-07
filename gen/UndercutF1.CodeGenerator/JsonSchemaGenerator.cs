@@ -33,12 +33,12 @@ public sealed class JsonSchemaGenerator
         config.RegisterXmlCommentFile<LiveTimingOptions>(
             Path.Join(repositoryRoot, "UndercutF1.Data/bin/Debug/net9.0/UndercutF1.Data.xml")
         );
-        config.RegisterXmlCommentFile<Options>(
+        config.RegisterXmlCommentFile<ConsoleOptions>(
             Path.Join(repositoryRoot, "UndercutF1.Console/bin/Debug/net9.0/undercutf1.xml")
         );
 
         var schemaBuilder = new JsonSchemaBuilder();
-        var schema = schemaBuilder.FromType<Options>(config).Build();
+        var schema = schemaBuilder.FromType<ConsoleOptions>(config).Build();
 
         var schemaString = JsonSerializer.Serialize(
             schema.ToJsonDocument(),

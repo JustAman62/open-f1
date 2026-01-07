@@ -63,7 +63,7 @@ public class DriverTrackerDisplay : IDisplay
     private readonly SessionInfoProcessor _sessionInfo;
     private readonly TerminalInfoProvider _terminalInfo;
     private readonly Formula1Account _accountService;
-    private readonly IOptions<Options> _options;
+    private readonly IOptions<ConsoleOptions> _options;
     private TransformFactors? _transform = null;
 
     private string[] _trackMapControlSequence = [];
@@ -79,7 +79,7 @@ public class DriverTrackerDisplay : IDisplay
         SessionInfoProcessor sessionInfo,
         TerminalInfoProvider terminalInfo,
         Formula1Account accountService,
-        IOptions<Options> options
+        IOptions<ConsoleOptions> options
     )
     {
         _state = state;

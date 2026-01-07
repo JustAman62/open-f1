@@ -1,7 +1,7 @@
 using System.Collections.Concurrent;
+using System.Diagnostics.CodeAnalysis;
 using System.Text.Json;
 using System.Text.Json.Nodes;
-using System.Text.Json.Serialization;
 using System.Threading.Channels;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
@@ -16,16 +16,6 @@ public class TimingService(
     private ConcurrentQueue<(string type, string? data, DateTimeOffset timestamp)> _recent = new();
     private Channel<(string type, string? data, DateTimeOffset timestamp)> _workItems =
         Channel.CreateUnbounded<(string type, string? data, DateTimeOffset timestamp)>();
-
-    private static readonly JsonSerializerOptions _jsonSerializerOptions = new(
-        JsonSerializerDefaults.Web
-    )
-    {
-        UnmappedMemberHandling = JsonUnmappedMemberHandling.Skip,
-        AllowTrailingCommas = true,
-        WriteIndented = false,
-        Converters = { new JsonStringEnumConverter(), new StringToBoolConverter() },
-    };
 
     public ILogger Logger { get; } = logger;
 
@@ -272,7 +262,7 @@ public class TimingService(
             // Remove the _kf property, it's not needed and breaks deserialization
             json["_kf"] = null;
 
-            var model = json.Deserialize<T>(_jsonSerializerOptions)!;
+            var model = json.Deserialize(TimingDataSerializerContext.Raw.GetTypeInfo<T>())!;
             processors
                 .OfType<IProcessor<T>>()
                 .ToList()
@@ -289,7 +279,7 @@ public class TimingService(
                             "Failed to send {Name}, data to processor: {ProcessorName}: {Json}",
                             typeof(T).Name,
                             x.InputType.Name,
-                            json.ToJsonString(_jsonSerializerOptions)
+                            json.ToJsonString(TimingDataSerializerContext.Raw.Options)
                         );
                     }
                 });
@@ -300,7 +290,7 @@ public class TimingService(
                 ex,
                 "Failed to send {Name}, data to processor: {Json}",
                 typeof(T).Name,
-                json.ToJsonString(_jsonSerializerOptions)
+                json.ToJsonString(TimingDataSerializerContext.Raw.Options)
             );
         }
     }
@@ -312,7 +302,8 @@ public class TimingService(
             var dict = node.AsArray()
                 .Select((val, idx) => (idx, val))
                 .ToDictionary(x => x.idx.ToString(), x => x.val);
-            return JsonSerializer.SerializeToNode(dict)!;
+
+            return JsonSerializer.SerializeToNode(dict, TimingDataSerializerContext.Raw.DictionaryStringJsonNode)!;
         }
         else
         {

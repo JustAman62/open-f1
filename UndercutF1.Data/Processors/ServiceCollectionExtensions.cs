@@ -6,7 +6,6 @@ public static partial class ServiceCollectionExtensions
 {
     public static IServiceCollection AddLiveTimingProcessors(this IServiceCollection collection)
     {
-        
         foreach (var (processorType, dataPointType) in ProcessorHelper.GetProcessorTypes())
         {
             collection

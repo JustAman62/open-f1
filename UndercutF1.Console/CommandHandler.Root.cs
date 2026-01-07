@@ -44,7 +44,7 @@ public static partial class CommandHandler
             .AddHostedService(sp => sp.GetRequiredService<ConsoleLoop>())
             .AddHostedService(sp => sp.GetRequiredService<WebSocketSynchroniser>());
 
-        var options = builder.Configuration.Get<Options>() ?? new();
+        var options = builder.Configuration.Get<ConsoleOptions>() ?? new();
 
         if (options.ApiEnabled)
         {

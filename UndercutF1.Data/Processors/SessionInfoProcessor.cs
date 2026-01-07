@@ -13,11 +13,6 @@ public class SessionInfoProcessor(
 ) : ProcessorBase<SessionInfoDataPoint>(mapper)
 {
     private Task? _loadCircuitTask = null;
-    private JsonSerializerOptions _jsonSerializerOptions = new(JsonSerializerDefaults.Web)
-    {
-        PropertyNameCaseInsensitive = true,
-        Converters = { new IntJsonConverter() },
-    };
 
     public override void Process(SessionInfoDataPoint data)
     {
@@ -45,12 +40,15 @@ public class SessionInfoProcessor(
             var httpClient = httpClientFactory.CreateClient("Proxy");
             var url = $"/api/v1/circuits/{circuitKey}/{DateTimeOffset.UtcNow.Year}";
             var circuitInfo = await httpClient
-                .GetFromJsonAsync<CircuitInfoResponse>(url, _jsonSerializerOptions)
+                .GetFromJsonAsync(url, SessionInfoProcessorContext.Default.CircuitInfoResponse)
                 .ConfigureAwait(false);
 
             logger.LogDebug(
                 "Received circuit info from MultiViewer: {CircuitInfo}",
-                JsonSerializer.Serialize(circuitInfo, _jsonSerializerOptions)
+                JsonSerializer.Serialize(
+                    circuitInfo,
+                    SessionInfoProcessorContext.Default.CircuitInfoResponse
+                )
             );
 
             Latest.CircuitPoints = circuitInfo!.X.Zip(circuitInfo.Y).ToList();
@@ -65,16 +63,16 @@ public class SessionInfoProcessor(
         }
     }
 
-    private sealed record CircuitInfoResponse(
+    internal sealed record CircuitInfoResponse(
         List<int> X,
         List<int> Y,
         List<TrackCornerResponse> Corners,
         int Rotation
     );
 
-    private sealed record TrackCornerResponse(int Number, TrackPositionResponse TrackPosition);
+    internal sealed record TrackCornerResponse(int Number, TrackPositionResponse TrackPosition);
 
-    private sealed record TrackPositionResponse(float X, float Y);
+    internal sealed record TrackPositionResponse(float X, float Y);
 }
 
 /// <summary>
@@ -94,3 +92,7 @@ internal class IntJsonConverter : JsonConverter<int>
     public override void Write(Utf8JsonWriter writer, int value, JsonSerializerOptions options) =>
         writer.WriteNumberValue(value);
 }
+
+[JsonSourceGenerationOptions(Converters = [typeof(IntJsonConverter)])]
+[JsonSerializable(typeof(SessionInfoProcessor.CircuitInfoResponse))]
+internal partial class SessionInfoProcessorContext : JsonSerializerContext { }

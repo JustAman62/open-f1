@@ -8,7 +8,7 @@ namespace UndercutF1.Console;
 
 public sealed partial class TerminalInfoProvider
 {
-    private readonly IOptions<Options> _options;
+    private readonly IOptions<ConsoleOptions> _options;
     private readonly ILogger<TerminalInfoProvider> _logger;
 
     private static readonly string[] ITERM_PROTOCOL_SUPPORTED_TERMINALS = ["iterm", "wezterm"];
@@ -56,7 +56,7 @@ public sealed partial class TerminalInfoProvider
     /// </summary>
     public Lazy<TerminalSizeInfo> TerminalSize { get; private set; }
 
-    public TerminalInfoProvider(IOptions<Options> options, ILogger<TerminalInfoProvider> logger)
+    public TerminalInfoProvider(IOptions<ConsoleOptions> options, ILogger<TerminalInfoProvider> logger)
     {
         _options = options;
         _logger = logger;

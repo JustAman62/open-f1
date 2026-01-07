@@ -93,9 +93,9 @@ public sealed class Formula1Account
             tokenPart += new string('=', 4 - missingPaddingChars);
         }
 
-        var tokenPayload = JsonSerializer.Deserialize<TokenPayload>(
+        var tokenPayload = JsonSerializer.Deserialize(
             Convert.FromBase64String(tokenPart),
-            JsonSerializerOptions.Web
+            TimingDataSerializerContext.Raw.TokenPayload
         );
         _logger.LogDebug("F1 TV Token Details: {Token}", tokenPayload);
         return tokenPayload;

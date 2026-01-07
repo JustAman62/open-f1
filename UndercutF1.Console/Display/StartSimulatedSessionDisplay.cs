@@ -16,7 +16,7 @@ public record StartSimulatedSessionOptions
 public class StartSimulatedSessionDisplay(
     State state,
     StartSimulatedSessionOptions displayOptions,
-    IOptions<Options> options
+    IOptions<ConsoleOptions> options
 ) : IDisplay
 {
     public Screen Screen => Screen.StartSimulatedSession;
