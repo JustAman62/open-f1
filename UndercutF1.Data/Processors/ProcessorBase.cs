@@ -7,7 +7,7 @@ namespace UndercutF1.Data;
 /// </summary>
 /// <typeparam name="T">The type of <see cref="ILiveTimingDataPoint"/> to process.</typeparam>
 /// <param name="mapper">The <see cref="IMapper"/> used to map the data points on to each other.</param>
-public class ProcessorBase<T>(IMapper mapper) : IProcessor<T>
+public abstract class ProcessorBase<T>(IMapper mapper) : IProcessor<T>
     where T : ILiveTimingDataPoint, new()
 {
     public T Latest { get; private set; } = new();

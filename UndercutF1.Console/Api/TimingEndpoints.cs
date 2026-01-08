@@ -1,3 +1,4 @@
+using System.Diagnostics.CodeAnalysis;
 using Microsoft.AspNetCore.Mvc;
 using UndercutF1.Data;
 
@@ -50,6 +51,21 @@ public static class TimingEndpoints
         return app;
     }
 
+    [UnconditionalSuppressMessage(
+        "Trimming",
+        "IL2026:Members annotated with 'RequiresUnreferencedCodeAttribute' require dynamic access otherwise can break functionality when trimming application code",
+        Justification = "Can be safely suppressed, endpoint generation will just happen at runtime"
+    )]
+    [UnconditionalSuppressMessage(
+        "AOT",
+        "IL3050:Calling members annotated with 'RequiresDynamicCodeAttribute' may break functionality when AOT compiling.",
+        Justification = "Can be safely suppressed, endpoint generation will just happen at runtime"
+    )]
+    [SuppressMessage(
+        "Usage",
+        "RDG011:Type parameters not supported",
+        Justification = "Can be safely suppressed, endpoint generation will just happen at runtime"
+    )]
     private static WebApplication MapLatestDataEndpoint<TProcessor, T>(this WebApplication app)
         where TProcessor : IProcessor<T>
         where T : ILiveTimingDataPoint, new()
