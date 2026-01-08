@@ -62,7 +62,9 @@ public sealed class DataImporter(
     {
         var httpClient = httpClientFactory.CreateClient("Default");
         var url = $"https://livetiming.formula1.com/static/{year}/Index.json";
-        return await httpClient.GetFromJsonAsync<ListMeetingsApiResponse>(url).ConfigureAwait(false)
+        return await httpClient
+                .GetFromJsonAsync(url, TimingDataSerializerContext.Raw.ListMeetingsApiResponse)
+                .ConfigureAwait(false)
             ?? throw new InvalidOperationException("An error occurred parsing the API response");
     }
 
@@ -166,7 +168,9 @@ public sealed class DataImporter(
         var lines = dataPointsCollection
             .SelectMany(x => x)
             .OrderBy(x => x.DateTime)
-            .Select(x => JsonSerializer.Serialize(x))
+            .Select(x =>
+                JsonSerializer.Serialize(x, TimingDataSerializerContext.Raw.RawTimingDataPoint)
+            )
             .ToList();
 
         logger.LogInformation("Saving session data to {FilePath}", liveFilePath);

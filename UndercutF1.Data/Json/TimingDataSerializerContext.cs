@@ -4,7 +4,11 @@ using System.Text.Json.Serialization;
 
 namespace UndercutF1.Data;
 
-[JsonSourceGenerationOptions(UseStringEnumConverter = true)]
+[JsonSourceGenerationOptions(
+    UseStringEnumConverter = true,
+    PropertyNamingPolicy = JsonKnownNamingPolicy.CamelCase,
+    Converters = [typeof(StringToBoolConverter)]
+)]
 [JsonSerializable(typeof(RawTimingDataPoint))]
 [JsonSerializable(typeof(CarDataPoint))]
 [JsonSerializable(typeof(CarDataPoint.Entry), TypeInfoPropertyName = "CarDataPoint_Entry")]
@@ -59,26 +63,37 @@ namespace UndercutF1.Data;
 [JsonSerializable(typeof(Formula1Account.TokenPayload))] // For SignalR messages
 [JsonSerializable(typeof(string[]))] // For SignalR messages
 [JsonSerializable(typeof(JsonObject))] // For SignalR messages
+[JsonSerializable(typeof(ListMeetingsApiResponse))] // For IDataImporter
 [JsonSerializable(typeof(Dictionary<string, JsonNode>))]
 public partial class TimingDataSerializerContext : JsonSerializerContext
 {
-    public static TimingDataSerializerContext Pretty = new(
-        new(JsonSerializerDefaults.Web)
-        {
-            UnmappedMemberHandling = JsonUnmappedMemberHandling.Skip,
-            AllowTrailingCommas = true,
-            Converters = { new JsonStringEnumConverter(), new StringToBoolConverter() },
-            WriteIndented = false,
-        }
-    );
+    public static TimingDataSerializerContext Pretty => LazyPretty.Value;
 
-    public static TimingDataSerializerContext Raw = new(
-        new(JsonSerializerDefaults.Web)
-        {
-            UnmappedMemberHandling = JsonUnmappedMemberHandling.Skip,
-            AllowTrailingCommas = true,
-            Converters = { new JsonStringEnumConverter(), new StringToBoolConverter() },
-            WriteIndented = true,
-        }
-    );
+    public static Lazy<TimingDataSerializerContext> LazyPretty { get; } =
+        new(() =>
+            new(
+                new(JsonSerializerDefaults.Web)
+                {
+                    UnmappedMemberHandling = JsonUnmappedMemberHandling.Skip,
+                    AllowTrailingCommas = true,
+                    WriteIndented = false,
+                    Converters = { new StringToBoolConverter() },
+                }
+            )
+        );
+
+    public static TimingDataSerializerContext Raw => LazyRaw.Value;
+
+    public static Lazy<TimingDataSerializerContext> LazyRaw { get; } =
+        new(() =>
+            new(
+                new(JsonSerializerDefaults.Web)
+                {
+                    UnmappedMemberHandling = JsonUnmappedMemberHandling.Skip,
+                    AllowTrailingCommas = true,
+                    WriteIndented = true,
+                    Converters = { new StringToBoolConverter() },
+                }
+            )
+        );
 }

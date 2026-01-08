@@ -10,7 +10,7 @@ internal partial class ConsoleSerializerContext : JsonSerializerContext
 {
     public static ConsoleSerializerContext Pretty { get; } =
         new(
-            new(Default!.Options)
+            new(s_defaultOptions!)
             {
                 UnmappedMemberHandling = JsonUnmappedMemberHandling.Skip,
                 AllowTrailingCommas = true,

@@ -64,14 +64,20 @@ public static partial class CommandHandler
 
         builder.Services.Configure<Microsoft.AspNetCore.Http.Json.JsonOptions>(x =>
         {
-            x.SerializerOptions.Converters.Add(new JsonStringEnumConverter());
+            foreach (var converter in TimingDataSerializerContext.Pretty.Options.Converters)
+            {
+                x.SerializerOptions.Converters.Add(converter);
+            }
             x.SerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
         });
 
         // The Swagger UI only respects the Mvc JsonOptions, so set both even though we only need the Http.Json one for minimal APIs
         builder.Services.Configure<Microsoft.AspNetCore.Mvc.JsonOptions>(x =>
         {
-            x.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
+            foreach (var converter in TimingDataSerializerContext.Pretty.Options.Converters)
+            {
+                x.JsonSerializerOptions.Converters.Add(converter);
+            }
             x.JsonSerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
         });
 
