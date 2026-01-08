@@ -30,7 +30,7 @@ public sealed class Formula1Account
     public void Refresh(string? token)
     {
         var authResult = CheckToken(token, out var payload);
-        Payload = authResult == AuthenticationResult.Success ? payload : null;
+        Payload = payload;
         IsAuthenticated = authResult;
         AccessToken =
             authResult == AuthenticationResult.Success
