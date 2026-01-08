@@ -1,6 +1,6 @@
 using System.Text.Json;
-using System.Text.Json.Serialization;
-using Microsoft.OpenApi.Models;
+using System.Text.Json.Serialization.Metadata;
+using Microsoft.OpenApi;
 using UndercutF1.Console.Api;
 using UndercutF1.Console.Audio;
 using UndercutF1.Console.ExternalPlayerSync;
@@ -68,23 +68,13 @@ public static partial class CommandHandler
         }
 
         builder.Services.Configure<Microsoft.AspNetCore.Http.Json.JsonOptions>(x =>
-        {
-            foreach (var converter in TimingDataSerializerContext.Pretty.Options.Converters)
-            {
-                x.SerializerOptions.Converters.Add(converter);
-            }
-            x.SerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
-        });
+            ConfigureJsonSerializer(x.SerializerOptions)
+        );
 
         // The Swagger UI only respects the Mvc JsonOptions, so set both even though we only need the Http.Json one for minimal APIs
         builder.Services.Configure<Microsoft.AspNetCore.Mvc.JsonOptions>(x =>
-        {
-            foreach (var converter in TimingDataSerializerContext.Pretty.Options.Converters)
-            {
-                x.JsonSerializerOptions.Converters.Add(converter);
-            }
-            x.JsonSerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
-        });
+            ConfigureJsonSerializer(x.JsonSerializerOptions)
+        );
 
         var app = builder.Build();
 
@@ -131,5 +121,18 @@ public static partial class CommandHandler
 
         await EnsureConfigFileExistsAsync(app.Logger);
         await app.RunAsync();
+    }
+
+    private static void ConfigureJsonSerializer(JsonSerializerOptions options)
+    {
+        foreach (var converter in TimingDataSerializerContext.Pretty.Options.Converters)
+        {
+            options.Converters.Add(converter);
+        }
+        options.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
+        options.TypeInfoResolver = JsonTypeInfoResolver.Combine(
+            ConsoleSerializerContext.Pretty,
+            TimingDataSerializerContext.Pretty
+        );
     }
 }

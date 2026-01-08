@@ -1,5 +1,4 @@
 using System.Collections.Concurrent;
-using System.Diagnostics.CodeAnalysis;
 using System.Text.Json;
 using System.Text.Json.Nodes;
 using System.Threading.Channels;
@@ -303,7 +302,10 @@ public class TimingService(
                 .Select((val, idx) => (idx, val))
                 .ToDictionary(x => x.idx.ToString(), x => x.val);
 
-            return JsonSerializer.SerializeToNode(dict, TimingDataSerializerContext.Raw.DictionaryStringJsonNode)!;
+            return JsonSerializer.SerializeToNode(
+                dict,
+                TimingDataSerializerContext.Raw.DictionaryStringJsonNode
+            )!;
         }
         else
         {

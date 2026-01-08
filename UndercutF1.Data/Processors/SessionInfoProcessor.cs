@@ -93,6 +93,10 @@ internal class IntJsonConverter : JsonConverter<int>
         writer.WriteNumberValue(value);
 }
 
-[JsonSourceGenerationOptions(Converters = [typeof(IntJsonConverter)])]
+[JsonSourceGenerationOptions(
+    PropertyNameCaseInsensitive = true,
+    PropertyNamingPolicy = JsonKnownNamingPolicy.CamelCase,
+    Converters = [typeof(IntJsonConverter)]
+)]
 [JsonSerializable(typeof(SessionInfoProcessor.CircuitInfoResponse))]
 internal partial class SessionInfoProcessorContext : JsonSerializerContext { }
