@@ -1,5 +1,4 @@
 using System.Text.Json;
-using System.Text.Json.Serialization;
 using System.Text.Json.Serialization.Metadata;
 using UndercutF1.Console.Api;
 using UndercutF1.Console.Audio;
@@ -63,23 +62,13 @@ public static partial class CommandHandler
         }
 
         builder.Services.Configure<Microsoft.AspNetCore.Http.Json.JsonOptions>(x =>
-        {
-            foreach (var converter in TimingDataSerializerContext.Pretty.Options.Converters)
-            {
-                x.SerializerOptions.Converters.Add(converter);
-            }
-            x.SerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
-        });
+            ConfigureJsonSerializer(x.SerializerOptions)
+        );
 
         // The Swagger UI only respects the Mvc JsonOptions, so set both even though we only need the Http.Json one for minimal APIs
         builder.Services.Configure<Microsoft.AspNetCore.Mvc.JsonOptions>(x =>
-        {
-            foreach (var converter in TimingDataSerializerContext.Pretty.Options.Converters)
-            {
-                x.JsonSerializerOptions.Converters.Add(converter);
-            }
-            x.JsonSerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
-        });
+            ConfigureJsonSerializer(x.JsonSerializerOptions)
+        );
 
         var app = builder.Build();
 
@@ -138,5 +127,18 @@ public static partial class CommandHandler
             : name.Replace("UndercutF1.Data.", string.Empty)
                 .Replace("UndercutF1.Console.Api.", string.Empty)
                 .Replace("+", string.Empty);
+    }
+
+    private static void ConfigureJsonSerializer(JsonSerializerOptions options)
+    {
+        foreach (var converter in TimingDataSerializerContext.Pretty.Options.Converters)
+        {
+            options.Converters.Add(converter);
+        }
+        options.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
+        options.TypeInfoResolver = JsonTypeInfoResolver.Combine(
+            ConsoleSerializerContext.Pretty,
+            TimingDataSerializerContext.Pretty
+        );
     }
 }
