@@ -1,3 +1,4 @@
+using System.Text.Json;
 using System.Text.Json.Serialization;
 
 namespace UndercutF1.Console;
@@ -10,7 +11,7 @@ internal partial class ConsoleSerializerContext : JsonSerializerContext
 {
     public static ConsoleSerializerContext Pretty { get; } =
         new(
-            new(s_defaultOptions!)
+            new(JsonSerializerDefaults.Web)
             {
                 UnmappedMemberHandling = JsonUnmappedMemberHandling.Skip,
                 AllowTrailingCommas = true,
