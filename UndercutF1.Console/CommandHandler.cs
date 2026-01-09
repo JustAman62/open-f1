@@ -236,7 +236,10 @@ public static partial class CommandHandler
         }
         if (preferFfmpeg is not null)
         {
-            commandLineOpts.Add(nameof(ConsoleOptions.PreferFfmpegPlayback), preferFfmpeg.ToString());
+            commandLineOpts.Add(
+                nameof(ConsoleOptions.PreferFfmpegPlayback),
+                preferFfmpeg.ToString()
+            );
         }
         if (preventDisplaySleep is not null)
         {
@@ -254,7 +257,11 @@ public static partial class CommandHandler
         }
 
         _ = builder
-            .Configuration.AddJsonFile(ConsoleOptions.ConfigFilePath, optional: true, reloadOnChange: true)
+            .Configuration.AddJsonFile(
+                ConsoleOptions.ConfigFilePath,
+                optional: true,
+                reloadOnChange: true
+            )
             .AddEnvironmentVariables("UNDERCUTF1_")
             .AddInMemoryCollection(commandLineOpts);
 
