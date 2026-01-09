@@ -20,7 +20,8 @@ namespace UndercutF1.Data;
 ///      }
 /// </c>
 /// </summary>
-public sealed class ChampionshipPredictionDataPoint : ILiveTimingDataPoint
+[Mergeable]
+public sealed partial record ChampionshipPredictionDataPoint : ILiveTimingDataPoint
 {
     /// <inheritdoc />
     public LiveTimingDataType LiveTimingDataType => LiveTimingDataType.ChampionshipPrediction;
@@ -28,7 +29,7 @@ public sealed class ChampionshipPredictionDataPoint : ILiveTimingDataPoint
     public Dictionary<string, Driver> Drivers { get; set; } = new();
     public Dictionary<string, Team> Teams { get; set; } = new();
 
-    public sealed record Driver
+    public sealed partial record Driver
     {
         public string? RacingNumber { get; set; }
         public int? CurrentPosition { get; set; }
@@ -37,7 +38,7 @@ public sealed class ChampionshipPredictionDataPoint : ILiveTimingDataPoint
         public decimal? PredictedPoints { get; set; }
     }
 
-    public sealed record Team
+    public sealed partial record Team
     {
         public string? TeamName { get; set; }
         public int? CurrentPosition { get; set; }

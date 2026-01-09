@@ -6,23 +6,24 @@ namespace UndercutF1.Data;
 /// Car data is sent as compressed (with deflate) JSON containing Entries.
 /// Each Entry is all the car data for a specific point in time, and they seem to be batched to reduce network load.
 /// </summary>
-public sealed class CarDataPoint : ILiveTimingDataPoint
+[Mergeable]
+public sealed partial record CarDataPoint : ILiveTimingDataPoint
 {
     public LiveTimingDataType LiveTimingDataType => LiveTimingDataType.CarData;
 
     public List<Entry> Entries { get; set; } = new();
 
-    public sealed class Entry
+    public sealed partial record Entry
     {
         public DateTimeOffset Utc { get; set; }
 
         public Dictionary<string, Car> Cars { get; set; } = new();
 
-        public sealed class Car
+        public sealed partial record Car
         {
             public Channel Channels { get; set; } = new();
 
-            public sealed class Channel
+            public sealed partial record Channel
             {
                 [JsonPropertyName("0")]
                 public int? Rpm { get; set; }

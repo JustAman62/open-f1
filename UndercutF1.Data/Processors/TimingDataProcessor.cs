@@ -1,9 +1,8 @@
 using System.Text.Json;
-using AutoMapper;
 
 namespace UndercutF1.Data;
 
-public class TimingDataProcessor(IMapper mapper) : IProcessor<TimingDataPoint>
+public class TimingDataProcessor() : IProcessor<TimingDataPoint>
 {
     /// <summary>
     /// The latest timing data available
@@ -26,7 +25,7 @@ public class TimingDataProcessor(IMapper mapper) : IProcessor<TimingDataPoint>
 
     public void Process(TimingDataPoint data)
     {
-        _ = mapper.Map(data, Latest);
+        Latest.MergeWith(data);
 
         foreach (var (driverNumber, lapUpdate) in data.Lines)
         {
