@@ -56,7 +56,10 @@ public sealed partial class TerminalInfoProvider
     /// </summary>
     public Lazy<TerminalSizeInfo> TerminalSize { get; private set; }
 
-    public TerminalInfoProvider(IOptions<ConsoleOptions> options, ILogger<TerminalInfoProvider> logger)
+    public TerminalInfoProvider(
+        IOptions<ConsoleOptions> options,
+        ILogger<TerminalInfoProvider> logger
+    )
     {
         _options = options;
         _logger = logger;
