@@ -11,6 +11,7 @@
     <GenerateRuntimeConfigurationFiles>true</GenerateRuntimeConfigurationFiles>
     <InvariantGlobalization>true</InvariantGlobalization>
     <EnableCompressionInSingleFile>true</EnableCompressionInSingleFile>
+    <SelfContained>true</SelfContained>
     <PublishAot>true</PublishAot>
   </PropertyGroup>
   <ItemGroup>
@@ -39,6 +40,7 @@
       Include="../gen/UndercutF1.Console.SourceGeneration/UndercutF1.Console.SourceGeneration.csproj"
       OutputItemType="Analyzer"
       ReferenceOutputAssembly="false"
+      PrivateAssets="all"
     />
     <ProjectReference Include="..\UndercutF1.Data\UndercutF1.Data.csproj" />
   </ItemGroup>

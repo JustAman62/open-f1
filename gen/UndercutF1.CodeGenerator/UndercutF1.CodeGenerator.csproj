@@ -2,6 +2,7 @@
   <PropertyGroup>
     <OutputType>Exe</OutputType>
     <IsPackable>false</IsPackable>
+    <SelfContained>true</SelfContained>
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="../../UndercutF1.Console/UndercutF1.Console.csproj" />
