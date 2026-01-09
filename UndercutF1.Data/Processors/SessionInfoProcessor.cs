@@ -1,16 +1,15 @@
 using System.Net.Http.Json;
 using System.Text.Json;
 using System.Text.Json.Serialization;
-using AutoMapper;
 using Microsoft.Extensions.Logging;
 
 namespace UndercutF1.Data;
 
 public class SessionInfoProcessor(
     IHttpClientFactory httpClientFactory,
-    IMapper mapper,
+    IMerger merger,
     ILogger<SessionInfoProcessor> logger
-) : ProcessorBase<SessionInfoDataPoint>(mapper)
+) : ProcessorBase<SessionInfoDataPoint>(merger)
 {
     private Task? _loadCircuitTask = null;
     private JsonSerializerOptions _jsonSerializerOptions = new(JsonSerializerDefaults.Web)

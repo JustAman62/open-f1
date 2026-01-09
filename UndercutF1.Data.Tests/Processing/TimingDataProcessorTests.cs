@@ -1,7 +1,3 @@
-using AutoMapper;
-using AutoMapper.EquivalencyExpression;
-using UndercutF1.Data.AutoMapper;
-
 namespace UndercutF1.Data.Tests;
 
 public class TimingDataProcessorTests
@@ -10,12 +6,8 @@ public class TimingDataProcessorTests
     public void VerifyDataUpdate()
     {
         // Arrange
-        var mapper = new MapperConfiguration(cfg =>
-        {
-            cfg.AddCollectionMappers();
-            cfg.AddProfile<TimingDataPointConfiguration>();
-        }).CreateMapper();
-        var processor = new TimingDataProcessor(mapper);
+        var merger = new Merger();
+        var processor = new TimingDataProcessor(merger);
 
         var data = new List<TimingDataPoint>()
         {
@@ -61,12 +53,8 @@ public class TimingDataProcessorTests
     public void VerifyBestLapUpdatesOnImprovement()
     {
         // Arrange
-        var mapper = new MapperConfiguration(cfg =>
-        {
-            cfg.AddCollectionMappers();
-            cfg.AddProfile<TimingDataPointConfiguration>();
-        }).CreateMapper();
-        var processor = new TimingDataProcessor(mapper);
+        var merger = new Merger();
+        var processor = new TimingDataProcessor(merger);
 
         var initialBestLapTime = "1:34.678";
         var fasterBestLapTime = "1:20.123";
@@ -119,12 +107,8 @@ public class TimingDataProcessorTests
     public void VerifyBestLapDoesNotUpdateOnSlowerLap()
     {
         // Arrange
-        var mapper = new MapperConfiguration(cfg =>
-        {
-            cfg.AddCollectionMappers();
-            cfg.AddProfile<TimingDataPointConfiguration>();
-        }).CreateMapper();
-        var processor = new TimingDataProcessor(mapper);
+        var merger = new Merger();
+        var processor = new TimingDataProcessor(merger);
 
         var initialBestLapTime = "1:34.678";
         var slowerBestLapTime = "1:50.123";

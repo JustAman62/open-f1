@@ -1,13 +1,11 @@
-using AutoMapper;
-
 namespace UndercutF1.Data;
 
 public class TeamRadioProcessor(
     SessionInfoProcessor sessionInfoProcessor,
     ITranscriptionProvider transcriptionProvider,
     IHttpClientFactory httpClientFactory,
-    IMapper mapper
-) : ProcessorBase<TeamRadioDataPoint>(mapper)
+    IMerger merger
+) : ProcessorBase<TeamRadioDataPoint>(merger)
 {
     public Dictionary<string, TeamRadioDataPoint.Capture> Ordered =>
         Latest.Captures.Reverse().ToDictionary(x => x.Key, x => x.Value);

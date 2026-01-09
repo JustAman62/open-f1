@@ -1,8 +1,6 @@
-using AutoMapper;
-
 namespace UndercutF1.Data;
 
-public class PositionDataProcessor(IMapper mapper) : IProcessor<PositionDataPoint>
+public class PositionDataProcessor(IMerger merger) : IProcessor<PositionDataPoint>
 {
     public PositionDataPoint Latest { get; private set; } = new();
 
@@ -10,7 +8,7 @@ public class PositionDataProcessor(IMapper mapper) : IProcessor<PositionDataPoin
     {
         foreach (var item in data.Position)
         {
-            mapper.Map(item.Entries, Latest.Position.Last().Entries);
+            merger.Merge(item.Entries, Latest.Position.Last().Entries);
         }
     }
 }

@@ -1,20 +1,18 @@
-using AutoMapper;
-
 namespace UndercutF1.Data;
 
-public class HeartbeatProcessor(IMapper mapper) : ProcessorBase<HeartbeatDataPoint>(mapper);
+public class HeartbeatProcessor(IMerger merger) : ProcessorBase<HeartbeatDataPoint>(merger);
 
-public class LapCountProcessor(IMapper mapper) : ProcessorBase<LapCountDataPoint>(mapper);
+public class LapCountProcessor(IMerger merger) : ProcessorBase<LapCountDataPoint>(merger);
 
-public class TimingAppDataProcessor(IMapper mapper) : ProcessorBase<TimingAppDataPoint>(mapper);
+public class TimingAppDataProcessor(IMerger merger) : ProcessorBase<TimingAppDataPoint>(merger);
 
-public class TrackStatusProcessor(IMapper mapper) : ProcessorBase<TrackStatusDataPoint>(mapper);
+public class TrackStatusProcessor(IMerger merger) : ProcessorBase<TrackStatusDataPoint>(merger);
 
-public class WeatherProcessor(IMapper mapper) : ProcessorBase<WeatherDataPoint>(mapper);
+public class WeatherProcessor(IMerger merger) : ProcessorBase<WeatherDataPoint>(merger);
 
-public class ChampionshipPredictionProcessor(IMapper mapper)
-    : ProcessorBase<ChampionshipPredictionDataPoint>(mapper);
+public class ChampionshipPredictionProcessor(IMerger merger)
+    : ProcessorBase<ChampionshipPredictionDataPoint>(merger);
 
-public class TimingStatsProcessor(IMapper mapper) : ProcessorBase<TimingStatsDataPoint>(mapper);
+public class TimingStatsProcessor(IMerger merger) : ProcessorBase<TimingStatsDataPoint>(merger);
 
-public class PitStopSeriesProcessor(IMapper mapper) : ProcessorBase<PitStopSeriesDataPoint>(mapper);
+public class PitStopSeriesProcessor(IMerger merger) : ProcessorBase<PitStopSeriesDataPoint>(merger);

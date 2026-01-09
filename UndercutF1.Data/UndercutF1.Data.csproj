@@ -6,9 +6,9 @@
     <PackageTags>formula1;f1;livetiming;timing</PackageTags>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="AutoMapper" />
-    <PackageReference Include="AutoMapper.Collection" />
     <PackageReference Include="FFMpegCore" />
+    <PackageReference Include="Mapster" />
+    <PackageReference Include="Mapster.Core" />
     <PackageReference Include="Microsoft.AspNetCore.SignalR.Client" />
     <PackageReference Include="Microsoft.Extensions.Configuration" />
     <PackageReference Include="Microsoft.Extensions.Logging" />

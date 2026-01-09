@@ -1,9 +1,8 @@
 using System.Text.Json;
-using AutoMapper;
 
 namespace UndercutF1.Data;
 
-public class TimingDataProcessor(IMapper mapper) : IProcessor<TimingDataPoint>
+public class TimingDataProcessor(IMerger merger) : IProcessor<TimingDataPoint>
 {
     /// <summary>
     /// The latest timing data available
@@ -26,13 +25,13 @@ public class TimingDataProcessor(IMapper mapper) : IProcessor<TimingDataPoint>
 
     public void Process(TimingDataPoint data)
     {
-        _ = mapper.Map(data, Latest);
+        _ = merger.Merge(data, Latest);
 
         foreach (var (driverNumber, lapUpdate) in data.Lines)
         {
             PushCustomProperties(driverNumber, lapUpdate);
 
-            // Super hacky way of doing a clean clone. Using AutoMapper seems to not clone the Sectors array properly.
+            // Super hacky way of doing a clean clone. Using Mapster seems to not clone the Sectors array properly.
             // We need this clone because we want to store a snapshot of the lap which means we don't want to store the
             // same reference.
             var cloned = JsonSerializer.Deserialize<TimingDataPoint.Driver>(

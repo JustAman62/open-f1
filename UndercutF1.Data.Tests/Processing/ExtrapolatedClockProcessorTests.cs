@@ -1,7 +1,5 @@
 using System.Text.Json;
-using AutoMapper;
 using NSubstitute;
-using UndercutF1.Data.AutoMapper;
 
 namespace UndercutF1.Data.Tests;
 
@@ -40,11 +38,8 @@ public class ExtrapolatedClockProcessorTests
         var dateTimeProvider = Substitute.For<IDateTimeProvider>();
         dateTimeProvider.Utc.Returns(clockTime);
 
-        var mapper = new MapperConfiguration(cfg =>
-        {
-            cfg.AddProfile<ExtrapolatedClockDataPointConfiguration>();
-        }).CreateMapper();
-        var processor = new ExtrapolatedClockProcessor(dateTimeProvider, mapper);
+        var merger = new Merger();
+        var processor = new ExtrapolatedClockProcessor(dateTimeProvider, merger);
 
         // Act
         processor.Process(data);

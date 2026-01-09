@@ -1,9 +1,7 @@
-using AutoMapper;
-
 namespace UndercutF1.Data;
 
-public class ExtrapolatedClockProcessor(IDateTimeProvider dateTimeProvider, IMapper mapper)
-    : ProcessorBase<ExtrapolatedClockDataPoint>(mapper)
+public class ExtrapolatedClockProcessor(IDateTimeProvider dateTimeProvider, IMerger merger)
+    : ProcessorBase<ExtrapolatedClockDataPoint>(merger)
 {
     public TimeSpan ExtrapolatedRemaining()
     {
