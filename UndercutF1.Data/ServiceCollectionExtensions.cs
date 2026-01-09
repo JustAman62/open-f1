@@ -1,7 +1,5 @@
-﻿using AutoMapper.EquivalencyExpression;
-using Microsoft.Extensions.Configuration;
+﻿using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using UndercutF1.Data.AutoMapper;
 
 namespace UndercutF1.Data;
 
@@ -23,10 +21,6 @@ public static partial class ServiceCollectionExtensions
     {
         collection
             .Configure<LiveTimingOptions>(configuration)
-            .AddAutoMapper(
-                cfg => cfg.AddCollectionMappers(),
-                typeof(TimingDataPointConfiguration).Assembly
-            )
             .AddLiveTimingClient()
             .AddLiveTimingProcessors()
             .AddSingleton<INotifyService, NotifyService>()

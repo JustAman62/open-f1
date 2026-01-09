@@ -1,16 +1,14 @@
 using System.Net.Http.Json;
 using System.Text.Json;
 using System.Text.Json.Serialization;
-using AutoMapper;
 using Microsoft.Extensions.Logging;
 
 namespace UndercutF1.Data;
 
 public class SessionInfoProcessor(
     IHttpClientFactory httpClientFactory,
-    IMapper mapper,
     ILogger<SessionInfoProcessor> logger
-) : ProcessorBase<SessionInfoDataPoint>(mapper)
+) : ProcessorBase<SessionInfoDataPoint>()
 {
     private Task? _loadCircuitTask = null;
 

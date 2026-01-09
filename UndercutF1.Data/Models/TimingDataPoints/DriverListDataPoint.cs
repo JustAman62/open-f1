@@ -19,14 +19,15 @@ namespace UndercutF1.Data;
 /// }
 /// </c>
 /// </summary>
-public sealed class DriverListDataPoint
+[Mergeable]
+public sealed partial class DriverListDataPoint
     : Dictionary<string, DriverListDataPoint.Driver>,
         ILiveTimingDataPoint
 {
     /// <inheritdoc />
     public LiveTimingDataType LiveTimingDataType => LiveTimingDataType.DriverList;
 
-    public sealed record Driver
+    public sealed partial record Driver
     {
         public string? RacingNumber { get; set; }
         public string? BroadcastName { get; set; }
@@ -46,6 +47,7 @@ public sealed class DriverListDataPoint
         /// Internal property which identifiers whether this driver is "selected" or not.
         /// Unselected drivers are hidden in some displays.
         /// </summary>
+        [MergeableIgnore]
         public bool IsSelected { get; set; } = true;
     }
 }

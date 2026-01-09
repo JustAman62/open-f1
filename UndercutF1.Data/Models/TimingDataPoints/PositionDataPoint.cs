@@ -4,13 +4,14 @@ namespace UndercutF1.Data;
 /// Position data is sent as compressed (with deflate) JSON containing Entries.
 /// Each Position Entry is the cars position at a specific point of time, and they seem to be batched to reduce network load.
 /// </summary>
-public sealed class PositionDataPoint : ILiveTimingDataPoint
+[Mergeable]
+public sealed partial record PositionDataPoint : ILiveTimingDataPoint
 {
     public LiveTimingDataType LiveTimingDataType => LiveTimingDataType.Position;
 
     public List<PositionData> Position { get; set; } = [new()];
 
-    public sealed class PositionData
+    public sealed partial record PositionData
     {
         public DateTimeOffset Timestamp { get; set; }
 
@@ -19,7 +20,7 @@ public sealed class PositionDataPoint : ILiveTimingDataPoint
         /// </summary>
         public Dictionary<string, Entry> Entries { get; set; } = [];
 
-        public sealed class Entry
+        public sealed partial record Entry
         {
             public DriverStatus? Status { get; set; }
 

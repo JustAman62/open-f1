@@ -20,14 +20,15 @@ namespace UndercutF1.Data;
 ///   }
 /// }
 /// </summary>
-public sealed record TimingAppDataPoint : ILiveTimingDataPoint
+[Mergeable]
+public sealed partial record TimingAppDataPoint : ILiveTimingDataPoint
 {
     /// <inheritdoc />
     public LiveTimingDataType LiveTimingDataType => LiveTimingDataType.TimingAppData;
 
     public Dictionary<string, Driver> Lines { get; set; } = new();
 
-    public sealed record Driver
+    public sealed partial record Driver
     {
         /// <summary>
         /// The position the driver started the race from. Only available in Race sessions.
@@ -38,7 +39,7 @@ public sealed record TimingAppDataPoint : ILiveTimingDataPoint
 
         public Dictionary<string, Stint> Stints { get; set; } = new();
 
-        public sealed record Stint
+        public sealed partial record Stint
         {
             public int? LapFlags { get; set; }
             public string? Compound { get; set; }

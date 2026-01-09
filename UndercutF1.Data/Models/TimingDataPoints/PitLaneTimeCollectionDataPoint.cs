@@ -1,7 +1,8 @@
 namespace UndercutF1.Data;
 
 // {"Type":"PitLaneTimeCollection","Json":{"PitTimes":{"1":{"RacingNumber":"1","Duration":"","Lap":"5"}}},"DateTime":"2025-09-05T15:16:10.363+00:00"}
-public sealed record PitLaneTimeCollectionDataPoint : ILiveTimingDataPoint
+[Mergeable]
+public sealed partial record PitLaneTimeCollectionDataPoint : ILiveTimingDataPoint
 {
     /// <inheritdoc />
     public LiveTimingDataType LiveTimingDataType => LiveTimingDataType.PitLaneTimeCollection;
@@ -9,7 +10,7 @@ public sealed record PitLaneTimeCollectionDataPoint : ILiveTimingDataPoint
     public Dictionary<string, PitTime> PitTimes { get; set; } = new();
     public Dictionary<string, List<PitTime>> PitTimesList { get; set; } = new();
 
-    public sealed record PitTime
+    public sealed partial record PitTime
     {
         public string? Duration { get; set; }
         public string? Lap { get; set; }

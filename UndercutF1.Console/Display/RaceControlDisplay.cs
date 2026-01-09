@@ -64,7 +64,7 @@ public class RaceControlDisplay(
 
         foreach (var (key, value) in messages)
         {
-            table.AddRow($"{value.Utc:HH:mm:ss}", value.Message);
+            table.AddRow($"{value.Utc:HH:mm:ss}", value.Message ?? "MISSING");
         }
         return new Panel(table)
         {

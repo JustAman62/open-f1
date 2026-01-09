@@ -1,6 +1,7 @@
 namespace UndercutF1.Data;
 
-public sealed record TimingDataPoint : ILiveTimingDataPoint
+[Mergeable]
+public sealed partial record TimingDataPoint : ILiveTimingDataPoint
 {
     /// <inheritdoc />
     public LiveTimingDataType LiveTimingDataType => LiveTimingDataType.TimingData;
@@ -13,7 +14,7 @@ public sealed record TimingDataPoint : ILiveTimingDataPoint
 
     public Dictionary<string, Driver> Lines { get; set; } = new();
 
-    public sealed record Driver
+    public sealed partial record Driver
     {
         /// <summary>
         /// For the leader, this is the lap number e.g. <c>LAP 54</c>,
@@ -21,7 +22,7 @@ public sealed record TimingDataPoint : ILiveTimingDataPoint
         /// or if more than a lap down then <c>5L</c> (i.e. 5 laps behind).
         /// </summary>
         public string? GapToLeader { get; set; }
-        public Interval? IntervalToPositionAhead { get; set; }
+        public Interval IntervalToPositionAhead { get; set; } = new();
 
         public int? Line { get; set; }
         public string? Position { get; set; }
@@ -36,6 +37,7 @@ public sealed record TimingDataPoint : ILiveTimingDataPoint
         ///
         /// The intention of the property is to allow for easy filtering of non-flying laps from lap-by-lap data.
         /// </summary>
+        [MergeableIgnore]
         public bool IsPitLap { get; set; }
 
         /// <summary>
@@ -44,10 +46,11 @@ public sealed record TimingDataPoint : ILiveTimingDataPoint
         /// <c>null</c> in all non-qualifying sessions.
         /// Value is pushed down from <see cref="TimingDataPoint.SessionPart"/>.
         /// </summary>
+        [MergeableIgnore]
         public int? SessionPart { get; set; }
 
         public int? NumberOfLaps { get; set; }
-        public LapSectorTime? LastLapTime { get; set; }
+        public LapSectorTime LastLapTime { get; set; } = new();
 
         public Dictionary<string, LapSectorTime> Sectors { get; set; } = new();
 
@@ -73,7 +76,7 @@ public sealed record TimingDataPoint : ILiveTimingDataPoint
         /// </summary>
         public StatusFlags? Status { get; set; }
 
-        public sealed record Interval
+        public sealed partial record Interval
         {
             /// <summary>
             /// Can be in the format <c>+1.123</c>,
@@ -86,20 +89,20 @@ public sealed record TimingDataPoint : ILiveTimingDataPoint
         /// <summary>
         /// Represents both Laps and Sectors (same model in different places)
         /// </summary>
-        public sealed record LapSectorTime
+        public sealed partial record LapSectorTime
         {
             public string? Value { get; set; }
             public bool? OverallFastest { get; set; }
             public bool? PersonalFastest { get; set; }
-            public Dictionary<int, Segment>? Segments { get; set; }
+            public Dictionary<int, Segment> Segments { get; set; } = new();
 
-            public sealed record Segment
+            public sealed partial record Segment
             {
                 public StatusFlags? Status { get; set; }
             }
         }
 
-        public sealed record BestLap
+        public sealed partial record BestLap
         {
             public string? Value { get; set; }
             public int? Lap { get; set; }

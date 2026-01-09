@@ -1,17 +1,15 @@
-using AutoMapper;
-
 namespace UndercutF1.Data;
 
-public class ExtrapolatedClockProcessor(IDateTimeProvider dateTimeProvider, IMapper mapper)
-    : ProcessorBase<ExtrapolatedClockDataPoint>(mapper)
+public class ExtrapolatedClockProcessor(IDateTimeProvider dateTimeProvider)
+    : ProcessorBase<ExtrapolatedClockDataPoint>()
 {
     public TimeSpan ExtrapolatedRemaining()
     {
         if (Latest.Remaining.TryParseTimeSpan(out var initialRemaining))
         {
-            if (Latest.Extrapolating)
+            if (Latest.Extrapolating.GetValueOrDefault() && Latest.Utc.HasValue)
             {
-                var sinceStart = dateTimeProvider.Utc - Latest.Utc;
+                var sinceStart = dateTimeProvider.Utc - Latest.Utc.Value;
                 return initialRemaining - sinceStart;
             }
             else
