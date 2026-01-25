@@ -7,7 +7,7 @@
     <PackageVersion Include="HarfBuzzSharp.NativeAssets.Linux" Version="8.3.1.2" />
     <PackageVersion Include="InhibitSleep.Net" Version="0.1.11" />
     <PackageVersion Include="InMemoryLogger" Version="1.0.66" />
-    <PackageVersion Include="JsonSchema.Net" Version="8.0.0" />
+    <PackageVersion Include="JsonSchema.Net" Version="8.0.5" />
     <PackageVersion Include="JsonSchema.Net.Generation" Version="6.0.0" />
     <PackageVersion Include="LiveChartsCore" Version="2.0.0-rc6.1" />
     <PackageVersion Include="LiveChartsCore.SkiaSharpView" Version="2.0.0-rc6.1" />
@@ -35,15 +35,15 @@
     <PackageVersion Include="SkiaSharp.NativeAssets.Linux.NoDependencies" Version="3.119.1" />
     <PackageVersion Include="SkiaSharp.NativeAssets.macOS" Version="3.119.1" />
     <PackageVersion Include="SkiaSharp.NativeAssets.Win32" Version="3.119.1" />
-    <PackageVersion Include="Spectre.Console" Version="0.48.0" />
+    <PackageVersion Include="Spectre.Console" Version="0.54.0" />
     <PackageVersion Include="Swashbuckle.AspNetCore" Version="6.5.0" />
     <PackageVersion Include="System.CommandLine" Version="2.0.0-beta6.25358.103" />
     <PackageVersion Include="System.Drawing.Common" Version="8.0.6" />
     <PackageVersion Include="TextCopy" Version="6.2.1" />
     <PackageVersion Include="Vezel.Cathode" Version="0.14.17" />
     <PackageVersion Include="Vezel.Cathode.Extensions" Version="0.14.17" />
-    <PackageVersion Include="Whisper.net" Version="1.8.1" />
-    <PackageVersion Include="Whisper.net.Runtime" Version="1.8.1" />
+    <PackageVersion Include="Whisper.net" Version="1.9.0" />
+    <PackageVersion Include="Whisper.net.Runtime" Version="1.9.0" />
     <PackageVersion Include="xunit" Version="2.5.0" />
     <PackageVersion Include="xunit.runner.visualstudio" Version="2.5.0" />
   </ItemGroup>
