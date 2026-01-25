@@ -22,11 +22,9 @@ jobs:
           dotnet-version: 10.0.x
       - name: Restore dependencies
         run: dotnet restore
-      - name: Publish
-        # No point in having the NuGet tool be AOT, we know theres a dotnet runtime on the machine if they have the tool
-        run: dotnet publish --no-restore /p:PublicRelease=true /p:PublishAot=false
       - name: Pack
-        run: dotnet pack --no-build /p:PublicRelease=true /p:PublishAot=false
+        # No point in having the NuGet tool be AOT, we know theres a dotnet runtime on the machine if they have the tool
+        run: dotnet pack --no-restore /p:PublicRelease=true /p:PublishAot=false
       - name: Push Packages
         if: ${{ github.event_name == 'release'}}
         run: dotnet nuget push "**/*.nupkg" --source https://api.nuget.org/v3/index.json --api-key ${{ secrets.NUGET_API_KEY }} --skip-duplicate
