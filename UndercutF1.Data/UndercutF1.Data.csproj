@@ -4,7 +4,7 @@
     <PackageId>UndercutF1.Data</PackageId>
     <PackageReadmeFile>README.md</PackageReadmeFile>
     <PackageTags>formula1;f1;livetiming;timing</PackageTags>
-    <PublishAot>true</PublishAot>
+    <IsAotCompatible>true</IsAotCompatible>
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="FFMpegCore" />

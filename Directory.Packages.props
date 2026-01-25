@@ -33,7 +33,7 @@
     <PackageVersion Include="Serilog" Version="4.3.0" />
     <PackageVersion Include="Serilog.AspNetCore" Version="10.0.0" />
     <PackageVersion Include="Serilog.Sinks.File" Version="7.0.0" />
-    <PackageVersion Include="SharpWebview" Version="0.13.0" />
+    <PackageVersion Include="SharpWebview.Aot" Version="0.13.0" />
     <PackageVersion Include="SkiaSharp" Version="3.119.1" />
     <PackageVersion Include="SkiaSharp.NativeAssets.Linux.NoDependencies" Version="3.119.1" />
     <PackageVersion Include="SkiaSharp.NativeAssets.macOS" Version="3.119.1" />

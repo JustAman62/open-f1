@@ -61,7 +61,7 @@ jobs:
         run: dotnet restore
 
       - name: Create ${{ matrix.target }} Package
-        run: dotnet publish -r ${{ matrix.target }} --self-contained true -p:PublishSingleFile=true -p:IncludeNativeLibrariesForSelfExtract=true -p:DebugType=None -p:IncludeAllContentForSelfExtract=true -p:PublicRelease=true UndercutF1.Console/UndercutF1.Console.csproj -o ${{ matrix.target }}-output
+        run: dotnet publish -r ${{ matrix.target }} -p:IncludeNativeLibrariesForSelfExtract=true -p:DebugType=None -p:IncludeAllContentForSelfExtract=true -p:PublicRelease=true UndercutF1.Console/UndercutF1.Console.csproj -o ${{ matrix.target }}-output
 
       - name: Download codesign certificate
         if: ${{ contains(matrix.target, 'osx') && github.event_name == 'release' }}

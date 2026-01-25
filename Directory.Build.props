@@ -14,6 +14,7 @@
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <NBGV_ThisAssemblyIncludesPackageVersion>true</NBGV_ThisAssemblyIncludesPackageVersion>
     <JsonSerializerIsReflectionEnabledByDefault>false</JsonSerializerIsReflectionEnabledByDefault>
+    <EnableConfigurationBindingGenerator>true</EnableConfigurationBindingGenerator>
     <NoWarn>$(NoWarn);CS1573;CS1591;</NoWarn>
   </PropertyGroup>
   <ItemGroup>
