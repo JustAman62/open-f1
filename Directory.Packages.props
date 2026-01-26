@@ -11,7 +11,7 @@
     <PackageVersion Include="JsonSchema.Net.Generation" Version="6.0.0" />
     <PackageVersion Include="LiveChartsCore" Version="2.0.0-rc6.1" />
     <PackageVersion Include="LiveChartsCore.SkiaSharpView" Version="2.0.0-rc6.1" />
-    <PackageVersion Include="Microsoft.AspNetCore.OpenApi" Version="7.0.7" />
+    <PackageVersion Include="Microsoft.AspNetCore.OpenApi" Version="10.0.1" />
     <PackageVersion Include="Microsoft.AspNetCore.SignalR.Client" Version="10.0.1" />
     <PackageVersion Include="Microsoft.Extensions.Configuration" Version="10.0.1" />
     <PackageVersion Include="Microsoft.Extensions.DependencyInjection" Version="10.0.1" />
@@ -36,7 +36,7 @@
     <PackageVersion Include="SkiaSharp.NativeAssets.macOS" Version="3.119.1" />
     <PackageVersion Include="SkiaSharp.NativeAssets.Win32" Version="3.119.1" />
     <PackageVersion Include="Spectre.Console" Version="0.54.0" />
-    <PackageVersion Include="Swashbuckle.AspNetCore" Version="6.5.0" />
+    <PackageVersion Include="Swashbuckle.AspNetCore.SwaggerUI" Version="10.1.0" />
     <PackageVersion Include="System.CommandLine" Version="2.0.2" />
     <PackageVersion Include="System.Drawing.Common" Version="8.0.6" />
     <PackageVersion Include="TextCopy" Version="6.2.1" />
