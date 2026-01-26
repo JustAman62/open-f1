@@ -1,4 +1,4 @@
-﻿using System.Runtime.InteropServices;
+using System.Runtime.InteropServices;
 using UndercutF1.Console;
 
 var cts = new CancellationTokenSource();

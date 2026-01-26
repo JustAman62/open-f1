@@ -194,7 +194,7 @@ public class ConsoleLoop(
             var exceptionPanel = new Panel(
                 new Rows(
                     new Text($"Failed to render screen {state.CurrentScreen}"),
-                    exception.GetRenderable()
+                    new Text(exception.ToString())
                 )
             )
             {

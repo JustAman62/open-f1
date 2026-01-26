@@ -30,6 +30,15 @@ namespace UndercutF1.Data;
 [JsonSerializable(typeof(HeartbeatDataPoint))]
 [JsonSerializable(typeof(LapCountDataPoint))]
 [JsonSerializable(typeof(PitLaneTimeCollectionDataPoint))]
+[JsonSerializable(
+    typeof(PitLaneTimeCollectionDataPoint.PitTime),
+    TypeInfoPropertyName = "PitLaneTimeCollectionDataPoint_PitTime"
+)]
+[JsonSerializable(typeof(PitStopSeriesDataPoint))]
+[JsonSerializable(
+    typeof(Dictionary<string, PitStopSeriesDataPoint.PitTime>),
+    TypeInfoPropertyName = "PitStopSeriesDataPoint_PitTimeDictionary"
+)]
 [JsonSerializable(typeof(PositionDataPoint))]
 [JsonSerializable(
     typeof(PositionDataPoint.PositionData.Entry),
