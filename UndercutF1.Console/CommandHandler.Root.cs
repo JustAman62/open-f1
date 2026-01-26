@@ -1,6 +1,6 @@
 using System.Text.Json;
 using System.Text.Json.Serialization;
-using Microsoft.OpenApi.Models;
+using System.Text.Json.Serialization.Metadata;
 using UndercutF1.Console.Api;
 using UndercutF1.Console.Audio;
 using UndercutF1.Console.ExternalPlayerSync;
@@ -50,21 +50,16 @@ public static partial class CommandHandler
         {
             builder.WebHost.UseKestrel(opt => opt.ListenAnyIP(0xF1F1)); // listens on 61937
 
-            builder
-                .Services.AddRouting()
-                .AddEndpointsApiExplorer()
-                .AddSwaggerGen(c =>
+            builder.Services.AddOpenApi(
+                "v1",
+                opts =>
                 {
-                    c.CustomSchemaIds(type =>
-                        type.FullName!.Replace("UndercutF1.Data.", string.Empty)
-                            .Replace("UndercutF1.Console.Api.", string.Empty)
-                            .Replace("+", string.Empty)
-                    );
-                    c.SwaggerDoc(
-                        "v1",
-                        new OpenApiInfo { Title = "Undercut F1 API", Version = "v1" }
-                    );
-                });
+                    opts.CreateSchemaReferenceId = CreateSchemaReferenceId;
+                    opts.OpenApiVersion = Microsoft.OpenApi.OpenApiSpecVersion.OpenApi3_0;
+                }
+            );
+
+            builder.Services.AddRouting().AddEndpointsApiExplorer();
         }
 
         builder.Services.Configure<Microsoft.AspNetCore.Http.Json.JsonOptions>(x =>
@@ -84,9 +79,9 @@ public static partial class CommandHandler
 
         if (options.ApiEnabled)
         {
-            app.UseSwagger().UseSwaggerUI();
+            app.MapOpenApi();
 
-            app.MapSwagger();
+            app.UseSwaggerUI(opts => opts.SwaggerEndpoint("/openapi/v1.json", "v1"));
 
             app.MapControlEndpoints().MapTimingEndpoints();
         }
@@ -125,5 +120,17 @@ public static partial class CommandHandler
 
         await EnsureConfigFileExistsAsync(app.Logger);
         await app.RunAsync();
+    }
+
+    private static string? CreateSchemaReferenceId(JsonTypeInfo typeInfo)
+    {
+        var name = typeInfo.Type.FullName;
+
+        // Don't create references for simple types like bools
+        return name is null || name.StartsWith("System")
+            ? null
+            : name.Replace("UndercutF1.Data.", string.Empty)
+                .Replace("UndercutF1.Console.Api.", string.Empty)
+                .Replace("+", string.Empty);
     }
 }
