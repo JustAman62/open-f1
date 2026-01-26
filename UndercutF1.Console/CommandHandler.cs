@@ -196,10 +196,7 @@ public static partial class CommandHandler
         logoutCommand.SetAction(res => LogoutOfFormula1Account());
         rootCommand.Subcommands.Add(logoutCommand);
 
-        var commandConfiguration = new CommandLineConfiguration(rootCommand);
-        var parseResult = commandConfiguration.Parse(args);
-
-        await parseResult.InvokeAsync(cancellationToken);
+        await rootCommand.Parse(args).InvokeAsync(new(), cancellationToken);
     }
 
     private static WebApplicationBuilder GetBuilder(
