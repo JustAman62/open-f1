@@ -18,7 +18,7 @@ RUN dotnet restore "UndercutF1.Console/UndercutF1.Console.csproj"
 COPY . .
 WORKDIR "/src/UndercutF1.Console"
 ARG TARGETARCH
-RUN dotnet publish "UndercutF1.Console.csproj" -o /app/publish -a "$TARGETARCH" /p:PublicRelease=true
+RUN dotnet publish "UndercutF1.Console.csproj" -o /app/publish -a "$TARGETARCH" /p:PublicRelease=true /p:PublishTrimmed=false
 
 FROM base AS final
 WORKDIR /app
@@ -27,4 +27,4 @@ COPY --from=build /app/publish .
 ENV UNDERCUTF1_DATADIRECTORY=/data
 ENV UNDERCUTF1_LOGDIRECTORY=/logs
 
-ENTRYPOINT ["dotnet", "undercutf1.dll"]
+ENTRYPOINT ["./undercutf1"]
