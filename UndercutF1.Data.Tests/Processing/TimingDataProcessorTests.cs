@@ -1,7 +1,3 @@
-using AutoMapper;
-using AutoMapper.EquivalencyExpression;
-using UndercutF1.Data.AutoMapper;
-
 namespace UndercutF1.Data.Tests;
 
 public class TimingDataProcessorTests
@@ -10,12 +6,7 @@ public class TimingDataProcessorTests
     public void VerifyDataUpdate()
     {
         // Arrange
-        var mapper = new MapperConfiguration(cfg =>
-        {
-            cfg.AddCollectionMappers();
-            cfg.AddProfile<TimingDataPointConfiguration>();
-        }).CreateMapper();
-        var processor = new TimingDataProcessor(mapper);
+        var processor = new TimingDataProcessor();
 
         var data = new List<TimingDataPoint>()
         {
@@ -29,6 +20,7 @@ public class TimingDataProcessorTests
                         GapToLeader = "+1.000",
                         InPit = true,
                         BestLapTime = new() { Value = "1.11" },
+                        Sectors = new() { ["1"] = new() { Value = "10.123" } },
                     },
                 },
             },
@@ -37,6 +29,13 @@ public class TimingDataProcessorTests
                 Lines = new Dictionary<string, TimingDataPoint.Driver>()
                 {
                     ["1"] = new() { InPit = false },
+                },
+            },
+            new()
+            {
+                Lines = new Dictionary<string, TimingDataPoint.Driver>()
+                {
+                    ["1"] = new() { Sectors = new() { ["2"] = new() { Value = "20.234" } } },
                 },
             },
         };
@@ -55,18 +54,15 @@ public class TimingDataProcessorTests
         Assert.False(line.InPit);
         Assert.Equal("+1.000", line.GapToLeader);
         Assert.Equal("1.11", line.BestLapTime.Value);
+        Assert.Equal("10.123", line.Sectors["1"].Value);
+        Assert.Equal("20.234", line.Sectors["2"].Value);
     }
 
     [Fact]
     public void VerifyBestLapUpdatesOnImprovement()
     {
         // Arrange
-        var mapper = new MapperConfiguration(cfg =>
-        {
-            cfg.AddCollectionMappers();
-            cfg.AddProfile<TimingDataPointConfiguration>();
-        }).CreateMapper();
-        var processor = new TimingDataProcessor(mapper);
+        var processor = new TimingDataProcessor();
 
         var initialBestLapTime = "1:34.678";
         var fasterBestLapTime = "1:20.123";
@@ -119,12 +115,7 @@ public class TimingDataProcessorTests
     public void VerifyBestLapDoesNotUpdateOnSlowerLap()
     {
         // Arrange
-        var mapper = new MapperConfiguration(cfg =>
-        {
-            cfg.AddCollectionMappers();
-            cfg.AddProfile<TimingDataPointConfiguration>();
-        }).CreateMapper();
-        var processor = new TimingDataProcessor(mapper);
+        var processor = new TimingDataProcessor();
 
         var initialBestLapTime = "1:34.678";
         var slowerBestLapTime = "1:50.123";

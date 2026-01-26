@@ -22,21 +22,31 @@ jobs:
           dotnet-version: 10.0.x
       - name: Restore dependencies
         run: dotnet restore
-      - name: Publish
-        run: dotnet publish --no-restore /p:PublicRelease=true
       - name: Pack
-        run: dotnet pack --no-build /p:PublicRelease=true
+        # No point in having the NuGet tool be AOT, we know theres a dotnet runtime on the machine if they have the tool
+        run: dotnet pack --no-restore /p:PublicRelease=true /p:PublishAot=false
       - name: Push Packages
         if: ${{ github.event_name == 'release'}}
         run: dotnet nuget push "**/*.nupkg" --source https://api.nuget.org/v3/index.json --api-key ${{ secrets.NUGET_API_KEY }} --skip-duplicate
 
   build-executable:
-    runs-on: ubuntu-latest
     permissions:
       contents: write
     strategy:
       matrix:
         target: [osx-arm64, osx-x64, linux-x64, linux-arm64, win-x64]
+        include:
+          - target: osx-arm64
+            os: macos-latest
+          - target: osx-x64
+            os: macos-15-intel
+          - target: linux-x64
+            os: ubuntu-latest
+          - target: linux-arm64
+            os: ubuntu-24.04-arm
+          - target: win-x64
+            os: windows-latest
+    runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v6
         with:
@@ -51,7 +61,7 @@ jobs:
         run: dotnet restore
 
       - name: Create ${{ matrix.target }} Package
-        run: dotnet publish -r ${{ matrix.target }} --self-contained true -p:PublishSingleFile=true -p:IncludeNativeLibrariesForSelfExtract=true -p:DebugType=None -p:IncludeAllContentForSelfExtract=true -p:PublicRelease=true UndercutF1.Console/UndercutF1.Console.csproj -o ${{ matrix.target }}-output
+        run: dotnet publish -r ${{ matrix.target }} -p:IncludeNativeLibrariesForSelfExtract=true -p:DebugType=None -p:IncludeAllContentForSelfExtract=true -p:PublicRelease=true UndercutF1.Console/UndercutF1.Console.csproj -o ${{ matrix.target }}-output
 
       - name: Download codesign certificate
         if: ${{ contains(matrix.target, 'osx') && github.event_name == 'release' }}

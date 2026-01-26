@@ -25,7 +25,7 @@ public static partial class CommandHandler
             AnsiConsole.WriteLine();
             AnsiConsole.MarkupLine(
                 $"""
-                An access token is already configured in [bold]{Options.ConfigFilePath}[/].
+                An access token is already configured in [bold]{ConsoleOptions.ConfigFilePath}[/].
                 [dim]{existingPayload}[/]
                 This token will expire on [bold]{existingPayload.Expiry:yyyy-MM-dd}[/], at which point you'll need to login again.
                 If you'd like to log in again, please first logout using [bold]undercutf1 logout[/].
@@ -45,7 +45,7 @@ public static partial class CommandHandler
 
             Additionally, logging in is [bold]NOT[/] required for the above features if you import data for already completed sessions, as all data feeds are available after a session is complete.
 
-            Once logged in, your access token will be stored in [bold]{Options.ConfigFilePath}[/]. Your actual account credentials will not be stored anywhere.
+            Once logged in, your access token will be stored in [bold]{ConsoleOptions.ConfigFilePath}[/]. Your actual account credentials will not be stored anywhere.
             Simply remove the token entry from this file, or run [bold]undercutf1 logout[/] to remove usage of your token.
             """;
 
@@ -91,7 +91,7 @@ public static partial class CommandHandler
         {
             AnsiConsole.MarkupLine(
                 $"""
-                [green]Login Successful.[/] Your access token has been saved in [bold]{Options.ConfigFilePath}[/].
+                [green]Login Successful.[/] Your access token has been saved in [bold]{ConsoleOptions.ConfigFilePath}[/].
                 This token will expire on [bold]{payload.Expiry:yyyy-MM-dd}[/], at which point you'll need to login again.
                 """
             );
@@ -102,7 +102,7 @@ public static partial class CommandHandler
     {
         AnsiConsole.MarkupLine(
             $"""
-            Logging out will remove your access token stored in [bold]{Options.ConfigFilePath}[/].
+            Logging out will remove your access token stored in [bold]{ConsoleOptions.ConfigFilePath}[/].
             To log back in again in the future, simply run [bold]undercutf1 login[/].
             """
         );

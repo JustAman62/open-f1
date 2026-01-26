@@ -12,6 +12,10 @@ namespace UndercutF1.CodeGenerator;
 /// </summary>
 public sealed class JsonSchemaGenerator
 {
+    private static readonly JsonSerializerOptions _serializerOptions = new(
+        JsonSerializerDefaults.Web
+    );
+
     /// <summary>
     /// Generates JSON Schema files for UndercutF1 configuration
     /// </summary>
@@ -33,17 +37,14 @@ public sealed class JsonSchemaGenerator
         config.RegisterXmlCommentFile<LiveTimingOptions>(
             Path.Join(repositoryRoot, "UndercutF1.Data/bin/Debug/net9.0/UndercutF1.Data.xml")
         );
-        config.RegisterXmlCommentFile<Options>(
+        config.RegisterXmlCommentFile<ConsoleOptions>(
             Path.Join(repositoryRoot, "UndercutF1.Console/bin/Debug/net9.0/undercutf1.xml")
         );
 
         var schemaBuilder = new JsonSchemaBuilder();
-        var schema = schemaBuilder.FromType<Options>(config).Build();
+        var schema = schemaBuilder.FromType<ConsoleOptions>(config).Build();
 
-        var schemaString = JsonSerializer.Serialize(
-            schema.ToJsonDocument(),
-            Constants.JsonSerializerOptions
-        );
+        var schemaString = JsonSerializer.Serialize(schema.ToJsonDocument(), _serializerOptions);
 
         var outputPath = Path.Join(repositoryRoot, "config.schema.json");
         outputPath = Path.GetFullPath(outputPath);

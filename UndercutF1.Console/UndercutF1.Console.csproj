@@ -11,6 +11,10 @@
     <GenerateRuntimeConfigurationFiles>true</GenerateRuntimeConfigurationFiles>
     <InvariantGlobalization>true</InvariantGlobalization>
     <EnableCompressionInSingleFile>true</EnableCompressionInSingleFile>
+    <SelfContained>true</SelfContained>
+    <PublishSingleFile>true</PublishSingleFile>
+    <IsAotCompatible>true</IsAotCompatible>
+    <PublishTrimmed>true</PublishTrimmed>
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="HarfBuzzSharp.NativeAssets.Linux" />
@@ -22,7 +26,7 @@
     <PackageReference Include="Serilog" />
     <PackageReference Include="Serilog.AspNetCore" />
     <PackageReference Include="Serilog.Sinks.File" />
-    <PackageReference Include="SharpWebview" />
+    <PackageReference Include="SharpWebview.Aot" />
     <PackageReference Include="SkiaSharp" />
     <PackageReference Include="SkiaSharp.NativeAssets.Linux.NoDependencies" />
     <PackageReference Include="SkiaSharp.NativeAssets.macOS" />
@@ -35,6 +39,12 @@
     <PackageReference Include="Vezel.Cathode.Extensions" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference
+      Include="../gen/UndercutF1.Console.SourceGeneration/UndercutF1.Console.SourceGeneration.csproj"
+      OutputItemType="Analyzer"
+      ReferenceOutputAssembly="false"
+      PrivateAssets="all"
+    />
     <ProjectReference Include="..\UndercutF1.Data\UndercutF1.Data.csproj" />
   </ItemGroup>
   <ItemGroup>

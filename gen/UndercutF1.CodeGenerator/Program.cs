@@ -1,4 +1,4 @@
-﻿using UndercutF1.CodeGenerator;
+using UndercutF1.CodeGenerator;
 
 await Terminal.OutLineAsync("Running JSON Schema Generator");
 

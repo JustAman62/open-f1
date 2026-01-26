@@ -26,7 +26,7 @@ public class JsonTimingClient(
                 .ConfigureAwait(false);
             var sessionInfo = JsonNode
                 .Parse(subscriptionData)
-                ?["SessionInfo"]?.Deserialize<SessionInfoDataPoint>();
+                ?["SessionInfo"]?.Deserialize(TimingDataSerializerContext.Raw.SessionInfoDataPoint);
 
             var dateString = sessionInfo!.Path!.Split('/')[1].Split('_')[0];
 
@@ -137,14 +137,14 @@ public class JsonTimingClient(
         // Try to start at the session start, if available. Otherwise, start at the first heartbeat.
         var sessionInfo = JsonNode
             .Parse(subscriptionData ?? string.Empty)
-            ?["SessionInfo"]?.Deserialize<SessionInfoDataPoint>();
+            ?["SessionInfo"]?.Deserialize(TimingDataSerializerContext.Raw.SessionInfoDataPoint);
 
         var sessionStart =
             sessionInfo?.GetStartDateTimeUtc().GetValueOrDefault() ?? DateTime.MinValue;
 
         var heartbeat = JsonNode
             .Parse(subscriptionData ?? string.Empty)
-            ?["Heartbeat"]?.Deserialize<HeartbeatDataPoint>();
+            ?["Heartbeat"]?.Deserialize(TimingDataSerializerContext.Raw.HeartbeatDataPoint);
         var firstHeartbeatDateTime = heartbeat?.Utc.DateTime ?? DateTime.MinValue;
 
         var delay =
@@ -178,7 +178,7 @@ public class JsonTimingClient(
         }
         else
         {
-            var parts = json.Deserialize<RawTimingDataPoint>();
+            var parts = json.Deserialize(TimingDataSerializerContext.Raw.RawTimingDataPoint);
             return (parts.Type, parts.Json.ToString(), parts.DateTime);
         }
     }

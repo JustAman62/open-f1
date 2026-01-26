@@ -2,7 +2,6 @@ using System.CommandLine;
 using InMemLogger;
 using Serilog;
 using Serilog.Events;
-using TextCopy;
 using UndercutF1.Console.ExternalPlayerSync;
 using UndercutF1.Console.Graphics;
 using UndercutF1.Data;
@@ -216,49 +215,56 @@ public static partial class CommandHandler
         var commandLineOpts = new Dictionary<string, string?>();
         if (isVerbose is not null)
         {
-            commandLineOpts.Add(nameof(Options.Verbose), isVerbose.ToString());
+            commandLineOpts.Add(nameof(ConsoleOptions.Verbose), isVerbose.ToString());
         }
         if (isApiEnabled is not null)
         {
-            commandLineOpts.Add(nameof(Options.ApiEnabled), isApiEnabled.ToString());
+            commandLineOpts.Add(nameof(ConsoleOptions.ApiEnabled), isApiEnabled.ToString());
         }
         if (dataDirectory is not null)
         {
-            commandLineOpts.Add(nameof(Options.DataDirectory), dataDirectory?.FullName);
+            commandLineOpts.Add(nameof(ConsoleOptions.DataDirectory), dataDirectory?.FullName);
         }
         if (logDirectory is not null)
         {
-            commandLineOpts.Add(nameof(Options.LogDirectory), logDirectory?.FullName);
+            commandLineOpts.Add(nameof(ConsoleOptions.LogDirectory), logDirectory?.FullName);
         }
         if (notifyEnabled is not null)
         {
-            commandLineOpts.Add(nameof(Options.Notify), notifyEnabled.ToString());
+            commandLineOpts.Add(nameof(ConsoleOptions.Notify), notifyEnabled.ToString());
         }
         if (preferFfmpeg is not null)
         {
-            commandLineOpts.Add(nameof(Options.PreferFfmpegPlayback), preferFfmpeg.ToString());
+            commandLineOpts.Add(
+                nameof(ConsoleOptions.PreferFfmpegPlayback),
+                preferFfmpeg.ToString()
+            );
         }
         if (preventDisplaySleep is not null)
         {
             commandLineOpts.Add(
-                nameof(Options.PreventDisplaySleep),
+                nameof(ConsoleOptions.PreventDisplaySleep),
                 preventDisplaySleep.ToString()
             );
         }
         if (forceGraphicsProtocol is not null)
         {
             commandLineOpts.Add(
-                nameof(Options.ForceGraphicsProtocol),
+                nameof(ConsoleOptions.ForceGraphicsProtocol),
                 forceGraphicsProtocol.ToString()
             );
         }
 
         _ = builder
-            .Configuration.AddJsonFile(Options.ConfigFilePath, optional: true, reloadOnChange: true)
+            .Configuration.AddJsonFile(
+                ConsoleOptions.ConfigFilePath,
+                optional: true,
+                reloadOnChange: true
+            )
             .AddEnvironmentVariables("UNDERCUTF1_")
             .AddInMemoryCollection(commandLineOpts);
 
-        var options = builder.Configuration.Get<Options>() ?? new();
+        var options = builder.Configuration.Get<ConsoleOptions>() ?? new();
 
         var (inMemoryLogLevel, fileLogLevel) = options.Verbose
             ? (LogLevel.Trace, LogEventLevel.Verbose)
@@ -300,11 +306,10 @@ public static partial class CommandHandler
                         .AddSerilog();
                 }
             })
-            .Configure<Options>(builder.Configuration)
+            .Configure<ConsoleOptions>(builder.Configuration)
             .AddLiveTiming(builder.Configuration)
             .AddSingleton<WebSocketSynchroniser>()
-            .AddSingleton<AccountLogin>()
-            .InjectClipboard();
+            .AddSingleton<AccountLogin>();
 
         builder.WebHost.UseServer(new NullServer());
 
@@ -315,7 +320,7 @@ public static partial class CommandHandler
     {
         try
         {
-            if (File.Exists(Options.ConfigFilePath))
+            if (File.Exists(ConsoleOptions.ConfigFilePath))
             {
                 return;
             }
@@ -329,17 +334,17 @@ public static partial class CommandHandler
 
             logger.LogInformation(
                 "Writing default configuration file to {Path}",
-                Options.ConfigFilePath
+                ConsoleOptions.ConfigFilePath
             );
-            Directory.CreateDirectory(Directory.GetParent(Options.ConfigFilePath)!.FullName);
-            await File.WriteAllTextAsync(Options.ConfigFilePath, defaultConfigFile);
+            Directory.CreateDirectory(Directory.GetParent(ConsoleOptions.ConfigFilePath)!.FullName);
+            await File.WriteAllTextAsync(ConsoleOptions.ConfigFilePath, defaultConfigFile);
         }
         catch (Exception ex)
         {
             logger.LogError(
                 ex,
                 "Failed to write default configuration file to {Path}",
-                Options.ConfigFilePath
+                ConsoleOptions.ConfigFilePath
             );
         }
     }

@@ -1,20 +1,17 @@
-using AutoMapper;
-
 namespace UndercutF1.Data;
 
-public class HeartbeatProcessor(IMapper mapper) : ProcessorBase<HeartbeatDataPoint>(mapper);
+public class HeartbeatProcessor() : ProcessorBase<HeartbeatDataPoint>();
 
-public class LapCountProcessor(IMapper mapper) : ProcessorBase<LapCountDataPoint>(mapper);
+public class LapCountProcessor() : ProcessorBase<LapCountDataPoint>();
 
-public class TimingAppDataProcessor(IMapper mapper) : ProcessorBase<TimingAppDataPoint>(mapper);
+public class TimingAppDataProcessor() : ProcessorBase<TimingAppDataPoint>();
 
-public class TrackStatusProcessor(IMapper mapper) : ProcessorBase<TrackStatusDataPoint>(mapper);
+public class TrackStatusProcessor() : ProcessorBase<TrackStatusDataPoint>();
 
-public class WeatherProcessor(IMapper mapper) : ProcessorBase<WeatherDataPoint>(mapper);
+public class WeatherProcessor() : ProcessorBase<WeatherDataPoint>();
 
-public class ChampionshipPredictionProcessor(IMapper mapper)
-    : ProcessorBase<ChampionshipPredictionDataPoint>(mapper);
+public class ChampionshipPredictionProcessor() : ProcessorBase<ChampionshipPredictionDataPoint>();
 
-public class TimingStatsProcessor(IMapper mapper) : ProcessorBase<TimingStatsDataPoint>(mapper);
+public class TimingStatsProcessor() : ProcessorBase<TimingStatsDataPoint>();
 
-public class PitStopSeriesProcessor(IMapper mapper) : ProcessorBase<PitStopSeriesDataPoint>(mapper);
+public class PitStopSeriesProcessor() : ProcessorBase<PitStopSeriesDataPoint>();

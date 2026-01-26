@@ -19,14 +19,15 @@ namespace UndercutF1.Data;
 /// }
 /// </c>
 /// </summary>
-public sealed class TeamRadioDataPoint : ILiveTimingDataPoint
+[Mergeable]
+public sealed partial record TeamRadioDataPoint : ILiveTimingDataPoint
 {
     /// <inheritdoc />
     public LiveTimingDataType LiveTimingDataType => LiveTimingDataType.TeamRadio;
 
     public Dictionary<string, Capture> Captures { get; set; } = new();
 
-    public sealed record Capture
+    public sealed partial record Capture
     {
         public DateTimeOffset? Utc { get; set; }
         public string? RacingNumber { get; set; }

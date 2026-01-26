@@ -1,4 +1,4 @@
-﻿using System.Text.Json;
+using System.Text.Json;
 using System.Text.Json.Nodes;
 using Microsoft.AspNetCore.SignalR.Client;
 using Microsoft.Extensions.DependencyInjection;
@@ -12,9 +12,10 @@ public sealed class LiveTimingClient : ILiveTimingClient, IDisposable
     private bool _disposedValue;
     private string _sessionKey = "UnknownSession";
 
-    private readonly JsonSerializerOptions _prettyJsonOptions = new(JsonSerializerOptions.Default)
+    private readonly JsonSerializerOptions _prettyJsonOptions = new(JsonSerializerDefaults.Web)
     {
         WriteIndented = true,
+        TypeInfoResolver = TimingDataSerializerContext.Default,
     };
 
     private static readonly string[] _topics =
@@ -98,7 +99,9 @@ public sealed class LiveTimingClient : ILiveTimingClient, IDisposable
             .ConfigureLogging(configure =>
                 configure.AddProvider(_loggerProvider).SetMinimumLevel(LogLevel.Information)
             )
-            .AddJsonProtocol()
+            .AddJsonProtocol(opts =>
+                opts.PayloadSerializerOptions.TypeInfoResolver = TimingDataSerializerContext.Default
+            )
             .Build();
 
         Connection.On<string, JsonNode, DateTimeOffset>("feed", HandleData);
@@ -157,7 +160,10 @@ public sealed class LiveTimingClient : ILiveTimingClient, IDisposable
         {
             File.AppendAllText(
                 Path.Join(_options.CurrentValue.DataDirectory, $"{_sessionKey}/live.jsonl"),
-                JsonSerializer.Serialize(raw) + Environment.NewLine
+                JsonSerializer.Serialize(
+                    raw,
+                    TimingDataSerializerContext.Default.RawTimingDataPoint
+                ) + Environment.NewLine
             );
 
             // TODO: converting `json` to a string shouldn't be needed here, we need to change the signature in TimingService

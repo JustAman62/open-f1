@@ -18,10 +18,7 @@ public sealed class DebugDataDisplay(IEnumerable<IProcessor> processors, State s
             );
         var processorName = processor.GetType().Name;
 
-        var latestDataPoint = processor
-            .GetType()
-            .GetProperty(nameof(IProcessor<TimingDataPoint>.Latest))
-            ?.GetValue(processor);
+        var latestDataPoint = processor.GetLatestData();
         if (latestDataPoint is null)
             return Task.FromResult<IRenderable>(
                 new Text($"Latest datapoint for {processorName} is null")
@@ -29,7 +26,12 @@ public sealed class DebugDataDisplay(IEnumerable<IProcessor> processors, State s
 
         var rows = new Rows(
             new Text($"Name: {processorName}"),
-            new Text(JsonSerializer.Serialize(latestDataPoint, Constants.JsonSerializerOptions))
+            new Text(
+                JsonSerializer.Serialize(
+                    latestDataPoint,
+                    TimingDataSerializerContext.Pretty.GetTypeInfo(latestDataPoint.GetType())!
+                )
+            )
         );
 
         return Task.FromResult<IRenderable>(rows);

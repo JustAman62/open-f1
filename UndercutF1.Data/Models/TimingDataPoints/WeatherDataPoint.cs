@@ -3,7 +3,8 @@ namespace UndercutF1.Data;
 /// <summary>
 /// Sample: { "AirTemp": "25.6", "Humidity": "62.0", "Pressure": "1013.1", "Rainfall": "0", "TrackTemp": "31.2", "WindDirection": "7", "WindSpeed": "1.2" }
 /// </summary>
-public sealed record WeatherDataPoint : ILiveTimingDataPoint
+[Mergeable]
+public sealed partial record WeatherDataPoint : ILiveTimingDataPoint
 {
     /// <inheritdoc />
     public LiveTimingDataType LiveTimingDataType => LiveTimingDataType.WeatherData;

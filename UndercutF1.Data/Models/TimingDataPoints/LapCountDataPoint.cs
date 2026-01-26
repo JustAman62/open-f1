@@ -3,7 +3,8 @@ namespace UndercutF1.Data;
 /// <summary>
 /// Sample: { "CurrentLap": 3, "TotalLaps": 71, "_kf": true }
 /// </summary>
-public sealed class LapCountDataPoint : ILiveTimingDataPoint
+[Mergeable]
+public sealed partial record LapCountDataPoint : ILiveTimingDataPoint
 {
     /// <inheritdoc />
     public LiveTimingDataType LiveTimingDataType => LiveTimingDataType.LapCount;

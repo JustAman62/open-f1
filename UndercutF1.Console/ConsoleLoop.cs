@@ -15,7 +15,7 @@ public class ConsoleLoop(
     IEnumerable<IInputHandler> inputHandlers,
     IHostApplicationLifetime hostApplicationLifetime,
     TerminalInfoProvider terminalInfo,
-    IOptions<Options> options,
+    IOptions<ConsoleOptions> options,
     ILogger<ConsoleLoop> logger
 ) : BackgroundService
 {
@@ -176,7 +176,7 @@ public class ConsoleLoop(
         {
             logger.LogInformation(
                 "{OptionName} is enabled, attempting to prevent device sleep",
-                nameof(Options.PreventDisplaySleep)
+                nameof(ConsoleOptions.PreventDisplaySleep)
             );
             _sleepInhibitor ??= new("undercutf1");
             _sleepInhibitor.InhibitSleep();
@@ -194,7 +194,7 @@ public class ConsoleLoop(
             var exceptionPanel = new Panel(
                 new Rows(
                     new Text($"Failed to render screen {state.CurrentScreen}"),
-                    exception.GetRenderable()
+                    new Text(exception.ToString())
                 )
             )
             {
