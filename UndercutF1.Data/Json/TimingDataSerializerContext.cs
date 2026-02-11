@@ -100,7 +100,7 @@ public partial class TimingDataSerializerContext : JsonSerializerContext
                 {
                     UnmappedMemberHandling = JsonUnmappedMemberHandling.Skip,
                     AllowTrailingCommas = true,
-                    WriteIndented = true,
+                    WriteIndented = false,
                     Converters = { new StringToBoolConverter() },
                 }
             )
