@@ -61,7 +61,6 @@ public static class DisplayUtils
     public static Style GetStyle(
         TimingDataPoint.Driver.Interval? interval,
         bool isComparisonLine,
-        CarDataPoint.Entry.Car? car = null,
         Decoration decoration = Decoration.None
     )
     {
@@ -82,11 +81,6 @@ public static class DisplayUtils
             foreground = Color.Green3;
         }
 
-        if (car is { Channels: { Drs: > 8 } })
-        {
-            foreground = Color.White;
-            background = Color.Green3;
-        }
         return new Style(foreground: foreground, background: background, decoration: decoration);
     }
 

@@ -138,10 +138,8 @@ public class TimingTowerDisplay(
                 position.Status == PositionDataPoint.PositionData.Entry.DriverStatus.OffTrack
                     ? new Text("OFF TRK", new Style(background: Color.Red, foreground: Color.White))
                     : new Text(
-                        $"{(car?.Channels.Drs >= 8 ? "•" : "")}{line.IntervalToPositionAhead?.Value}".ToFixedWidth(
-                            8
-                        ),
-                        DisplayUtils.GetStyle(line.IntervalToPositionAhead, isComparisonLine, car)
+                        $"{line.IntervalToPositionAhead?.Value}".ToFixedWidth(8),
+                        DisplayUtils.GetStyle(line.IntervalToPositionAhead, isComparisonLine)
                     ),
                 new Text(
                     line.BestLapTime?.Value ?? "NULL",
