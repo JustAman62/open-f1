@@ -225,15 +225,8 @@ public class DriverTrackerDisplay : IDisplay
                             decoration
                         )
                         : new Text(
-                            $"{(car?.Channels.Drs >= 8 ? "•" : "")}{line.IntervalToPositionAhead?.Value}".ToFixedWidth(
-                                7
-                            ),
-                            DisplayUtils.GetStyle(
-                                line.IntervalToPositionAhead,
-                                false,
-                                car,
-                                decoration
-                            )
+                            $"{line.IntervalToPositionAhead?.Value}".ToFixedWidth(7),
+                            DisplayUtils.GetStyle(line.IntervalToPositionAhead, false, decoration)
                         )
                 );
             }

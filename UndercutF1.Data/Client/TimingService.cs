@@ -259,7 +259,7 @@ public class TimingService(
         try
         {
             // Remove the _kf property, it's not needed and breaks deserialization
-            json["_kf"] = null;
+            json.AsObject().Remove("_kf");
 
             var model = json.Deserialize(TimingDataSerializerContext.Raw.GetTypeInfo<T>())!;
             processors
