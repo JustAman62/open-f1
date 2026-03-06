@@ -108,6 +108,8 @@ jobs:
         with:
           dotnet-version: 10.0.x
 
+      - run: dotnet tool restore
+
       - uses: dotnet/nbgv@master
         id: nbgv
 

@@ -5,28 +5,28 @@
     <PackageVersion Include="HarfBuzzSharp.NativeAssets.Linux" Version="8.3.1.2" />
     <PackageVersion Include="InhibitSleep.Net" Version="0.1.11" />
     <PackageVersion Include="InMemoryLogger" Version="1.0.66" />
-    <PackageVersion Include="JsonSchema.Net" Version="8.0.5" />
-    <PackageVersion Include="JsonSchema.Net.Generation" Version="6.0.0" />
+    <PackageVersion Include="JsonSchema.Net" Version="9.0.0" />
+    <PackageVersion Include="JsonSchema.Net.Generation" Version="7.0.0" />
     <PackageVersion Include="LiveChartsCore" Version="2.0.0-rc6.1" />
     <PackageVersion Include="LiveChartsCore.SkiaSharpView" Version="2.0.0-rc6.1" />
-    <PackageVersion Include="Microsoft.AspNetCore.OpenApi" Version="10.0.1" />
-    <PackageVersion Include="Microsoft.AspNetCore.SignalR.Client" Version="10.0.1" />
+    <PackageVersion Include="Microsoft.AspNetCore.OpenApi" Version="10.0.2" />
+    <PackageVersion Include="Microsoft.AspNetCore.SignalR.Client" Version="10.0.2" />
     <PackageVersion Include="Microsoft.CodeAnalysis.Analyzers" Version="3.11.0">
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       <PrivateAssets>all</PrivateAssets>
     </PackageVersion>
     <PackageVersion Include="Microsoft.CodeAnalysis.CSharp" Version="5.0.0" />
-    <PackageVersion Include="Microsoft.Extensions.Configuration" Version="10.0.1" />
-    <PackageVersion Include="Microsoft.Extensions.DependencyInjection" Version="10.0.1" />
-    <PackageVersion Include="Microsoft.Extensions.Hosting" Version="10.0.1" />
-    <PackageVersion Include="Microsoft.Extensions.Http" Version="10.0.1" />
-    <PackageVersion Include="Microsoft.Extensions.Logging" Version="10.0.1" />
-    <PackageVersion Include="Microsoft.Extensions.Logging.Console" Version="10.0.1" />
+    <PackageVersion Include="Microsoft.Extensions.Configuration" Version="10.0.2" />
+    <PackageVersion Include="Microsoft.Extensions.DependencyInjection" Version="10.0.2" />
+    <PackageVersion Include="Microsoft.Extensions.Hosting" Version="10.0.2" />
+    <PackageVersion Include="Microsoft.Extensions.Http" Version="10.0.2" />
+    <PackageVersion Include="Microsoft.Extensions.Logging" Version="10.0.2" />
+    <PackageVersion Include="Microsoft.Extensions.Logging.Console" Version="10.0.2" />
     <PackageVersion
       Include="Microsoft.Extensions.Options.ConfigurationExtensions"
-      Version="10.0.1"
+      Version="10.0.2"
     />
-    <PackageVersion Include="Microsoft.Extensions.Options" Version="10.0.1" />
+    <PackageVersion Include="Microsoft.Extensions.Options" Version="10.0.2" />
     <PackageVersion Include="Microsoft.NET.Test.Sdk" Version="18.0.1" />
     <PackageVersion Include="Nerdbank.GitVersioning" Version="3.9.50" />
     <PackageVersion Include="NSubstitute" Version="5.3.0" />
