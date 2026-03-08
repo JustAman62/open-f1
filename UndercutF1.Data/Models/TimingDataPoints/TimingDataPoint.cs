@@ -108,16 +108,63 @@ public sealed partial record TimingDataPoint : ILiveTimingDataPoint
             public int? Lap { get; set; }
         }
 
+        /// <summary>
+        /// A flags enum that represents the state of a drivers line on the timing tower, or a sector.
+        /// Some flags are only used for either the line or timing tower, others used for both.
+        /// </summary>
         [Flags]
         public enum StatusFlags
         {
+            /// <summary>
+            /// Personal best sector time (green). Only used for sector status.
+            /// </summary>
             PersonalBest = 1,
+
+            /// <summary>
+            /// Overall best sector time (purple). Only used for sector status.
+            /// </summary>
             OverallBest = 2,
+
+            /// <summary>
+            /// Driver has stopped somewhere on/off track. Usually the lead up to a retirement.
+            /// </summary>
+            OffTrack = 4,
+
+            /// <summary>
+            /// Unknown
+            /// </summary>
+            U8 = 8,
 
             /// <summary>
             /// Went through this mini sector in the pit lane
             /// </summary>
             PitLane = 16,
+
+            /// <summary>
+            /// Just recently exited the pit lane
+            /// </summary>
+            PitExit = 32,
+
+            /// <summary>
+            /// Might indicate "normal" in races? seems to be the most common/default status.
+            /// Only turned off when a driver has retired.
+            /// </summary>
+            U64 = 64,
+
+            /// <summary>
+            /// Unknown
+            /// </summary>
+            U128 = 128,
+
+            /// <summary>
+            /// Unknown
+            /// </summary>
+            U256 = 256,
+
+            /// <summary>
+            /// On the first lap out of the pits? Seems to be set for the duration of a lap after <see cref="PitExit"/>
+            /// </summary>
+            OutLap = 512,
 
             /// <summary>
             /// Set when the driver passes the chequered flag in quali or race sessions
@@ -128,6 +175,18 @@ public sealed partial record TimingDataPoint : ILiveTimingDataPoint
             /// Segment completed. If this is the only flag set, means a yellow segment.
             /// </summary>
             SegmentComplete = 2048,
+
+            /// <summary>
+            /// This driver has just recently overtaken another driver.
+            /// Usually an up arrow is displayed on TV whilst this status is set. Set for only a few seconds.
+            /// </summary>
+            Overtook = 4096,
+
+            /// <summary>
+            /// This driver has just been overtaken by another driver.
+            /// Usually a down arrow is displayed on TV whilst this status is set. Set for only a few seconds.
+            /// </summary>
+            Overtaken = 8192,
         }
     }
 }
