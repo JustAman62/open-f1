@@ -134,31 +134,37 @@ public sealed class DataImporter(
 
         var prefix = $"https://livetiming.formula1.com/static/{session.Path}";
 
-        var sessionDataPoint = await GetDataAsync(prefix, "SessionInfo", DateTimeOffset.UnixEpoch)
+        var sessionDataPoints = await GetDataAsync(prefix, "SessionInfo", DateTimeOffset.UnixEpoch)
             .ConfigureAwait(false);
-        var heartbeatDataPoint = await GetDataAsync(prefix, "Heartbeat", DateTimeOffset.UnixEpoch)
+        var heartbeatDataPoints = await GetDataAsync(prefix, "Heartbeat", DateTimeOffset.UnixEpoch)
             .ConfigureAwait(false);
 
-        if (heartbeatDataPoint.First().Json["Utc"] is null)
+        if (heartbeatDataPoints.First().Json["Utc"] is null)
         {
             throw new InvalidOperationException(
                 "Unable to find the first heartbeat data point for the session"
             );
         }
 
+        // We want to use the first heartbeat to work out the correct offset below
+        // However, in some seasons multiple heartbeats are received with an identical offset, but different timestamps
+        // The correct timestamp to use here is the last one with the same offset as the first one.
+        var firstHeartbeat = heartbeatDataPoints.First();
+        firstHeartbeat = heartbeatDataPoints.Last(x => x.DateTime == firstHeartbeat.DateTime);
+
         // Records returned by the API don't have a timestamp, instead they have an offset from the very first datapoint sent
         // We need to calculate when that first data point was
         // The heartbeat data point includes the Utc timestamp from when the message was sent,
-        // So use that timestamp, and take away the offset from when that message was received
+        // So use that timestamp, and take away the offset (DateTime) from when that message was received
         // To get the real start of the sessions data stream
-        var startDate = ((DateTimeOffset)heartbeatDataPoint.First().Json["Utc"]!).AddMilliseconds(
-            -heartbeatDataPoint.First().DateTime.ToUnixTimeMilliseconds()
-        );
+        var startDate = firstHeartbeat.Json["Utc"]!
+            .GetValue<DateTimeOffset>()
+            .AddMilliseconds(-firstHeartbeat.DateTime.ToUnixTimeMilliseconds());
 
         logger.LogInformation(
-            "Found start date {StartDate} with other {Other}",
+            "Found start date {StartDate} using offset {Offset}",
             startDate,
-            heartbeatDataPoint.First().DateTime
+            firstHeartbeat.DateTime
         );
 
         var topics = session.Type == "Race" ? _raceTopics : _nonRaceTopics;
@@ -182,8 +188,8 @@ public sealed class DataImporter(
         logger.LogInformation("Saving initial session data to {FilePath}", subscribeFilePath);
         var subscribeJson = new JsonObject
         {
-            ["SessionInfo"] = sessionDataPoint.First().Json,
-            ["Heartbeat"] = heartbeatDataPoint.First().Json,
+            ["SessionInfo"] = sessionDataPoints.First().Json,
+            ["Heartbeat"] = firstHeartbeat.Json,
         };
         await File.WriteAllTextAsync(subscribeFilePath, subscribeJson.ToString(), Encoding.UTF8)
             .ConfigureAwait(false);
