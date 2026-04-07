@@ -129,7 +129,7 @@ jobs:
 
       - name: Build and push
         if: ${{ github.event_name == 'release'}}
-        uses: docker/build-push-action@v6
+        uses: docker/build-push-action@v7
         with:
           context: .
           platforms: linux/amd64,linux/arm64
@@ -138,7 +138,7 @@ jobs:
 
       - name: Build and push
         if: ${{ github.event_name == 'pull_request' }}
-        uses: docker/build-push-action@v6
+        uses: docker/build-push-action@v7
         with:
           context: .
           platforms: linux/amd64,linux/arm64
