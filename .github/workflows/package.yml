@@ -11,6 +11,8 @@ jobs:
 
     permissions:
       contents: write
+      # GitHub OIDC token issuance for publishing the NuGet
+      id-token: write
 
     steps:
       - uses: actions/checkout@v6
@@ -25,9 +27,16 @@ jobs:
       - name: Pack
         # No point in having the NuGet tool be AOT, we know theres a dotnet runtime on the machine if they have the tool
         run: dotnet pack --no-restore /p:PublicRelease=true /p:PublishAot=false
+      
+      - name: NuGet login (OIDC → temp API key)
+        uses: NuGet/login@v1
+        id: login
+        with:
+          user: ${{ secrets.NUGET_USER }}
+
       - name: Push Packages
         if: ${{ github.event_name == 'release'}}
-        run: dotnet nuget push "**/*.nupkg" --source https://api.nuget.org/v3/index.json --api-key ${{ secrets.NUGET_API_KEY }} --skip-duplicate
+        run: dotnet nuget push "**/*.nupkg" --source https://api.nuget.org/v3/index.json --api-key ${{ steps.login.outputs.NUGET_API_KEY }} --skip-duplicate
 
   build-executable:
     permissions:
