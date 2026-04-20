@@ -7,7 +7,7 @@
     <PackageVersion Include="InMemoryLogger" Version="1.0.66" />
     <PackageVersion Include="JsonSchema.Net" Version="9.1.2" />
     <PackageVersion Include="JsonSchema.Net.Generation" Version="7.1.2" />
-    <PackageVersion Include="LiveChartsCore" Version="2.0.0-rc6.1" />
+    <PackageVersion Include="LiveChartsCore" Version="2.0.0" />
     <PackageVersion Include="LiveChartsCore.SkiaSharpView" Version="2.0.0-rc6.1" />
     <PackageVersion Include="Microsoft.AspNetCore.OpenApi" Version="10.0.3" />
     <PackageVersion Include="Microsoft.AspNetCore.SignalR.Client" Version="10.0.3" />
