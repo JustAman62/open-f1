@@ -58,6 +58,33 @@ public static class DisplayUtils
     public static string MarkedUpDriverNumber(DriverListDataPoint.Driver driver) =>
         $"[#{driver.TeamColour ?? "000000"} bold]{driver.RacingNumber, 2} {driver.Tla ?? "UNK"}[/]";
 
+    public static string MarkedUpTyreStint(
+        TimingAppDataPoint.Driver.Stint? stint,
+        int width,
+        bool displayFullAge
+    )
+    {
+        if (stint is null)
+        {
+            return string.Empty.ToFixedWidth(width);
+        }
+        var compoundIdentifier = stint.Compound?[0] ?? ' ';
+        var text = stint.New.GetValueOrDefault()
+            ? $"{compoundIdentifier}"
+            : $"[dim]{compoundIdentifier}[/]";
+
+        if (width > 1)
+        {
+            var stintDuration = displayFullAge
+                ? $"{stint.TotalLaps}"
+                : $"{stint.GetStintDuration()}";
+            text += stintDuration.ToFixedWidth(width - 1);
+        }
+
+        var style = GetStyleForTyreCompound(stint.Compound).ToMarkup();
+        return $"[{style}]{text}[/]";
+    }
+
     public static Style GetStyle(
         TimingDataPoint.Driver.Interval? interval,
         bool isComparisonLine,
