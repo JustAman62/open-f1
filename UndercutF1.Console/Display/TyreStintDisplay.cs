@@ -62,19 +62,14 @@ public class TyreStintDisplay(
 
             foreach (var (stintNumber, stint) in line.Stints.OrderBy(x => x.Key))
             {
-                var markup = DisplayUtils.GetStyleForTyreCompound(stint.Compound).ToMarkup();
                 var lapsOnThisTyre = stint.GetStintDuration();
-
-                var padLength = Math.Max(1, lapsOnThisTyre - 1);
-                var text = $"{lapsOnThisTyre}".ToFixedWidth(padLength);
-                if (lapsOnThisTyre <= 1)
-                {
-                    text = string.Empty;
-                }
-                lineTotalPadLength += text.Length + 1;
-
-                // Prepend the compound indicator, and wrap the whole line in markup to colour it
-                rowMarkup += $"[{markup}]{stint.Compound?[0] ?? ' '}{text}[/]";
+                var stintLength = Math.Max(1, lapsOnThisTyre);
+                lineTotalPadLength += stintLength;
+                rowMarkup += DisplayUtils.MarkedUpTyreStint(
+                    stint,
+                    stintLength,
+                    displayFullAge: false
+                );
             }
 
             if (totalLapCount > 0)

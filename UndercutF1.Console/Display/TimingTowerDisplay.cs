@@ -172,10 +172,7 @@ public class TimingTowerDisplay(
                             ? new Style(foreground: Color.Black, background: Color.Green)
                         : Style.Plain
                 ),
-                new Text(
-                    $"{stint?.Compound?[0]} {stint?.TotalLaps, 2}",
-                    DisplayUtils.GetStyle(stint)
-                ),
+                new Markup(DisplayUtils.MarkedUpTyreStint(stint, 4, displayFullAge: true)),
                 DisplayUtils.GetGapBetweenLines(
                     lines,
                     comparisonDataPoint.Key,
@@ -295,10 +292,7 @@ public class TimingTowerDisplay(
                         : line.PitOut.GetValueOrDefault() ? DisplayUtils.STYLE_PB
                         : Style.Plain
                 ),
-                new Text(
-                    $"{stint?.Compound?[0] ?? 'X'} {stint?.TotalLaps, 2}",
-                    DisplayUtils.GetStyle(stint)
-                )
+                new Markup(DisplayUtils.MarkedUpTyreStint(stint, 4, displayFullAge: true))
             );
         }
         return table;
