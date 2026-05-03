@@ -63,13 +63,16 @@ public class TimingHistoryDisplay(
     };
 
     private string[] _chartPanelControlSequence = [];
-    private string[] _previousSequence = [];
+    private string[] _previousChartPanelControlSequence = [];
+    private string[] _bottomChartPanelControlSequence = [];
+    private string[] _previousBottomChartPanelControlSequence = [];
 
     public Task<IRenderable> GetContentAsync()
     {
         var timingTower = GetTimingTower();
 
         _chartPanelControlSequence = GetChartPanel();
+        _bottomChartPanelControlSequence = GetBottomChartPanel();
 
         var layout = new Layout("Root").SplitRows(new Layout("Timing Tower", timingTower));
 
@@ -79,18 +82,38 @@ public class TimingHistoryDisplay(
     /// <inheritdoc />
     public async Task PostContentDrawAsync(bool shouldDraw)
     {
-        await Terminal.OutAsync(ControlSequences.MoveCursorTo(0, LEFT_OFFSET));
-
         // Only draw if we need to, or if the drawing has changed
-        var hasChanged = !_previousSequence.SequenceEqual(_chartPanelControlSequence);
-        if (shouldDraw || hasChanged)
+        var chartPanelChanged = !_previousChartPanelControlSequence.SequenceEqual(
+            _chartPanelControlSequence
+        );
+
+        if (shouldDraw || chartPanelChanged)
         {
+            await Terminal.OutAsync(ControlSequences.MoveCursorTo(0, LEFT_OFFSET));
             foreach (var sequence in _chartPanelControlSequence)
             {
                 await Terminal.OutAsync(sequence);
-                _previousSequence = _chartPanelControlSequence;
+                _previousChartPanelControlSequence = _chartPanelControlSequence;
             }
         }
+
+        var buttomPanelChanged = !_previousBottomChartPanelControlSequence.SequenceEqual(
+            _bottomChartPanelControlSequence
+        );
+        if (shouldDraw || buttomPanelChanged)
+        {
+            // Draw the bottom chart panel below the timing history tower
+            var numberDriverOnCurrentLap =
+                timingData.DriversByLap.GetValueOrDefault(state.CursorOffset + 1)?.Count ?? 0;
+            var topOffset = numberDriverOnCurrentLap + 1;
+            await Terminal.OutAsync(ControlSequences.MoveCursorTo(topOffset, 0));
+            foreach (var sequence in _bottomChartPanelControlSequence)
+            {
+                await Terminal.OutAsync(sequence);
+                _previousBottomChartPanelControlSequence = _bottomChartPanelControlSequence;
+            }
+        }
+        _previousBottomChartPanelControlSequence = _bottomChartPanelControlSequence;
     }
 
     private IRenderable GetTimingTower()
@@ -381,6 +404,113 @@ public class TimingHistoryDisplay(
         return surface.Snapshot().ToGraphicsSequence(terminalInfo, heightCells, widthCells);
     }
 
+    private string[] GetBottomChartPanel()
+    {
+        // Only use data from the last LAPS_IN_CHART laps
+        // Lap numbers are 1-indexed, cursor is 0-indexed, so offset by 1
+        var minLap = state.CursorOffset - LAPS_IN_CHART + 1;
+        var maxLap = state.CursorOffset + 1;
+
+        var averageLapSeriesData = driverList
+            .Latest.Where(x => x.Key != "_kf") // Data quirk, dictionaries include _kf which obviously isn't a driver
+            .ToDictionary(x => x.Key, _ => new List<ObservablePoint>());
+
+        foreach (
+            var (lap, lines) in timingData
+                .DriversByLap.OrderBy(x => x.Key)
+                .Where(x => x.Key >= minLap && x.Key <= maxLap)
+        )
+        {
+            // Only include selected drivers when coming up with the average lap time
+            var averageLapTime = lines
+                .Where(x => driverList.IsSelected(x.Key))
+                .Select(x => x.Value.LastLapTime.ToTimeSpan())
+                .Where(x => x.HasValue)
+                .DefaultIfEmpty(TimeSpan.Zero)
+                .Average(x => x!.Value.TotalMilliseconds);
+
+            foreach (var (driver, timingData) in lines)
+            {
+                var lapTime = timingData.LastLapTime.ToTimeSpan()?.TotalMilliseconds;
+                if (lapTime.HasValue)
+                {
+                    averageLapSeriesData[driver].Add(new(lap, lapTime.Value - averageLapTime));
+                }
+                else
+                {
+                    averageLapSeriesData[driver].Add(new(lap, null));
+                }
+            }
+        }
+
+        var averageLapSeries = averageLapSeriesData
+            .Select(x =>
+            {
+                var driver = driverList.Latest.GetValueOrDefault(x.Key) ?? new();
+                var colour = driver.TeamColour ?? "FFFFFF";
+                return new LineSeries<ObservablePoint?>(x.Value)
+                {
+                    Name = x.Key,
+                    Fill = new SolidColorPaint(SKColors.Transparent) { IsAntialias = false },
+                    GeometrySize = 4,
+                    GeometryStroke = new SolidColorPaint(SKColor.Parse(driver.TeamColour))
+                    {
+                        IsAntialias = false,
+                        StrokeThickness = 2,
+                    },
+                    GeometryFill = null,
+                    Stroke = new SolidColorPaint(SKColor.Parse(driver.TeamColour))
+                    {
+                        IsAntialias = false,
+                        StrokeThickness = 2,
+                    },
+                    IsVisible = driverList.IsSelected(x.Key),
+                    LineSmoothness = 0,
+                    // Add the drivers name next to the final data point, as a series label
+                    DataLabelsFormatter = p =>
+                        p.Index == x.Value.Count - 1 || x.Value[p.Index + 1].Y == null
+                            ? driver.Tla!
+                            : string.Empty,
+                    DataLabelsPosition = LiveChartsCore.Measure.DataLabelsPosition.Right,
+                    DataLabelsSize = 16,
+                    DataLabelsPaint = new SolidColorPaint(SKColor.Parse(driver.TeamColour))
+                    {
+                        IsAntialias = false,
+                    },
+                    DataPadding = new LvcPoint(1, 0),
+                };
+            })
+            .ToArray();
+
+        var widthCells = LEFT_OFFSET;
+        var numberDriverOnCurrentLap =
+            timingData.DriversByLap.GetValueOrDefault(maxLap)?.Count ?? 0;
+        var topOffset = numberDriverOnCurrentLap + 1;
+        var heightCells = Terminal.Size.Height - topOffset - BOTTOM_OFFSET;
+
+        var terminalHeightPixels = terminalInfo.TerminalSize.Value.Height;
+        var heightPerCell = terminalHeightPixels / Terminal.Size.Height;
+
+        var terminalWidthPixels = terminalInfo.TerminalSize.Value.Width;
+        var widthPerCell = terminalWidthPixels / Terminal.Size.Width;
+
+        var heightPixels = heightCells * heightPerCell;
+        var widthPixels = widthCells * widthPerCell;
+
+        var averageLapChart = CreateChart(
+            averageLapSeries,
+            "Delta to Average Lap Time",
+            heightPixels,
+            widthPixels,
+            labeler: v =>
+                v < 0
+                    ? TimeSpan.FromMilliseconds(v).ToString("\\-s\\.f")
+                    : TimeSpan.FromMilliseconds(v).ToString("s\\.f"),
+            yMinStep: 500
+        );
+        return averageLapChart.GetImage().ToGraphicsSequence(terminalInfo, heightCells, widthCells);
+    }
+
     private SKCartesianChart CreateChart(
         LineSeries<ObservablePoint?>[] series,
         string title,
@@ -422,6 +552,7 @@ public class TimingHistoryDisplay(
                 {
                     SeparatorsPaint = _lightGrayPaint,
                     LabelsPaint = _labelsPaint,
+                    ZeroPaint = _whitePaint,
                     MinLimit = axisMin,
                     MaxLimit = axisMax,
                     Labeler = labeler,
