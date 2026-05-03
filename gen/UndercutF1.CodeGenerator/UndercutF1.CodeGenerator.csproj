@@ -3,6 +3,7 @@
     <OutputType>Exe</OutputType>
     <IsPackable>false</IsPackable>
     <SelfContained>true</SelfContained>
+    <JsonSerializerIsReflectionEnabledByDefault>true</JsonSerializerIsReflectionEnabledByDefault>
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="../../UndercutF1.Console/UndercutF1.Console.csproj" />

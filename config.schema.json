@@ -1,5 +1,4 @@
 {
-  "description": "Options specific to the console app part of UndercutF1.",
   "type": "object",
   "properties": {
     "dataDirectory": {
@@ -23,22 +22,16 @@
         "string"
       ]
     },
-    "preferFfmpegPlayback": {
-      "type": "boolean",
-      "description": "Prefer to use FFmpeg (\u003Cc\u003Effplay\u003C/c\u003E) for audio playback (e.g. Team Radio) instead of more native options\nsuch as \u003Cc\u003Empg123\u003C/c\u003E or \u003Cc\u003Eafplay\u003C/c\u003E. FFmpeg is always used on Windows.\nDefaults to \u003Csee langword=\u0022false\u0022 /\u003E ."
-    },
     "forceGraphicsProtocol": {
       "enum": [
         "iTerm",
         "Kitty",
         "Sixel",
         null
-      ],
-      "description": "If provided, forces the app to output images using the given protocol.\nOtherwise, heuristics and queries will be used to determine if graphics are supported, and which protocol to use."
+      ]
     },
     "preventDisplaySleep": {
-      "type": "boolean",
-      "description": "Whwther the app should try to prevent the display from turning off/sleeping whilst running.\nThis is similar to running \u003Cc\u003Ecaffeinate -d undercutf1\u003C/c\u003E on macOS."
+      "type": "boolean"
     },
     "externalPlayerSync": {
       "description": "Options to configure the external player synchronisation service",
