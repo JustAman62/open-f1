@@ -1,10 +1,6 @@
 FROM mcr.microsoft.com/dotnet/aspnet:10.0 AS base
 WORKDIR /app
 
-# ffmpeg libgdiplus required for ffmpeg
-RUN apt-get update && apt-get install ffmpeg libgdiplus -y
-
-
 FROM --platform=$BUILDPLATFORM mcr.microsoft.com/dotnet/sdk:10.0-aot AS build
 WORKDIR /src
 COPY .git .git

@@ -11,7 +11,6 @@ public static partial class CommandHandler
         DirectoryInfo? logDirectory,
         bool? isVerbose,
         bool? notifyEnabled,
-        bool? preferFfmpeg,
         bool? preventDisplaySleep,
         GraphicsProtocol? forceGraphicsProtocol
     )
@@ -21,7 +20,6 @@ public static partial class CommandHandler
             logDirectory: logDirectory,
             isVerbose: isVerbose,
             notifyEnabled: notifyEnabled,
-            preferFfmpeg: preferFfmpeg,
             preventDisplaySleep: preventDisplaySleep,
             forceGraphicsProtocol: forceGraphicsProtocol
         );

@@ -34,11 +34,6 @@ public static partial class CommandHandler
             Description =
                 "Whether audible BELs are sent to your terminal when new race control messages are received",
         };
-        var preferFfmpegOption = new Option<bool?>("--prefer-ffmpeg")
-        {
-            Description =
-                "Prefer the usage of `ffplay` for playing Team Radio on Mac/Linux, instead of afplay/mpg123. `ffplay` is always used on Windows",
-        };
         var preventSleepOption = new Option<bool?>("--prevent-sleep")
         {
             Description =
@@ -56,7 +51,6 @@ public static partial class CommandHandler
             dataDirectoryOption,
             logDirectoryOption,
             notifyOption,
-            preferFfmpegOption,
             preventSleepOption,
             forceGraphicsProtocol,
         };
@@ -68,7 +62,6 @@ public static partial class CommandHandler
                 parseResult.GetValue(logDirectoryOption),
                 parseResult.GetValue(isVerboseOption),
                 parseResult.GetValue(notifyOption),
-                parseResult.GetValue(preferFfmpegOption),
                 parseResult.GetValue(preventSleepOption),
                 parseResult.GetValue(forceGraphicsProtocol)
             )
@@ -129,7 +122,6 @@ public static partial class CommandHandler
             logDirectoryOption,
             isVerboseOption,
             notifyOption,
-            preferFfmpegOption,
             preventSleepOption,
             forceGraphicsProtocol,
         };
@@ -139,7 +131,6 @@ public static partial class CommandHandler
                 res.GetValue(logDirectoryOption),
                 res.GetValue(isVerboseOption),
                 res.GetValue(notifyOption),
-                res.GetValue(preferFfmpegOption),
                 res.GetValue(preventSleepOption),
                 res.GetValue(forceGraphicsProtocol)
             )
@@ -204,7 +195,6 @@ public static partial class CommandHandler
         DirectoryInfo? logDirectory = null,
         bool? isVerbose = false,
         bool? notifyEnabled = null,
-        bool? preferFfmpeg = null,
         bool? preventDisplaySleep = null,
         GraphicsProtocol? forceGraphicsProtocol = null,
         bool useConsoleLogging = false
@@ -232,13 +222,6 @@ public static partial class CommandHandler
         if (notifyEnabled is not null)
         {
             commandLineOpts.Add(nameof(ConsoleOptions.Notify), notifyEnabled.ToString());
-        }
-        if (preferFfmpeg is not null)
-        {
-            commandLineOpts.Add(
-                nameof(ConsoleOptions.PreferFfmpegPlayback),
-                preferFfmpeg.ToString()
-            );
         }
         if (preventDisplaySleep is not null)
         {

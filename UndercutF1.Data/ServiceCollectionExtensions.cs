@@ -24,7 +24,6 @@ public static partial class ServiceCollectionExtensions
             .AddLiveTimingClient()
             .AddLiveTimingProcessors()
             .AddSingleton<INotifyService, NotifyService>()
-            .AddSingleton<ITranscriptionProvider, TranscriptionProvider>()
             .AddSingleton<Formula1Account>()
             .AddSingleton<IDataImporter, DataImporter>();
 
