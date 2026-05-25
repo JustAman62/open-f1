@@ -28,7 +28,7 @@ public sealed class SelectDriverDisplay(
         table
             .AddColumns(
                 new TableColumn("Drivers") { Width = 8 },
-                new TableColumn("Gap") { Width = 7, Alignment = Justify.Right },
+                new TableColumn("Gap") { Width = 8, Alignment = Justify.Right },
                 new TableColumn("Action  ") { Alignment = Justify.Right }
             )
             .NoBorder()
