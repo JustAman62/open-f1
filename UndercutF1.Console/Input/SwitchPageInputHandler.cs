@@ -10,6 +10,7 @@ public class SwitchPageInputHandler(TimingDataProcessor timingDataProcessor, Sta
     public Screen[] ApplicableScreens =>
         [
             Screen.RaceControl,
+            Screen.TeamRadio,
             Screen.DriverTracker,
             Screen.TimingTower,
             Screen.TimingHistory,
@@ -52,6 +53,7 @@ public class SwitchPageInputHandler(TimingDataProcessor timingDataProcessor, Sta
             case Screen.RaceControl:
             case Screen.DriverTracker:
             case Screen.ChampionshipStats:
+            case Screen.TeamRadio:
             case Screen.TyreStints:
                 state.CursorOffset = 0;
                 break;

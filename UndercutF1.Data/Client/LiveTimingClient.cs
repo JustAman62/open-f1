@@ -32,6 +32,7 @@ public sealed class LiveTimingClient : ILiveTimingClient, IDisposable
         "SessionData",
         "LapCount",
         "TimingData",
+        "TeamRadio",
         // Only available with subscription
         "CarData.z",
         "Position.z",

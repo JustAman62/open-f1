@@ -34,6 +34,7 @@ public class EscapeInputHandler(State state) : IInputHandler
         {
             Screen.Main => Screen.Shutdown,
             Screen.StartSimulatedSession => Screen.ManageSession,
+            Screen.DownloadTranscriptionModel => Screen.TeamRadio,
             Screen.SelectDriver => state.PreviousScreen,
             Screen.ManageAccount => state.PreviousScreen,
             _ => Screen.Main,

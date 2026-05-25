@@ -21,6 +21,13 @@ public sealed record ConsoleOptions : LiveTimingOptions
     public static string ConfigFilePath => GetConfigFilePath();
 
     /// <summary>
+    /// Prefer to use FFmpeg (<c>ffplay</c>) for audio playback (e.g. Team Radio) instead of more native options
+    /// such as <c>mpg123</c> or <c>afplay</c>. FFmpeg is always used on Windows.
+    /// Defaults to <see langword="false"/> .
+    /// </summary>
+    public bool PreferFfmpegPlayback { get; set; } = false;
+
+    /// <summary>
     /// If provided, forces the app to output images using the given protocol.
     /// Otherwise, heuristics and queries will be used to determine if graphics are supported, and which protocol to use.
     /// </summary>

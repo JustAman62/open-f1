@@ -1,6 +1,7 @@
 using System.Text.Json;
 using System.Text.Json.Serialization.Metadata;
 using UndercutF1.Console.Api;
+using UndercutF1.Console.Audio;
 using UndercutF1.Console.ExternalPlayerSync;
 using UndercutF1.Console.Graphics;
 using UndercutF1.Data;
@@ -15,6 +16,7 @@ public static partial class CommandHandler
         DirectoryInfo? logDirectory,
         bool? isVerbose,
         bool? notifyEnabled,
+        bool? preferFfmpeg,
         bool? preventDisplaySleep,
         GraphicsProtocol? forceGraphicsProtocol
     )
@@ -25,6 +27,7 @@ public static partial class CommandHandler
             logDirectory: logDirectory,
             isVerbose: isVerbose,
             notifyEnabled: notifyEnabled,
+            preferFfmpeg: preferFfmpeg,
             preventDisplaySleep: preventDisplaySleep,
             forceGraphicsProtocol: forceGraphicsProtocol
         );
@@ -36,6 +39,7 @@ public static partial class CommandHandler
             .AddDisplays()
             .AddSingleton<INotifyHandler, NotifyHandler>()
             .AddSingleton<TerminalInfoProvider>()
+            .AddSingleton<AudioPlayer>()
             .AddHostedService(sp => sp.GetRequiredService<ConsoleLoop>())
             .AddHostedService(sp => sp.GetRequiredService<WebSocketSynchroniser>());
 
@@ -85,6 +89,27 @@ public static partial class CommandHandler
                 Formula1AccessToken = options.Formula1AccessToken is null
                     ? "<missing>"
                     : "<present>",
+            }
+        );
+
+        Whisper.net.Logger.LogProvider.AddLogger(
+            (level, msg) =>
+            {
+                switch (level)
+                {
+                    case Whisper.net.Logger.WhisperLogLevel.Error:
+                        app.Logger.LogError("Whisper: {Message}", msg?.Trim('\n'));
+                        break;
+                    case Whisper.net.Logger.WhisperLogLevel.Warning:
+                        app.Logger.LogDebug("Whisper: {Message}", msg?.Trim('\n'));
+                        break;
+                    case Whisper.net.Logger.WhisperLogLevel.Debug:
+                        app.Logger.LogDebug("Whisper: {Message}", msg?.Trim('\n'));
+                        break;
+                    default:
+                        app.Logger.LogDebug("Whisper {Level}: {Message}", level, msg?.Trim('\n'));
+                        break;
+                }
             }
         );
 
