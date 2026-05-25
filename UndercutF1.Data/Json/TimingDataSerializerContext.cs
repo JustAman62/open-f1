@@ -46,6 +46,7 @@ namespace UndercutF1.Data;
 )]
 [JsonSerializable(typeof(RaceControlMessageDataPoint))]
 [JsonSerializable(typeof(SessionInfoDataPoint))]
+[JsonSerializable(typeof(TeamRadioDataPoint))]
 [JsonSerializable(typeof(TimingAppDataPoint))]
 [JsonSerializable(
     typeof(Dictionary<string, TimingAppDataPoint.Driver>),

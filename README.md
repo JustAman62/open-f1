@@ -53,6 +53,7 @@ Feature Highlights:
   - [Driver Tracker](#driver-tracker)
   - [Tyre Stint / Strategy](#tyre-stint--strategy)
   - [Using a Cursor to View Timing History by Lap](#using-a-cursor-to-view-timing-history-by-lap)
+  - [Listen to and Transcribe Team Radio](#listen-to-and-transcribe-team-radio)
 - [Getting Started with `undercutf1`](#getting-started-with-undercutf1)
   - [Installation](#installation)
     - [Prerequisites](#prerequisites)
@@ -60,6 +61,7 @@ Feature Highlights:
     - [Install from Homebrew](#install-from-homebrew)
     - [Install and run the standalone executable](#install-and-run-the-standalone-executable)
     - [Run using the docker image](#run-using-the-docker-image)
+      - [Known Issues with Docker](#known-issues-with-docker)
     - [Run directly from Source](#run-directly-from-source)
   - [Start Timing for a Live Session](#start-timing-for-a-live-session)
   - [Start Timing for a Pre-recorded Session](#start-timing-for-a-pre-recorded-session)
@@ -162,6 +164,14 @@ You can show/hide drivers here by using the <kbd>D</kbd> `Select Drivers` action
 
 ![Using a Cursor to View Timing History by Lap](docs/screenshots/timing-history-screen.png)
 
+### Listen to and Transcribe Team Radio
+
+Listen to team radio clips from anytime in the session, and use a local ML model (Whisper) to transcribe the audio on demand. Transcription accuracy is fairly low, depending on the that days audio quality and driver. Suggestions welcome for improving this!
+
+See [Prerequisites](#prerequisites) to ensure you are able to playback audio.
+
+![Listen to and Transcribe Team Radio](docs/screenshots/team-radio.png)
+
 ## Getting Started with `undercutf1`
 
 ### Installation
@@ -171,6 +181,15 @@ You can show/hide drivers here by using the <kbd>D</kbd> `Select Drivers` action
 UndercutF1 tries to statically link as many dependencies as possible to make installation and usage easy.
 There are however some utilities that may need to be installed for some functionality:
 
+- Team Radio audio playback uses platform-specific command-line executables to play audio files.
+  - On Linux, you need `mpg123` available on the `PATH`. For apt-based systems, you can install with `apt install mpg123`
+  - On Mac, you need `afplay` available on the `PATH`. This should be installed by default.
+  - On Windows, we only support audio playback via FFmpeg (`ffplay`) - see below for installation instructions.
+  - On Linux/Mac, you can use the [`preferFfmpegPlayback` configuration](#configuration) to use `ffplay` instead of `mpg123`/`afplay`
+- Team Radio transcription relies on FFmpeg and Whisper. Whisper models are downloaded on demand (after user confirmation) in the app. See the [FFmpeg download page](See <https://www.ffmpeg.org/download.html>) for details on how to install.
+  - On Linux apt-based systems, you can install with `apt install ffmpeg`
+  - On Mac with brew, you can install with `brew install ffmpeg`
+  - On Windows with WinGet, you can install with `winget install ffmpeg`
 - Terminal graphics rely on [SkiaSharp](https://github.com/mono/SkiaSharp). I've statically linked all the skia libs, so you shouldn't need to download skia. However, skia does rely on `libfontconfig` which may not be installed on your system by default.
   - On Linux apt-based systems, you can install with `apt install libfontconfig`
   - On Mac with brew, you can install with `brew install fontconfig`
@@ -237,6 +256,10 @@ docker run -it -e TERM_PROGRAM -v $HOME/undercut-f1/data:/data justaman62/underc
 # for example:
 docker run -it -v $HOME/undercut-f1/data:/data justaman62/undercutf1 import 2025
 ```
+
+##### Known Issues with Docker
+
+- Audio playback of Team Radio may not work when using Docker. This is due to difficulties in using audio devices in a cross-platform way, which I haven't managed to figure out yet.
 
 #### Run directly from Source
 
@@ -310,11 +333,12 @@ To view what configuration is currently being used, open the <kbd>I</kbd> `Info`
 
 | JSON Path                                     | Command Line                | Environment Variable                                      | Description                                                                                                                                                                                                                             |
 | --------------------------------------------- | --------------------------- | --------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `dataDirectory`                               | `--data-directory`          | `UNDERCUTF1_DATADIRECTORY`                                | The directory to which JSON timing data is read or written from.                                                                                                                                                                        |
+| `dataDirectory`                               | `--data-directory`          | `UNDERCUTF1_DATADIRECTORY`                                | The directory to which JSON timing data is read or written from. This directory is also where Whisper models will be stored (if downloaded) for team radio transcription.                                                               |
 | `logDirectory`                                | `--log-directory`           | `UNDERCUTF1_LOGDIRECTORY`                                 | The directory to which logs are written to.                                                                                                                                                                                             |
 | `verbose`                                     | `-v\|--verbose`             | `UNDERCUTF1_VERBOSE`                                      | Whether verbose logging should be enabled. Default: `false`. Values: `true` or `false`.                                                                                                                                                 |
 | `apiEnabled`                                  | `--with-api`                | `UNDERCUTF1_APIENABLED`                                   | Whether the app should expose an API at <http://localhost:61937>. Default: `false`. Values: `true` or `false`.                                                                                                                          |
 | `notify`                                      | `--notify`                  | `UNDERCUTF1_NOTIFY`                                       | Whether the app should sent audible BELs to your terminal when new race control messages are received. Default: `true`. Values: `true` or `false`.                                                                                      |
+| `preferFfmpegPlayback`                        | `--prefer-ffmpeg`           | `UNDERCUTF1_PREFERFFMPEGPLAYBACK`                         | Prefer the usage of `ffplay` for playing Team Radio on Mac/Linux, instead of afplay/mpg123 respectively. `ffplay` is always used on Windows. Default: `false`. Values: `true` or `false`.                                               |
 | `forceGraphicsProtocol`                       | `--force-graphics-protocol` | `UNDERCUTF1_FORCEGRAPHICSPROTOCOL`                        | Forces the usage of a particular graphics protocol instead of using heuristics to find a supported one. Values: `Kitty`, `Sixel`, or `iTerm`.                                                                                           |
 | `preventDisplaySleep`                         | `--prevent-sleep`           | `UNDERCUTF1_PREVENTDISPLAYSLEEP`                          | If enabled, will attempt to prevent the device/display from sleeping whilst the app is running. Intended to help prevent accidental stream disconnection due to inactivity on your device. Default: `false`. Values: `true` or `false`. |
 | `formula1AccessToken`                         | N/A                         | `UNDERCUTF1_FORMULA1ACCESSTOKEN`                          | The access token to use when connecting to the F1 Live Timing feed. Only required to see additional data feeds.                                                                                                                         |

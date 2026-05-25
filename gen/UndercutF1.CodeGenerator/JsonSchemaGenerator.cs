@@ -14,10 +14,7 @@ public sealed class JsonSchemaGenerator
 {
     private static readonly JsonSerializerOptions _serializerOptions = new(
         JsonSerializerDefaults.Web
-    )
-    {
-        WriteIndented = true,
-    };
+    );
 
     /// <summary>
     /// Generates JSON Schema files for UndercutF1 configuration
@@ -31,17 +28,17 @@ public sealed class JsonSchemaGenerator
         }
 
         repositoryRoot = Directory.GetParent(repositoryRoot)!.ToString();
-        repositoryRoot = Path.Join(repositoryRoot, "../../../../../..");
+        repositoryRoot = Path.Join(repositoryRoot, "../../../../..");
 
         var config = new SchemaGeneratorConfiguration()
         {
             PropertyNameResolver = PropertyNameResolvers.CamelCase,
         };
         config.RegisterXmlCommentFile<LiveTimingOptions>(
-            Path.Join(repositoryRoot, "UndercutF1.Data/bin/Debug/net10.0/UndercutF1.Data.xml")
+            Path.Join(repositoryRoot, "UndercutF1.Data/bin/Debug/net9.0/UndercutF1.Data.xml")
         );
         config.RegisterXmlCommentFile<ConsoleOptions>(
-            Path.Join(repositoryRoot, "UndercutF1.Console/bin/Debug/net10.0/undercutf1.xml")
+            Path.Join(repositoryRoot, "UndercutF1.Console/bin/Debug/net9.0/undercutf1.xml")
         );
 
         var schemaBuilder = new JsonSchemaBuilder();
