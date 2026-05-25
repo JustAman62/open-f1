@@ -15,5 +15,10 @@ public sealed partial record RaceControlMessageDataPoint : ILiveTimingDataPoint
     {
         public DateTimeOffset Utc { get; set; }
         public string? Message { get; set; }
+        public string? Category { get; set; }
+        public int? Lap { get; set; }
+        public string? Flag { get; set; }
+        public string? Scope { get; set; }
+        public string? RacingNumber { get; set; }
     }
 }
