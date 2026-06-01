@@ -2,7 +2,7 @@
 <Project>
   <ItemGroup>
     <PackageVersion Include="FFMpegCore" Version="5.4.0" />
-    <PackageVersion Include="HarfBuzzSharp.NativeAssets.Linux" Version="8.3.1.3" />
+    <PackageVersion Include="HarfBuzzSharp.NativeAssets.Linux" Version="8.3.1.5" />
     <PackageVersion Include="InhibitSleep.Net" Version="0.1.11" />
     <PackageVersion Include="InMemoryLogger" Version="1.0.66" />
     <PackageVersion Include="JsonSchema.Net" Version="9.1.2" />
