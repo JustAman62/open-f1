@@ -107,7 +107,7 @@ public class MainDisplay(
         var httpClient = httpClientFactory.CreateClient("Default");
         var res = await httpClient.GetFromJsonAsync(
             "https://api.github.com/repos/justaman62/undercut-f1/tags",
-            ConsoleSerializerContext.Default.GitHubTagEntryArray
+            ConsoleSerializerContext.Pretty.GitHubTagEntryArray
         );
         var tag = res?.FirstOrDefault()?.Name;
         logger.LogInformation("Latest tag from GitHub: {Tag}", tag);
