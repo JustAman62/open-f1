@@ -101,9 +101,8 @@ public class TrackPositionSmootherTests
     [Fact]
     public void SmoothsSpeedAcrossJitteryTimestamps()
     {
-        // Arrange: constant motion (+1000 units/sample) but samples arrive at irregular
-        // timestamps. Interpolating straight between two samples would pulse -- segment speed
-        // (1000/gap) swings from ~700 to ~2000 units/s -- whereas the line fit averages it out.
+        // Arrange: constant motion (+1000 units/sample) arriving at irregular timestamps. The line
+        // fit must recover a steady speed across the varying gaps.
         var clock = new FakeClock();
         var smoother = new TrackPositionSmoother(clock);
         double[] times = [0, 1.3, 1.8, 3.2, 3.9, 5.1];

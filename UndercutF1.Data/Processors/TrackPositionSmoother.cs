@@ -15,8 +15,8 @@ public sealed class TrackPositionSmoother(IDateTimeProvider dateTimeProvider)
     // the feed's typical update gap (~1s).
     private static readonly TimeSpan RenderDelay = TimeSpan.FromSeconds(1.5);
 
-    // If the render cursor falls this far behind (a long feed gap, then a burst), jump it forward
-    // rather than crawl back into sync.
+    // Largest lag the cursor tolerates before resyncing with a forward jump, e.g. after a long
+    // feed gap.
     private static readonly TimeSpan MaxLag = TimeSpan.FromSeconds(3);
 
     private const int SmoothingPoints = 7;

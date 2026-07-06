@@ -102,7 +102,7 @@ public class DriverTrackerDisplay : IDisplay
 
     public Screen Screen => Screen.DriverTracker;
 
-    // Redraw faster while smoothing is on so the positions animate; nothing to animate otherwise.
+    // Redraw faster while smoothing is on so the positions animate between updates.
     public TimeSpan FrameInterval =>
         _options.Value.EnablePositionSmoothing
             ? TimeSpan.FromMilliseconds(66)
@@ -466,9 +466,8 @@ public class DriverTrackerDisplay : IDisplay
         await Terminal.OutAsync(ControlSequences.MoveCursorTo(TOP_OFFSET, LEFT_OFFSET));
 
         var hasChanged = !_previousTrackMapControlSequence.SequenceEqual(_trackMapControlSequence);
-        // Redraw when the surrounding layout was redrawn (it overwrites the map area) or when
-        // the map itself changed (the dots moved). Without the latter the smoothed per-frame
-        // motion never reaches the terminal between layout updates, so the dots jump in step.
+        // The map is drawn over the layout area, so re-send it when the layout redraws (overwriting
+        // it) or when the map image itself changes.
         if (shouldDraw || hasChanged)
         {
             foreach (var sequence in _trackMapControlSequence)
