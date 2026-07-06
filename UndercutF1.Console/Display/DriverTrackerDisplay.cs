@@ -59,7 +59,6 @@ public class DriverTrackerDisplay : IDisplay
     private readonly TimingDataProcessor _timingData;
     private readonly DriverListProcessor _driverList;
     private readonly PositionDataProcessor _positionData;
-    private readonly IDateTimeProvider _dateTimeProvider;
     private readonly TrackPositionSmoother _positionSmoother;
     private readonly CarDataProcessor _carData;
     private readonly SessionInfoProcessor _sessionInfo;
@@ -77,7 +76,6 @@ public class DriverTrackerDisplay : IDisplay
         TimingDataProcessor timingData,
         DriverListProcessor driverList,
         PositionDataProcessor positionData,
-        IDateTimeProvider dateTimeProvider,
         TrackPositionSmoother positionSmoother,
         CarDataProcessor carData,
         SessionInfoProcessor sessionInfo,
@@ -91,7 +89,6 @@ public class DriverTrackerDisplay : IDisplay
         _timingData = timingData;
         _driverList = driverList;
         _positionData = positionData;
-        _dateTimeProvider = dateTimeProvider;
         _positionSmoother = positionSmoother;
         _carData = carData;
         _sessionInfo = sessionInfo;
@@ -325,11 +322,7 @@ public class DriverTrackerDisplay : IDisplay
                     var dotPoint = (x: position.X.Value, y: position.Y.Value);
                     if (
                         _options.Value.EnablePositionSmoothing
-                        && _positionSmoother.TryGetSmoothed(
-                            driverNumber,
-                            _dateTimeProvider.Utc,
-                            out var smoothed
-                        )
+                        && _positionSmoother.TryGetSmoothed(driverNumber, out var smoothed)
                     )
                     {
                         dotPoint = ((int)Math.Round(smoothed.x), (int)Math.Round(smoothed.y));
