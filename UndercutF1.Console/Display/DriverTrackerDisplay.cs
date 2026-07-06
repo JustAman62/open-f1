@@ -59,6 +59,8 @@ public class DriverTrackerDisplay : IDisplay
     private readonly TimingDataProcessor _timingData;
     private readonly DriverListProcessor _driverList;
     private readonly PositionDataProcessor _positionData;
+    private readonly IDateTimeProvider _dateTimeProvider;
+    private readonly TrackPositionSmoother _positionSmoother;
     private readonly CarDataProcessor _carData;
     private readonly SessionInfoProcessor _sessionInfo;
     private readonly TerminalInfoProvider _terminalInfo;
@@ -75,6 +77,8 @@ public class DriverTrackerDisplay : IDisplay
         TimingDataProcessor timingData,
         DriverListProcessor driverList,
         PositionDataProcessor positionData,
+        IDateTimeProvider dateTimeProvider,
+        TrackPositionSmoother positionSmoother,
         CarDataProcessor carData,
         SessionInfoProcessor sessionInfo,
         TerminalInfoProvider terminalInfo,
@@ -87,6 +91,8 @@ public class DriverTrackerDisplay : IDisplay
         _timingData = timingData;
         _driverList = driverList;
         _positionData = positionData;
+        _dateTimeProvider = dateTimeProvider;
+        _positionSmoother = positionSmoother;
         _carData = carData;
         _sessionInfo = sessionInfo;
         _terminalInfo = terminalInfo;
@@ -98,6 +104,12 @@ public class DriverTrackerDisplay : IDisplay
     }
 
     public Screen Screen => Screen.DriverTracker;
+
+    // Redraw faster while smoothing is on so the positions animate; nothing to animate otherwise.
+    public TimeSpan FrameInterval =>
+        _options.Value.EnablePositionSmoothing
+            ? TimeSpan.FromMilliseconds(66)
+            : TimeSpan.FromMilliseconds(IDisplay.DefaultFrameIntervalMs);
 
     public Task<IRenderable> GetContentAsync()
     {
@@ -310,10 +322,19 @@ public class DriverTrackerDisplay : IDisplay
                     _timingData.Latest.Lines[driverNumber].Line == _state.CursorOffset;
                 if (driver.IsSelected || driverHighlighted)
                 {
-                    var (x, y) = TransformPoint(
-                        (x: position.X.Value, y: position.Y.Value),
-                        _transform
-                    );
+                    var dotPoint = (x: position.X.Value, y: position.Y.Value);
+                    if (
+                        _options.Value.EnablePositionSmoothing
+                        && _positionSmoother.TryGetSmoothed(
+                            driverNumber,
+                            _dateTimeProvider.Utc,
+                            out var smoothed
+                        )
+                    )
+                    {
+                        dotPoint = ((int)Math.Round(smoothed.x), (int)Math.Round(smoothed.y));
+                    }
+                    var (x, y) = TransformPoint(dotPoint, _transform);
                     var paint = new SKPaint
                     {
                         Color = SKColor.Parse(driver.TeamColour),
@@ -452,14 +473,16 @@ public class DriverTrackerDisplay : IDisplay
         await Terminal.OutAsync(ControlSequences.MoveCursorTo(TOP_OFFSET, LEFT_OFFSET));
 
         var hasChanged = !_previousTrackMapControlSequence.SequenceEqual(_trackMapControlSequence);
-        // Only draw if we need to, or if the drawing has changed
-        if (shouldDraw || !hasChanged)
+        // Redraw when the surrounding layout was redrawn (it overwrites the map area) or when
+        // the map itself changed (the dots moved). Without the latter the smoothed per-frame
+        // motion never reaches the terminal between layout updates, so the dots jump in step.
+        if (shouldDraw || hasChanged)
         {
             foreach (var sequence in _trackMapControlSequence)
             {
                 await Terminal.OutAsync(sequence);
-                _previousTrackMapControlSequence = _trackMapControlSequence;
             }
+            _previousTrackMapControlSequence = _trackMapControlSequence;
         }
     }
 

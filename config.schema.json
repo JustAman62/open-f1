@@ -40,6 +40,10 @@
       "type": "boolean",
       "description": "Whwther the app should try to prevent the display from turning off/sleeping whilst running.\nThis is similar to running \u003Cc\u003Ecaffeinate -d undercutf1\u003C/c\u003E on macOS."
     },
+    "enablePositionSmoothing": {
+      "type": "boolean",
+      "description": "Whether car positions on the driver tracker glide between updates by fitting a line to\nrecent samples, rather than jumping to each raw sample as it arrives. The smoothed dot\nlags live slightly so it can be fitted from the samples around it.\nDefaults to \u003Csee langword=\u0022true\u0022 /\u003E."
+    },
     "externalPlayerSync": {
       "description": "Options to configure the external player synchronisation service",
       "type": [
