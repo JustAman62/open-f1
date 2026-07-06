@@ -9,7 +9,7 @@
     <PackageVersion Include="JsonSchema.Net.Generation" Version="7.1.2" />
     <PackageVersion Include="LiveChartsCore" Version="2.0.0-rc6.1" />
     <PackageVersion Include="LiveChartsCore.SkiaSharpView" Version="2.0.0-rc6.1" />
-    <PackageVersion Include="Microsoft.AspNetCore.OpenApi" Version="10.0.3" />
+    <PackageVersion Include="Microsoft.AspNetCore.OpenApi" Version="10.0.8" />
     <PackageVersion Include="Microsoft.AspNetCore.SignalR.Client" Version="10.0.3" />
     <PackageVersion Include="Microsoft.CodeAnalysis.Analyzers" Version="3.11.0">
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
