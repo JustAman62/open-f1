@@ -43,9 +43,9 @@ public sealed record ConsoleOptions : LiveTimingOptions
     /// Whether car positions on the driver tracker glide between updates by fitting a line to
     /// recent samples, rather than jumping to each raw sample as it arrives. The smoothed dot
     /// lags live slightly so it can be fitted from the samples around it.
-    /// Defaults to <see langword="true"/>.
+    /// Defaults to <see langword="false"/>.
     /// </summary>
-    public bool EnablePositionSmoothing { get; set; } = true;
+    public bool EnablePositionSmoothing { get; set; } = false;
 
     /// <inheritdoc cref="ExternalPlayerSync.SyncOptions" />
     public ExternalPlayerSync.SyncOptions? ExternalPlayerSync { get; set; }
